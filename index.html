@@ -1946,18 +1946,30 @@
                             : " puntos disponibles.")
                     );
 
-                    map.setView(
+                    // Enfocar el/los vendedores realmente encontrados.
+                    if (matches.length === 1) {
+                        const foundPoint = matches[0];
+                        map.setView([foundPoint.lat, foundPoint.lng], 17);
 
-                        [
-                            sellerPoint.lat,
-                            sellerPoint.lng
-                        ],
+                        const foundMarker = sellerMarkers.find(function(marker) {
+                            return marker.coyoteSellerId === foundPoint.id;
+                        });
 
-                        17
-
-                    );
-
-                    sellerMarker.openPopup();
+                        if (foundMarker) {
+                            foundMarker.openPopup();
+                        }
+                    }
+                    else if (matches.length > 1) {
+                        const bounds = L.latLngBounds(
+                            matches.map(function(point) {
+                                return [point.lat, point.lng];
+                            })
+                        );
+                        map.fitBounds(bounds, {
+                            padding: [60, 60],
+                            maxZoom: 16
+                        });
+                    }
 
                 }
 
@@ -2434,6 +2446,9 @@
         }
 
 
+        window.stopBuyerGuide = stopBuyerGuide;
+
+
         window.openDirectionsToSeller =
             function(sellerId) {
 
@@ -2470,6 +2485,17 @@
 
                             userLocation = {lat: lat, lng: lng};
 
+                            // Leer la posición más reciente del vendedor.
+                            // En la versión local funciona dentro del mismo navegador;
+                            // con backend/realtime esta misma lógica recibirá la posición compartida.
+                            const latestPoint =
+                                sellerPoints.find(function(item) {
+                                    return item.id === buyerGuideSellerId;
+                                }) || point;
+
+                            const sellerLat = latestPoint.lat;
+                            const sellerLng = latestPoint.lng;
+
                             if (buyerGuideMarker &&
                                 map.hasLayer(buyerGuideMarker)) {
                                 buyerGuideMarker.setLatLng([lat, lng]);
@@ -2500,7 +2526,7 @@
                                 map.hasLayer(buyerGuideLine)) {
                                 buyerGuideLine.setLatLngs([
                                     [lat, lng],
-                                    [point.lat, point.lng]
+                                    [sellerLat, sellerLng]
                                 ]);
                             }
                             else {
@@ -2508,7 +2534,7 @@
                                     L.polyline(
                                         [
                                             [lat, lng],
-                                            [point.lat, point.lng]
+                                            [sellerLat, sellerLng]
                                         ],
                                         {
                                             weight: 4,
@@ -2522,8 +2548,8 @@
                                 distanceKm(
                                     lat,
                                     lng,
-                                    point.lat,
-                                    point.lng
+                                    sellerLat,
+                                    sellerLng
                                 );
 
                             setStatus(
@@ -2531,13 +2557,16 @@
                                 (km < 1
                                     ? Math.round(km * 1000) + " m"
                                     : km.toFixed(1) + " km") +
-                                " · siguiendo su posición en COYOTE."
+                                " · siguiendo su posición en COYOTE.<br>" +
+                                '<button onclick="stopBuyerGuide()" ' +
+                                'style="margin-top:7px;border:0;border-radius:7px;padding:7px 9px;background:#333;color:white;cursor:pointer;">' +
+                                '⏹ DETENER SEGUIMIENTO</button>'
                             );
 
                             const bounds =
                                 L.latLngBounds([
                                     [lat, lng],
-                                    [point.lat, point.lng]
+                                    [sellerLat, sellerLng]
                                 ]);
 
                             map.fitBounds(
