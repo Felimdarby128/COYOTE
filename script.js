@@ -17,6 +17,19 @@ let userMarker = null;
 let selectedRadius = 10;
 
 
+/* =========================================================
+   SEGUIR PUNTO DENTRO DE COYOTE
+========================================================= */
+
+let followWatchId = null;
+
+let followUserMarker = null;
+
+let followLine = null;
+
+let followedSellerPoint = null;
+
+
 /*
  * Puntos comerciales.
  *
@@ -103,19 +116,11 @@ function activateSeller() {
             };
 
 
-            /*
-             * Centrar mapa
-             */
-
             map.setView(
                 [lat, lng],
                 17
             );
 
-
-            /*
-             * Mostrar formulario
-             */
 
             document
                 .getElementById("sellerForm")
@@ -156,9 +161,7 @@ function activateSeller() {
 
         {
             enableHighAccuracy: true,
-
             timeout: 10000,
-
             maximumAge: 0
         }
     );
@@ -234,26 +237,14 @@ function createSellerPoint() {
     };
 
 
-    /*
-     * Guardar punto localmente
-     */
-
     localStorage.setItem(
         "coyote_seller_point",
         JSON.stringify(point)
     );
 
 
-    /*
-     * Mostrar punto
-     */
-
     showGreenPoint(point);
 
-
-    /*
-     * Actualizar interfaz
-     */
 
     document
         .getElementById("sellerForm")
@@ -328,7 +319,6 @@ function showGreenPoint(point) {
             "es-PE",
             {
                 dateStyle: "short",
-
                 timeStyle: "short"
             }
         );
@@ -355,6 +345,23 @@ function showGreenPoint(point) {
             </div>
 
             <br>
+
+
+            <button
+                onclick="followSellerPoint()"
+                style="
+                    border:none;
+                    border-radius:8px;
+                    padding:8px;
+                    margin-right:6px;
+                    background:#2980b9;
+                    color:white;
+                    cursor:pointer;
+                "
+            >
+                🧭 Seguir punto
+            </button>
+
 
             <button
                 onclick="deactivateSeller()"
@@ -387,6 +394,9 @@ function showGreenPoint(point) {
 ========================================================= */
 
 function deactivateSeller() {
+
+    stopFollowingSeller(false);
+
 
     localStorage.removeItem(
         "coyote_seller_point"
@@ -548,14 +558,6 @@ function updateReference() {
         );
 
 
-    /*
-     * Por ahora usamos una explicación
-     * general.
-     *
-     * Después podemos conectar esto
-     * con lugares reales cercanos.
-     */
-
     let text = "";
 
 
@@ -631,16 +633,6 @@ function searchProducts() {
     }
 
 
-    /*
-     * En esta primera versión,
-     * buscamos solamente entre
-     * los puntos disponibles
-     * en este navegador.
-     *
-     * Luego será una búsqueda
-     * global.
-     */
-
     const savedSeller =
         localStorage.getItem(
             "coyote_seller_point"
@@ -691,10 +683,6 @@ function searchProducts() {
     );
 
 
-    /*
-     * Actualizar indicadores.
-     */
-
     document
         .getElementById(
             "offerText"
@@ -703,12 +691,6 @@ function searchProducts() {
             matches.length +
             " punto(s)";
 
-
-    /*
-     * Por ahora la intensidad
-     * representa la actividad
-     * de búsqueda local.
-     */
 
     const intensity =
         Math.min(
@@ -737,10 +719,6 @@ function searchProducts() {
                 : "Actividad inicial";
 
 
-    /*
-     * Mensaje.
-     */
-
     if (matches.length > 0) {
 
         updateStatus(
@@ -751,6 +729,32 @@ function searchProducts() {
             "."
         );
 
+
+        /*
+         * Abrimos automáticamente el punto encontrado
+         * para que el comprador pueda pulsar
+         * "SEGUIR PUNTO".
+         */
+
+        const point =
+            matches[0];
+
+
+        map.setView(
+            [
+                point.lat,
+                point.lng
+            ],
+            17
+        );
+
+
+        if (userMarker) {
+
+            userMarker.openPopup();
+
+        }
+
     } else {
 
         updateStatus(
@@ -760,6 +764,510 @@ function searchProducts() {
         );
 
     }
+
+}
+
+
+/* =========================================================
+   SEGUIR PUNTO — NAVEGACIÓN INTERNA COYOTE
+========================================================= */
+
+function followSellerPoint() {
+
+    const saved =
+        localStorage.getItem(
+            "coyote_seller_point"
+        );
+
+
+    if (!saved) {
+
+        updateStatus(
+            "⚠️ Este punto ya no está disponible."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        followedSellerPoint =
+            JSON.parse(saved);
+
+    } catch (error) {
+
+        updateStatus(
+            "⚠️ No se pudo leer la ubicación del vendedor."
+        );
+
+        return;
+    }
+
+
+    if (!navigator.geolocation) {
+
+        updateStatus(
+            "❌ Tu navegador no permite utilizar ubicación."
+        );
+
+        return;
+    }
+
+
+    stopFollowingSeller(false);
+
+
+    updateStatus(
+        "🧭 Buscando tu ubicación..."
+    );
+
+
+    followWatchId =
+        navigator.geolocation.watchPosition(
+
+            function(position) {
+
+                const buyerLat =
+                    position.coords.latitude;
+
+                const buyerLng =
+                    position.coords.longitude;
+
+
+                /*
+                 * Volvemos a consultar la ubicación
+                 * almacenada del vendedor.
+                 */
+
+                const latestSaved =
+                    localStorage.getItem(
+                        "coyote_seller_point"
+                    );
+
+
+                if (latestSaved) {
+
+                    try {
+
+                        const latestPoint =
+                            JSON.parse(
+                                latestSaved
+                            );
+
+
+                        if (
+                            latestPoint &&
+                            latestPoint.active
+                        ) {
+
+                            followedSellerPoint =
+                                latestPoint;
+
+                        }
+
+                    } catch (error) {
+
+                        console.error(error);
+
+                    }
+
+                }
+
+
+                if (!followedSellerPoint) {
+
+                    stopFollowingSeller(false);
+
+                    updateStatus(
+                        "⚠️ El vendedor ya no está disponible."
+                    );
+
+                    return;
+                }
+
+
+                const sellerLat =
+                    followedSellerPoint.lat;
+
+                const sellerLng =
+                    followedSellerPoint.lng;
+
+
+                /* =========================
+                   MARCADOR DEL COMPRADOR
+                ========================= */
+
+                if (!followUserMarker) {
+
+                    followUserMarker =
+                        L.circleMarker(
+
+                            [
+                                buyerLat,
+                                buyerLng
+                            ],
+
+                            {
+                                radius: 7,
+                                weight: 3,
+
+                                color:
+                                    "#2980b9",
+
+                                fillColor:
+                                    "#ffffff",
+
+                                fillOpacity:
+                                    1
+                            }
+
+                        )
+                        .addTo(map)
+                        .bindTooltip(
+                            "Tú",
+                            {
+                                direction:
+                                    "top"
+                            }
+                        );
+
+                } else {
+
+                    followUserMarker
+                        .setLatLng(
+                            [
+                                buyerLat,
+                                buyerLng
+                            ]
+                        );
+
+                }
+
+
+                /* =========================
+                   LÍNEA HACIA EL VENDEDOR
+                ========================= */
+
+                if (!followLine) {
+
+                    followLine =
+                        L.polyline(
+
+                            [
+                                [
+                                    buyerLat,
+                                    buyerLng
+                                ],
+
+                                [
+                                    sellerLat,
+                                    sellerLng
+                                ]
+                            ],
+
+                            {
+                                weight: 4,
+                                opacity: 0.85,
+
+                                dashArray:
+                                    "9 8"
+                            }
+
+                        )
+                        .addTo(map);
+
+                } else {
+
+                    followLine
+                        .setLatLngs(
+
+                            [
+                                [
+                                    buyerLat,
+                                    buyerLng
+                                ],
+
+                                [
+                                    sellerLat,
+                                    sellerLng
+                                ]
+                            ]
+
+                        );
+
+                }
+
+
+                /* =========================
+                   DISTANCIA
+                ========================= */
+
+                const distance =
+                    calculateDistanceKm(
+
+                        buyerLat,
+                        buyerLng,
+
+                        sellerLat,
+                        sellerLng
+
+                    );
+
+
+                const distanceText =
+
+                    distance < 1
+
+                        ? Math.round(
+                            distance * 1000
+                        ) + " m"
+
+                        : distance.toFixed(1) +
+                          " km";
+
+
+                updateStatus(
+
+                    "🧭 <strong>Siguiendo Punto Verde</strong><br>" +
+
+                    "Distancia aproximada: " +
+
+                    "<strong>" +
+                    distanceText +
+                    "</strong>" +
+
+                    "<br><br>" +
+
+                    '<button ' +
+                    'onclick="stopFollowingSeller()" ' +
+                    'style="' +
+                    'border:none;' +
+                    'border-radius:7px;' +
+                    'padding:7px 9px;' +
+                    'background:#333;' +
+                    'color:white;' +
+                    'cursor:pointer;' +
+                    '">' +
+
+                    "⏹ DETENER SEGUIMIENTO" +
+
+                    "</button>"
+
+                );
+
+
+                /* =========================
+                   MOSTRAR AMBOS EN MAPA
+                ========================= */
+
+                const bounds =
+                    L.latLngBounds(
+
+                        [
+                            [
+                                buyerLat,
+                                buyerLng
+                            ],
+
+                            [
+                                sellerLat,
+                                sellerLng
+                            ]
+                        ]
+
+                    );
+
+
+                map.fitBounds(
+
+                    bounds,
+
+                    {
+                        padding:
+                            [60, 60],
+
+                        maxZoom:
+                            17
+                    }
+
+                );
+
+            },
+
+
+            function(error) {
+
+                stopFollowingSeller(false);
+
+
+                if (error.code === 1) {
+
+                    updateStatus(
+                        "❌ Permite tu ubicación para seguir el punto."
+                    );
+
+                } else {
+
+                    updateStatus(
+                        "❌ No se pudo obtener tu ubicación."
+                    );
+
+                }
+
+            },
+
+
+            {
+                enableHighAccuracy:
+                    true,
+
+                maximumAge:
+                    3000,
+
+                timeout:
+                    12000
+            }
+
+        );
+
+}
+
+
+/* =========================================================
+   DETENER SEGUIMIENTO
+========================================================= */
+
+function stopFollowingSeller(
+    showMessage = true
+) {
+
+    if (
+        followWatchId !== null
+    ) {
+
+        navigator.geolocation
+            .clearWatch(
+                followWatchId
+            );
+
+        followWatchId =
+            null;
+
+    }
+
+
+    if (
+        followUserMarker &&
+        map.hasLayer(
+            followUserMarker
+        )
+    ) {
+
+        map.removeLayer(
+            followUserMarker
+        );
+
+    }
+
+
+    if (
+        followLine &&
+        map.hasLayer(
+            followLine
+        )
+    ) {
+
+        map.removeLayer(
+            followLine
+        );
+
+    }
+
+
+    followUserMarker =
+        null;
+
+    followLine =
+        null;
+
+    followedSellerPoint =
+        null;
+
+
+    if (showMessage) {
+
+        updateStatus(
+            "🧭 Seguimiento detenido."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CALCULAR DISTANCIA
+========================================================= */
+
+function calculateDistanceKm(
+    lat1,
+    lng1,
+    lat2,
+    lng2
+) {
+
+    const R =
+        6371;
+
+
+    const toRad =
+        value =>
+            value *
+            Math.PI /
+            180;
+
+
+    const dLat =
+        toRad(
+            lat2 - lat1
+        );
+
+
+    const dLng =
+        toRad(
+            lng2 - lng1
+        );
+
+
+    const a =
+
+        Math.sin(
+            dLat / 2
+        ) ** 2 +
+
+        Math.cos(
+            toRad(lat1)
+        ) *
+
+        Math.cos(
+            toRad(lat2)
+        ) *
+
+        Math.sin(
+            dLng / 2
+        ) ** 2;
+
+
+    return (
+
+        2 *
+        R *
+        Math.asin(
+            Math.sqrt(a)
+        )
+
+    );
 
 }
 
