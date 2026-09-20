@@ -1171,6 +1171,11 @@
 
 
     <!-- =====================================================
+         SUPABASE JS — BACKEND COMPARTIDO COYOTE
+    ====================================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- =====================================================
          JAVASCRIPT COYOTE
     ====================================================== -->
 
@@ -1179,6 +1184,142 @@
         console.log(
             "COYOTE: iniciando..."
         );
+
+
+        // ====================================================
+        // SUPABASE — BACKEND COMPARTIDO
+        // ====================================================
+
+        const COYOTE_SUPABASE_URL =
+            "https://quptqgkcjwkowssovlp.supabase.co";
+
+        const COYOTE_SUPABASE_KEY =
+            "sb_publishable_wes4Oh7SAs3xHNTgI1Xn7g_LFc1TuEt";
+
+        const supabaseClient =
+            window.supabase.createClient(
+                COYOTE_SUPABASE_URL,
+                COYOTE_SUPABASE_KEY
+            );
+
+        let coyoteUser = null;
+        let backendReady = false;
+
+        function rowToSellerPoint(row) {
+            const products = Array.isArray(row.products) ? row.products : [];
+            return {
+                id: row.seller_id,
+                databaseId: row.id,
+                sellerId: row.seller_id,
+                lat: Number(row.latitude),
+                lng: Number(row.longitude),
+                product: products.join(", "),
+                products: products,
+                info: row.description || "",
+                phone: row.phone || "",
+                active: row.active !== false,
+                lastActive: row.last_active || null
+            };
+        }
+
+        function normalizeProducts(value) {
+            return String(value || "")
+                .split(/[,;\n]+/)
+                .map(function(item) { return item.trim(); })
+                .filter(Boolean)
+                .slice(0, 20);
+        }
+
+        async function initSupabaseAuth() {
+            try {
+                const sessionResult =
+                    await supabaseClient.auth.getSession();
+
+                if (sessionResult.error) throw sessionResult.error;
+
+                let session = sessionResult.data.session;
+
+                if (!session) {
+                    const signInResult =
+                        await supabaseClient.auth.signInAnonymously();
+                    if (signInResult.error) throw signInResult.error;
+                    session = signInResult.data.session;
+                }
+
+                coyoteUser = session && session.user ? session.user : null;
+                backendReady = Boolean(coyoteUser);
+                return backendReady;
+            }
+            catch(error) {
+                console.error("COYOTE Supabase Auth:", error);
+                backendReady = false;
+                return false;
+            }
+        }
+
+        async function loadSharedSellerPoints() {
+            try {
+                const result = await supabaseClient
+                    .from("seller_points")
+                    .select("id,seller_id,latitude,longitude,products,description,phone,active,last_active")
+                    .eq("active", true);
+
+                if (result.error) throw result.error;
+
+                sellerPoints = (result.data || []).map(rowToSellerPoint);
+                return sellerPoints;
+            }
+            catch(error) {
+                console.error("COYOTE carga Supabase:", error);
+                return sellerPoints;
+            }
+        }
+
+        async function saveCurrentSellerToSupabase() {
+            if (!sellerPoint) return false;
+
+            if (!backendReady) {
+                const ready = await initSupabaseAuth();
+                if (!ready) return false;
+            }
+
+            const products = normalizeProducts(sellerPoint.product);
+            if (!products.length) return false;
+
+            const now = new Date().toISOString();
+            const payload = {
+                seller_id: coyoteUser.id,
+                latitude: Number(sellerPoint.lat),
+                longitude: Number(sellerPoint.lng),
+                products: products,
+                description: sellerPoint.info || "",
+                phone: sellerPoint.phone || "",
+                active: sellerPoint.active !== false,
+                updated_at: now,
+                last_active: now
+            };
+
+            const result = await supabaseClient
+                .from("seller_points")
+                .upsert(payload, { onConflict: "seller_id" });
+
+            if (result.error) {
+                console.error("COYOTE guardado Supabase:", result.error);
+                return false;
+            }
+
+            sellerPoint.id = coyoteUser.id;
+            sellerPoint.sellerId = coyoteUser.id;
+            sellerPoint.products = products;
+            sellerPoint.lastActive = now;
+
+            localStorage.setItem(
+                "coyote_seller_point",
+                JSON.stringify(sellerPoint)
+            );
+
+            return true;
+        }
 
 
         // ====================================================
@@ -1862,31 +2003,22 @@
         // ====================================================
 
         function getSellerPoints() {
-            try {
-                const saved = JSON.parse(
-                    localStorage.getItem("coyote_seller_points") || "[]"
-                );
-                return Array.isArray(saved) ? saved : [];
-            }
-            catch(error) {
-                return [];
-            }
+            // Los puntos compartidos vienen de Supabase.
+            // localStorage queda solo como respaldo de "mi" Punto Verde.
+            return sellerPoints;
         }
 
         function saveSellerPoints() {
-            localStorage.setItem(
-                "coyote_seller_points",
-                JSON.stringify(sellerPoints)
-            );
+            // Ya no guardamos la red completa de vendedores en este dispositivo.
+            // Supabase es la fuente compartida entre celulares.
         }
 
         function upsertCurrentSellerPoint() {
             if (!sellerPoint) return;
 
-            if (!sellerPoint.id) {
-                sellerPoint.id =
-                    "seller_" + Date.now() + "_" +
-                    Math.random().toString(36).slice(2, 8);
+            if (coyoteUser) {
+                sellerPoint.id = coyoteUser.id;
+                sellerPoint.sellerId = coyoteUser.id;
             }
 
             const index =
@@ -1901,13 +2033,16 @@
                 sellerPoints.push({...sellerPoint});
             }
 
-            saveSellerPoints();
-
-            // Conservamos esta clave para identificar "mi" punto en este navegador.
             localStorage.setItem(
                 "coyote_seller_point",
                 JSON.stringify(sellerPoint)
             );
+
+            saveCurrentSellerToSupabase().then(function(saved) {
+                if (!saved) {
+                    console.warn("COYOTE: el punto quedó local, pendiente de sincronizar.");
+                }
+            });
         }
 
         function clearSellerMarkers() {
@@ -2016,7 +2151,7 @@
         // ====================================================
 
         searchButton.onclick =
-            function() {
+            async function() {
 
 
                 const query =
@@ -2043,6 +2178,9 @@
                     return;
                 }
 
+                setStatus("☁️ Buscando vendedores en COYOTE...");
+                await loadSharedSellerPoints();
+
                 lastSearchDone = true;
                 activityView.classList.remove("hidden");
 
@@ -2057,7 +2195,9 @@
                         }
 
                         const productMatches =
-                            point.product
+                            (Array.isArray(point.products)
+                                ? point.products.join(" ")
+                                : point.product || "")
                                 .toLowerCase()
                                 .includes(query);
 
@@ -2790,7 +2930,6 @@
                 }
 
                 sellerPoints.push(point);
-                saveSellerPoints();
                 renderSellerPoints(sellerPoints);
                 return point;
             };
@@ -2840,9 +2979,10 @@
         // RECUPERAR PUNTO
         // ====================================================
 
-        function loadSeller() {
+        async function loadSeller() {
 
-            sellerPoints = getSellerPoints();
+            await initSupabaseAuth();
+            await loadSharedSellerPoints();
 
             const saved =
                 localStorage.getItem(
@@ -2853,18 +2993,20 @@
                 try {
                     sellerPoint = JSON.parse(saved);
 
-                    if (sellerPoint && !sellerPoint.id) {
-                        sellerPoint.id =
-                            "seller_" + Date.now() + "_" +
-                            Math.random().toString(36).slice(2, 8);
-                    }
+                    if (sellerPoint && coyoteUser) {
+                        // Migramos el identificador local antiguo al UUID anónimo real.
+                        sellerPoint.id = coyoteUser.id;
+                        sellerPoint.sellerId = coyoteUser.id;
 
-                    if (sellerPoint) {
-                        upsertCurrentSellerPoint();
+                        const ownIndex = sellerPoints.findIndex(function(item) {
+                            return item.id === sellerPoint.id;
+                        });
 
-                        sellerProductName.textContent =
-                            sellerPoint.product;
+                        if (ownIndex >= 0) {
+                            sellerPoint = {...sellerPoints[ownIndex]};
+                        }
 
+                        sellerProductName.textContent = sellerPoint.product;
                         chatSellerId = sellerPoint.id;
                         updateSellerInbox();
                         updateSellerPointControls();
@@ -2875,15 +3017,16 @@
                 }
             }
 
-            renderSellerPoints(sellerPoints);
+            // En la portada no mostramos todos los vendedores.
+            // Los Puntos Verdes se muestran al buscar dentro de una Zona Amarilla.
+            clearSellerMarkers();
 
             setStatus(
-                sellerPoint && !sellerPoint.active
-                    ? "🔴 Tu punto verde está desactivado."
-                    : "🐺 COYOTE está listo."
+                backendReady
+                    ? "☁️ COYOTE conectado · listo para buscar y publicar."
+                    : "⚠️ COYOTE abrió, pero no pudo conectar con el backend."
             );
         }
-
 
         // ====================================================
         // INICIAR
