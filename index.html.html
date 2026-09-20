@@ -1,0 +1,3064 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <!-- COYOTE v1 BASE ESTABLE: paneles separados + multipuntos + ruta + popup -->
+<title>COYOTE — Inteligencia Comercial</title>
+
+
+    <!-- =====================================================
+         LEAFLET CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+
+    <!-- =====================================================
+         ESTILOS COYOTE
+    ====================================================== -->
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html,
+        body {
+
+            margin: 0;
+
+            padding: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            overflow: hidden;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+        }
+
+
+        /* =================================================
+           MAPA
+        ================================================= */
+
+        #map {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100vh;
+
+            z-index: 1;
+
+            background: #d8d8d8;
+
+        }
+
+
+        /* =================================================
+           PANEL COYOTE — COMPACTO
+        ================================================= */
+
+        .panel {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            width: 245px;
+            z-index: 1000;
+            padding: 0;
+            background: transparent;
+            color: white;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            backdrop-filter: none;
+        }
+
+        .logo,
+        .subtitle {
+            background: rgba(16,16,16,.94);
+        }
+
+        .logo {
+            padding: 12px 14px 2px;
+            border-radius: 14px 14px 0 0;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            margin: 0;
+        }
+
+        .subtitle {
+            padding: 0 14px 11px;
+            margin: 0 0 10px;
+            border-radius: 0 0 14px 14px;
+            color: #888;
+            font-size: 10px;
+        }
+
+        .section {
+            padding: 0;
+            border: 0;
+        }
+
+        .section + .section {
+            margin-top: 8px;
+        }
+
+        .section h2,
+        .description,
+        .section > label {
+            display: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 8px;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            background: #242424;
+            color: white;
+            outline: none;
+            font-size: 13px;
+        }
+
+        input:focus {
+            border-color: #00ff66;
+        }
+
+        button {
+            cursor: pointer;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 6px;
+            border: 0;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .green {
+            background: #00ff66;
+            color: #06150b;
+        }
+
+        .blue {
+            background: #2997d6;
+            color: white;
+        }
+
+        .gray {
+            background: #333;
+            color: white;
+        }
+
+        .range-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin: 7px 0;
+        }
+
+        .range-button {
+            padding: 7px 2px;
+            border: 1px solid #444;
+            border-radius: 7px;
+            background: #292929;
+            color: #ddd;
+            font-size: 11px;
+        }
+
+        .range-button.active {
+            background: #00ff66;
+            color: #06150b;
+            border-color: #00ff66;
+            font-weight: bold;
+        }
+
+        .reference {
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 7px;
+            background: #252525;
+            color: #aaa;
+            font-size: 10px;
+            line-height: 1.4;
+        }
+
+        .bar {
+            width: 100%;
+            height: 7px;
+            margin-top: 6px;
+            border-radius: 20px;
+            background: #333;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            width: 0%;
+            height: 100%;
+            background: #00ff66;
+            border-radius: 20px;
+            transition: width .5s ease;
+        }
+
+        .status {
+            margin-top: 9px;
+            padding: 8px;
+            border-radius: 8px;
+            background: #252525;
+            color: #999;
+            font-size: 10px;
+            line-height: 1.4;
+        }
+
+        .metric {
+            font-size: 10px;
+            color: #aaa;
+        }
+
+        .metric br {
+            display: none;
+        }
+
+        .coyote-green-marker {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #00ff66;
+            border: 4px solid white;
+            box-shadow:
+                0 0 0 5px rgba(0,255,102,.2),
+                0 0 20px rgba(0,255,102,.9);
+        }
+
+        #sellerView,
+        #sellerDashboardView,
+        #searchView,
+        #sellerInboxView,
+        #chatView,
+        #activityView,
+        #status {
+            background: rgba(16,16,16,.95);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.34);
+        }
+
+        #sellerView,
+        #sellerDashboardView,
+        #searchView,
+        #sellerInboxView,
+        #chatView {
+            padding: 12px;
+        }
+
+        #status {
+            padding: 8px;
+        }
+
+        #sellerDashboardView #sellerProductName,
+        #sellerDashboardView #sellerAdditionalInfo {
+            display:none !important;
+        }
+
+        .seller-side-summary {
+            position:absolute;
+            left:calc(100% + 12px);
+            top:0;
+            width:185px;
+            padding:10px 12px;
+            border-radius:12px;
+            background:rgba(12,12,14,.62);
+            border:1px solid rgba(255,255,255,.14);
+            backdrop-filter:blur(8px);
+            box-shadow:0 8px 22px rgba(0,0,0,.25);
+            color:#fff;
+            font-size:11px;
+            line-height:1.35;
+            pointer-events:none;
+        }
+        .seller-side-summary strong {
+            display:block;
+            font-size:12px;
+            margin-bottom:3px;
+        }
+        .seller-side-summary .summary-muted {
+            color:#aaa;
+            font-size:9px;
+        }
+        .seller-detail-popup {
+            min-width:215px;
+            line-height:1.4;
+        }
+        .seller-detail-popup .popup-title {
+            font-weight:900;
+            font-size:14px;
+            margin-bottom:5px;
+        }
+        .seller-detail-popup .popup-meta {
+            color:#777;
+            font-size:10px;
+            margin-bottom:8px;
+        }
+        @media(max-width:700px) {
+            .seller-side-summary {
+                left:calc(100% + 8px);
+                width:150px;
+            }
+        }
+
+        .seller-actions-main,
+        .seller-actions-secondary {
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:8px;
+        }
+        .seller-actions-main { margin-top:8px; }
+        .seller-actions-secondary { margin-top:8px; }
+        .seller-actions-main .inbox-button,
+        .seller-actions-secondary .inbox-button {
+            margin:0;
+            min-height:42px;
+            padding:8px 6px;
+            font-size:10px;
+        }
+        .seller-actions-secondary .inbox-button {
+            min-height:36px;
+            opacity:.9;
+        }
+        .route-button-active {
+            background:#00d96b !important;
+            color:#07130b !important;
+            border-color:#00ff7b !important;
+        }
+        .route-status {
+            margin-top:8px;
+            padding:7px 9px;
+            border-radius:8px;
+            background:rgba(0,255,102,.08);
+            color:#9dffbd;
+            font-size:10px;
+            line-height:1.35;
+        }
+
+.hidden {
+            display: none !important;
+        }
+
+        .coyote-view {
+            animation: coyoteIn .18s ease;
+        }
+
+        @keyframes coyoteIn {
+            from {
+                opacity: 0;
+                transform: translateY(-3px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-button {
+            width: 100%;
+            padding: 7px;
+            margin-top: 2px;
+            border: 0;
+            border-radius: 7px;
+            background: #292929;
+            color: #aaa;
+            font-size: 10px;
+        }
+
+
+        /* =================================================
+           ACCIONES PRINCIPALES — IDENTIDAD COYOTE
+        ================================================= */
+
+        .main-action-card {
+            width: 100%;
+            border: 0;
+            border-radius: 13px;
+            padding: 14px 12px;
+            background: #202020;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: transform .15s ease, background .15s ease;
+        }
+
+        .main-action-card:hover {
+            background: #262626;
+            transform: translateY(-1px);
+        }
+
+        .green-point-big {
+            display: block;
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 9px;
+            border-radius: 50%;
+            background: #00ff66;
+            border: 5px solid white;
+            box-shadow:
+                0 0 0 6px rgba(0,255,102,.12),
+                0 0 23px rgba(0,255,102,.55);
+            animation: greenPulse 2s infinite;
+        }
+
+        @keyframes greenPulse {
+            0%, 100% {
+                box-shadow:
+                    0 0 0 6px rgba(0,255,102,.10),
+                    0 0 18px rgba(0,255,102,.45);
+            }
+            50% {
+                box-shadow:
+                    0 0 0 10px rgba(0,255,102,.04),
+                    0 0 28px rgba(0,255,102,.75);
+            }
+        }
+
+        .action-title {
+            display: block;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: .3px;
+        }
+
+        .action-help {
+            display: block;
+            margin-top: 4px;
+            color: #aaa;
+            font-size: 10px;
+            font-weight: normal;
+        }
+
+        .home-panel-label {
+            margin: 0 0 7px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .5px;
+            color: #aaa;
+        }
+
+        .home-panel {
+            position: relative;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 14px;
+            background: rgba(16,16,16,.96);
+            box-shadow: 0 8px 24px rgba(0,0,0,.36);
+            overflow: hidden;
+        }
+
+        .home-panel + .home-panel {
+            margin-top: 12px;
+        }
+
+        .home-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .seller-home-panel::before {
+            background: #00ff66;
+            box-shadow: 0 0 12px rgba(0,255,102,.65);
+        }
+
+        .buyer-home-panel::before {
+            background: #ffd400;
+            box-shadow: 0 0 12px rgba(255,212,0,.55);
+        }
+
+        .buyer-home-panel .buyer-search-card {
+            border-color: rgba(255,212,0,.28);
+        }
+
+        .buyer-home-panel .buyer-search-icon {
+            color: #ffd400;
+        }
+
+        .home-divider {
+            height: 1px;
+            margin: 11px 2px;
+            background: #333;
+        }
+
+        .search-home-button {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #3c3c3c;
+            border-radius: 10px;
+            background: #292929;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .search-home-button:hover {
+            background: #303030;
+        }
+
+        .search-home-help {
+            display: block;
+            margin-top: 3px;
+            color: #999;
+            font-size: 10px;
+            font-weight: normal;
+        }
+
+
+        /* =================================================
+           CHAT COYOTE
+        ================================================= */
+
+        .chat-box {
+            margin-top: 8px;
+            border: 1px solid #383838;
+            border-radius: 10px;
+            background: #1c1c1c;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 9px 10px;
+            background: #242424;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            height: 150px;
+            padding: 9px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .chat-message {
+            max-width: 82%;
+            padding: 7px 9px;
+            border-radius: 10px;
+            font-size: 10px;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .chat-message.buyer {
+            align-self: flex-end;
+            background: #2997d6;
+            color: white;
+            border-bottom-right-radius: 3px;
+        }
+
+        .chat-message.seller {
+            align-self: flex-start;
+            background: #2b2b2b;
+            color: #eee;
+            border-bottom-left-radius: 3px;
+        }
+
+        .chat-compose {
+            display: flex;
+            gap: 5px;
+            padding: 7px;
+            border-top: 1px solid #333;
+        }
+
+        .chat-compose input {
+            margin: 0;
+            min-width: 0;
+        }
+
+        .chat-send {
+            width: 42px;
+            border: 0;
+            border-radius: 8px;
+            background: #00ff66;
+            color: #06150b;
+            font-weight: 900;
+        }
+
+        
+
+        /* =================================================
+           PORTADA COYOTE — PUNTO VERDE PROTAGONISTA
+        ================================================= */
+
+        .seller-hero {
+            width: 100%;
+            padding: 17px 12px 15px;
+            border: 1px solid rgba(0,255,102,.22);
+            border-radius: 15px;
+            background:
+                radial-gradient(circle at 50% 34%,
+                    rgba(0,255,102,.10),
+                    rgba(31,31,31,.96) 55%);
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition:
+                transform .16s ease,
+                border-color .16s ease,
+                background .16s ease;
+        }
+
+        .seller-hero:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0,255,102,.48);
+        }
+
+        .green-point-hero {
+            display: block;
+            width: 62px;
+            height: 62px;
+            margin: 1px auto 12px;
+            border-radius: 50%;
+            background: #00ff66;
+            border: 5px solid #fff;
+            box-shadow:
+                0 0 0 7px rgba(0,255,102,.10),
+                0 0 27px rgba(0,255,102,.72);
+            animation: coyoteHeroPulse 2.2s ease-in-out infinite;
+        }
+
+        @keyframes coyoteHeroPulse {
+            0%, 100% {
+                box-shadow:
+                    0 0 0 7px rgba(0,255,102,.09),
+                    0 0 22px rgba(0,255,102,.55);
+            }
+            50% {
+                box-shadow:
+                    0 0 0 11px rgba(0,255,102,.035),
+                    0 0 34px rgba(0,255,102,.82);
+            }
+        }
+
+        .seller-hero-title {
+            display: block;
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: .35px;
+        }
+
+        .seller-hero-help {
+            display: block;
+            margin-top: 5px;
+            color: #aaa;
+            font-size: 10px;
+            font-weight: normal;
+        }
+
+        .buyer-search-card {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #393939;
+            border-radius: 11px;
+            background: #252525;
+            color: white;
+            text-align: left;
+            cursor: pointer;
+            transition:
+                background .15s ease,
+                transform .15s ease;
+        }
+
+        .buyer-search-card:hover {
+            background: #2c2c2c;
+            transform: translateY(-1px);
+        }
+
+        .buyer-search-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            margin-right: 9px;
+            border-radius: 9px;
+            background: #303030;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .buyer-search-copy {
+            display: block;
+            flex: 1;
+        }
+
+        /* =================================================
+           ROLES SEPARADOS
+        ================================================= */
+
+        .role-question {
+            margin: 2px 0 10px;
+            color: #aaa;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .role-card {
+            width: 100%;
+            padding: 13px 12px;
+            margin-bottom: 8px;
+            border: 1px solid #3a3a3a;
+            border-radius: 12px;
+            background: #202020;
+            color: white;
+            text-align: left;
+        }
+
+        .role-card.seller-role {
+            border-color: rgba(0,255,102,.35);
+        }
+
+        .role-icon {
+            display: inline-block;
+            width: 28px;
+            font-size: 18px;
+            vertical-align: middle;
+        }
+
+        .role-copy {
+            display: inline-block;
+            width: calc(100% - 36px);
+            vertical-align: middle;
+        }
+
+        .role-title {
+            display: block;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .role-help {
+            display: block;
+            margin-top: 3px;
+            color: #999;
+            font-size: 9px;
+        }
+
+        .seller-dashboard {
+            text-align: center;
+        }
+
+        .seller-product-name {
+            margin: 6px 0 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .inbox-button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 6px;
+            border: 1px solid #3b3b3b;
+            border-radius: 9px;
+            background: #292929;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .badge {
+            float: right;
+            min-width: 18px;
+            padding: 2px 5px;
+            border-radius: 20px;
+            background: #00ff66;
+            color: #06150b;
+            font-size: 9px;
+        }
+
+/* =================================================
+           MÓVIL
+        ================================================= */
+
+        @media (max-width: 600px) {
+            .panel {
+                top: 8px;
+                left: 8px;
+                width: 225px;
+                padding: 12px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+        }
+
+    </style>
+
+
+<style id="coyote-panel-layer-fix">
+/* Evita que mapa/controles Leaflet se vean por detrás del panel COYOTE */
+.panel {
+    z-index: 2000 !important;
+    isolation: isolate;
+}
+
+/* Las superficies del panel deben ser opacas en sus bordes redondeados */
+.logo,
+.subtitle,
+.home-panel,
+#sellerView,
+#sellerDashboardView,
+#searchView,
+#sellerInboxView,
+#chatView,
+#activityView,
+#status {
+    position: relative;
+    z-index: 2;
+}
+
+/* Leaflet siempre por debajo de la interfaz COYOTE */
+#map {
+    z-index: 1 !important;
+}
+
+.leaflet-control-container {
+    position: relative;
+    z-index: 400;
+}
+
+/* En la zona izquierda, los controles de Leaflet no atraviesan COYOTE */
+.leaflet-top.leaflet-left {
+    z-index: 500 !important;
+}
+</style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =================================================
+         MAPA
+    ================================================== -->
+
+    <div id="map"></div>
+
+
+    <!-- =================================================
+         PANEL COYOTE
+    ================================================== -->
+
+    <aside class="panel">
+
+        <div class="logo">COYOTE</div>
+        <div class="subtitle">Encuentra lo que hay cerca de ti</div>
+        <!-- PANTALLA INICIAL: ELECCIÓN SIMPLE -->
+        <div id="homeView" class="coyote-view">
+
+            <div class="home-panel seller-home-panel">
+                <div class="home-panel-label">¿QUÉ VENDES?</div>
+                <button id="sellerEntryButton" class="seller-hero">
+                    <span class="green-point-hero"></span>
+                    <span class="seller-hero-title">PUNTO VERDE</span>
+                    <span class="seller-hero-help">Activa, administra o entra a tu punto</span>
+                </button>
+            </div>
+
+            <div class="home-panel buyer-home-panel">
+                <div class="home-panel-label">¿QUÉ BUSCAS?</div>
+                <button id="buyerEntryButton" class="buyer-search-card">
+                    <span class="buyer-search-icon">⌕</span>
+                    <span class="buyer-search-copy">
+                        <span class="role-title">BUSCAR PRODUCTO</span>
+                        <span class="role-help">Encuentra vendedores cerca de ti</span>
+                    </span>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- VISTA COMERCIANTE -->
+        <div id="sellerView" class="coyote-view hidden">
+
+            <div style="font-size:11px;font-weight:bold;margin-bottom:8px;">
+                🟢 TU PUNTO VERDE
+            </div>
+
+            <input
+                id="productInput"
+                type="text"
+                placeholder="¿Qué vendes?"
+                autocomplete="off"
+            >
+
+            <input
+                id="sellerInfoInput"
+                type="text"
+                placeholder="Información adicional (opcional)"
+                autocomplete="off"
+                maxlength="180"
+            >
+
+            <button
+                id="confirmSellerButton"
+                class="button green"
+            >
+                ACTIVAR PUNTO VERDE
+            </button>
+
+            <button
+                id="cancelSellerButton"
+                class="back-button"
+            >
+                ← VOLVER
+            </button>
+
+        </div>
+
+
+        <!-- PANEL EXCLUSIVO DEL VENDEDOR -->
+        <div id="sellerDashboardView" class="coyote-view hidden">
+
+            <div class="seller-dashboard">
+                <span class="green-point-big"></span>
+
+                <div style="font-size:11px;font-weight:900;">
+                    TU PUNTO ESTÁ ACTIVO
+                </div>
+
+                <div id="sellerProductName" class="seller-product-name"></div>
+
+                <div id="sellerAdditionalInfo"
+                     style="display:none;margin:-4px 0 10px;color:#aaa;font-size:10px;line-height:1.4;">
+                </div>
+
+                <div id="sellerSideSummary" class="seller-side-summary">
+                    <strong id="sellerSideProduct">Tu punto verde</strong>
+                    <span id="sellerSideState" class="summary-muted">Información básica</span>
+                </div>
+
+                <div class="seller-actions-main">
+                    <button id="sellerInboxButton" class="inbox-button">
+                        💬 MENSAJES
+                        <span id="sellerMessageBadge" class="badge">0</span>
+                    </button>
+                    <button id="routeToggleButton" class="inbox-button">
+                        🛣 ACTIVAR RUTA
+                    </button>
+                </div>
+
+                <div id="routeStatus" class="route-status hidden">
+                    🟢 Ruta activa · compartiendo tu ubicación actual.
+                </div>
+
+                <div class="seller-actions-secondary">
+                    <button id="manageSellerButton" class="inbox-button">⚙ EDITAR</button>
+                    <button id="toggleSellerPointButton" class="inbox-button">🔴 DESACTIVAR</button>
+                </div>
+
+                <button id="sellerBackButton" class="back-button">
+                    ← SALIR DEL PANEL
+                </button>
+            </div>
+
+        </div>
+
+        <!-- VISTA BUSCADOR -->
+        <div id="searchView" class="coyote-view hidden">
+
+            <div style="font-size:11px;font-weight:bold;margin-bottom:8px;">
+                🔎 BUSCAR
+            </div>
+
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="¿Qué necesitas?"
+                autocomplete="off"
+            >
+
+            <div class="range-options">
+
+                <button class="range-button" data-radius="0.05">
+                    50 m
+                </button>
+
+                <button class="range-button" data-radius="0.1">
+                    100 m
+                </button>
+
+                <button class="range-button active" data-radius="0.25">
+                    250 m
+                </button>
+
+                <button class="range-button" data-radius="0.5">
+                    500 m
+                </button>
+
+            </div>
+
+            <div id="referenceText" class="reference">
+                🔎 <strong>250 m</strong><br>
+                Zona comercial cercana.
+            </div>
+
+            <button id="chooseSearchZoneButton" class="button" style="background:#ffd400;color:#171300;">
+                🟡 ELEGIR ZONA EN EL MAPA
+            </button>
+
+            <button
+                id="searchButton"
+                class="button blue"
+            >
+                BUSCAR
+            </button>
+
+            <button
+                id="cancelSearchButton"
+                class="back-button"
+            >
+                ← VOLVER
+            </button>
+
+        </div>
+
+
+        <!-- BANDEJA EXCLUSIVA DEL VENDEDOR -->
+        <div id="sellerInboxView" class="coyote-view hidden">
+
+            <div style="font-size:11px;font-weight:bold;margin-bottom:8px;">
+                💬 MENSAJES RECIBIDOS
+            </div>
+
+            <button id="openSellerConversationButton" class="role-card">
+                <span class="role-icon">👤</span>
+                <span class="role-copy">
+                    <span class="role-title">Interesado</span>
+                    <span id="sellerInboxPreview" class="role-help">
+                        No hay mensajes todavía.
+                    </span>
+                </span>
+            </button>
+
+            <button id="sellerInboxBackButton" class="back-button">
+                ← VOLVER A MI PUNTO
+            </button>
+
+        </div>
+
+        <!-- CONVERSACIÓN CON EL COMERCIANTE -->
+        <div id="chatView" class="coyote-view hidden">
+
+            <div style="font-size:11px;font-weight:bold;margin-bottom:7px;">
+                💬 CONVERSACIÓN
+            </div>
+
+            <div class="chat-box">
+
+                <div class="chat-header">
+                    🟢 Comerciante COYOTE
+                    <div id="chatProduct"
+                         style="font-size:9px;color:#999;margin-top:2px;">
+                    </div>
+                </div>
+
+                <div id="chatMessages" class="chat-messages"></div>
+
+                <div class="chat-compose">
+                    <input
+                        id="chatInput"
+                        type="text"
+                        placeholder="Escribe un mensaje..."
+                        autocomplete="off"
+                    >
+                    <button id="chatSendButton" class="chat-send">
+                        ➤
+                    </button>
+                </div>
+
+            </div>
+
+            <button id="closeChatButton" class="back-button">
+                ← VOLVER AL MAPA
+            </button>
+
+        </div>
+
+
+        <!-- ACTIVIDAD: OCULTA HASTA QUE HAYA BÚSQUEDA -->
+        <div id="activityView" class="coyote-view hidden"
+             style="margin-top:8px;">
+
+            <div style="font-size:10px;color:#aaa;margin-bottom:4px;">
+                📊 Actividad COYOTE
+            </div>
+
+            <div class="metric">
+                Intensidad de búsqueda
+                <div class="bar">
+                    <div id="demandBar" class="bar-fill"></div>
+                </div>
+                <small id="demandText">
+                    Esperando búsquedas...
+                </small>
+            </div>
+
+            <div class="metric" style="margin-top:7px;">
+                Oferta: <strong id="offerText">0 puntos</strong>
+            </div>
+
+            <div class="metric" style="margin-top:4px;">
+                Posibles puntos:
+                <strong id="opportunityText">0</strong>
+            </div>
+
+        </div>
+
+        <div id="status" class="status">
+            🐺 COYOTE está listo.
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         LEAFLET JS
+    ====================================================== -->
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    ></script>
+
+
+
+    <!-- =====================================================
+         SUPABASE JS — BACKEND COMPARTIDO COYOTE
+    ====================================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- =====================================================
+         JAVASCRIPT COYOTE
+    ====================================================== -->
+
+    <script>
+
+        console.log(
+            "COYOTE: iniciando..."
+        );
+
+
+        // ====================================================
+        // SUPABASE — BACKEND COMPARTIDO
+        // ====================================================
+
+        const COYOTE_SUPABASE_URL =
+            "https://quptqgkcjwkowssovlp.supabase.co";
+
+        const COYOTE_SUPABASE_KEY =
+            "sb_publishable_wes4Oh7SAs3xHNTgI1Xn7g_LFc1TuEt";
+
+        const supabaseClient =
+            window.supabase.createClient(
+                COYOTE_SUPABASE_URL,
+                COYOTE_SUPABASE_KEY
+            );
+
+        let coyoteUser = null;
+        let backendReady = false;
+
+        function rowToSellerPoint(row) {
+            const products = Array.isArray(row.products) ? row.products : [];
+            return {
+                id: row.seller_id,
+                databaseId: row.id,
+                sellerId: row.seller_id,
+                lat: Number(row.latitude),
+                lng: Number(row.longitude),
+                product: products.join(", "),
+                products: products,
+                info: row.description || "",
+                phone: row.phone || "",
+                active: row.active !== false,
+                lastActive: row.last_active || null
+            };
+        }
+
+        function normalizeProducts(value) {
+            return String(value || "")
+                .split(/[,;\n]+/)
+                .map(function(item) { return item.trim(); })
+                .filter(Boolean)
+                .slice(0, 20);
+        }
+
+        async function initSupabaseAuth() {
+            try {
+                const sessionResult =
+                    await supabaseClient.auth.getSession();
+
+                if (sessionResult.error) throw sessionResult.error;
+
+                let session = sessionResult.data.session;
+
+                if (!session) {
+                    const signInResult =
+                        await supabaseClient.auth.signInAnonymously();
+                    if (signInResult.error) throw signInResult.error;
+                    session = signInResult.data.session;
+                }
+
+                coyoteUser = session && session.user ? session.user : null;
+                backendReady = Boolean(coyoteUser);
+                return backendReady;
+            }
+            catch(error) {
+                console.error("COYOTE Supabase Auth:", error);
+                backendReady = false;
+                return false;
+            }
+        }
+
+        async function loadSharedSellerPoints() {
+            try {
+                const result = await supabaseClient
+                    .from("seller_points")
+                    .select("id,seller_id,latitude,longitude,products,description,phone,active,last_active")
+                    .eq("active", true);
+
+                if (result.error) throw result.error;
+
+                sellerPoints = (result.data || []).map(rowToSellerPoint);
+                return sellerPoints;
+            }
+            catch(error) {
+                console.error("COYOTE carga Supabase:", error);
+                return sellerPoints;
+            }
+        }
+
+        async function saveCurrentSellerToSupabase() {
+            if (!sellerPoint) return false;
+
+            if (!backendReady) {
+                const ready = await initSupabaseAuth();
+                if (!ready) return false;
+            }
+
+            const products = normalizeProducts(sellerPoint.product);
+            if (!products.length) return false;
+
+            const now = new Date().toISOString();
+            const payload = {
+                seller_id: coyoteUser.id,
+                latitude: Number(sellerPoint.lat),
+                longitude: Number(sellerPoint.lng),
+                products: products,
+                description: sellerPoint.info || "",
+                phone: sellerPoint.phone || "",
+                active: sellerPoint.active !== false,
+                updated_at: now,
+                last_active: now
+            };
+
+            const result = await supabaseClient
+                .from("seller_points")
+                .upsert(payload, { onConflict: "seller_id" });
+
+            if (result.error) {
+                console.error("COYOTE guardado Supabase:", result.error);
+                return false;
+            }
+
+            sellerPoint.id = coyoteUser.id;
+            sellerPoint.sellerId = coyoteUser.id;
+            sellerPoint.products = products;
+            sellerPoint.lastActive = now;
+
+            localStorage.setItem(
+                "coyote_seller_point",
+                JSON.stringify(sellerPoint)
+            );
+
+            return true;
+        }
+
+
+        // ====================================================
+        // MAPA
+        // ====================================================
+
+        const map =
+            L.map("map").setView(
+                [-12.012, -76.836],
+                15
+            );
+
+
+        L.tileLayer(
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                maxZoom: 19,
+
+                attribution:
+                    "&copy; OpenStreetMap contributors"
+            }
+        ).addTo(map);
+
+
+        console.log(
+            "COYOTE: mapa creado"
+        );
+
+
+        // ====================================================
+        // VARIABLES
+        // ====================================================
+
+        let userLocation =
+            null;
+
+        let sellerMarker =
+            null;
+
+        let sellerPoint =
+            null;
+
+        let sellerPoints =
+            [];
+
+        let sellerMarkers =
+            [];
+
+        let selectedRadius =
+            0.25;
+
+        // Centro opcional elegido manualmente por el comprador.
+        // No modifica el mapa base: solo añade un marcador amarillo.
+        let searchLocation = null;
+        let searchZoneMarker = null;
+        let searchZoneBoundary = null;
+        let searchZoneMask = null;
+        let choosingSearchZone = false;
+
+        let lastSearchDone =
+            false;
+
+
+        // ====================================================
+        // VISTAS COYOTE
+        // ====================================================
+
+        const homeView =
+            document.getElementById("homeView");
+
+        const sellerView =
+            document.getElementById("sellerView");
+
+        const searchView =
+            document.getElementById("searchView");
+
+        const activityView =
+            document.getElementById("activityView");
+
+        let openSearchButton = null;
+
+        const cancelSearchButton =
+            document.getElementById("cancelSearchButton");
+
+        const chatView =
+            document.getElementById("chatView");
+
+        const chatMessages =
+            document.getElementById("chatMessages");
+
+        const chatInput =
+            document.getElementById("chatInput");
+
+        const chatSendButton =
+            document.getElementById("chatSendButton");
+
+        const closeChatButton =
+            document.getElementById("closeChatButton");
+
+        const chatProduct =
+            document.getElementById("chatProduct");
+
+
+        function showView(view) {
+
+            if (view === homeView) {
+                activityView.classList.add("hidden");
+            }
+
+            homeView.classList.add("hidden");
+            sellerView.classList.add("hidden");
+            searchView.classList.add("hidden");
+            chatView.classList.add("hidden");
+            sellerDashboardView.classList.add("hidden");
+            sellerInboxView.classList.add("hidden");
+
+            view.classList.remove("hidden");
+        }
+
+
+        // ====================================================
+        // ELEMENTOS
+        // ====================================================
+
+        const sellerEntryButton =
+            document.getElementById("sellerEntryButton");
+
+        const buyerEntryButton =
+            document.getElementById("buyerEntryButton");
+
+        openSearchButton =
+            buyerEntryButton;
+
+        const activateButton =
+            sellerEntryButton;
+
+        const sellerDashboardView =
+            document.getElementById("sellerDashboardView");
+
+        const sellerInboxView =
+            document.getElementById("sellerInboxView");
+
+        const sellerProductName =
+            document.getElementById("sellerProductName");
+
+        const sellerAdditionalInfo =
+            document.getElementById("sellerAdditionalInfo");
+
+        const sellerInboxButton =
+            document.getElementById("sellerInboxButton");
+
+        const manageSellerButton =
+            document.getElementById("manageSellerButton");
+
+        const toggleSellerPointButton =
+            document.getElementById("toggleSellerPointButton");
+
+        const routeToggleButton =
+            document.getElementById("routeToggleButton");
+
+        const routeStatus =
+            document.getElementById("routeStatus");
+
+        const sellerSideProduct =
+            document.getElementById("sellerSideProduct");
+
+        const sellerSideState =
+            document.getElementById("sellerSideState");
+
+        let routeWatchId = null;
+
+        let buyerGuideWatchId = null;
+        let buyerGuideLine = null;
+        let buyerGuideMarker = null;
+        let buyerGuideSellerId = null;
+
+        const sellerMessageBadge =
+            document.getElementById("sellerMessageBadge");
+
+        const sellerBackButton =
+            document.getElementById("sellerBackButton");
+
+        const sellerInboxBackButton =
+            document.getElementById("sellerInboxBackButton");
+
+        const openSellerConversationButton =
+            document.getElementById("openSellerConversationButton");
+
+        const sellerInboxPreview =
+            document.getElementById("sellerInboxPreview");
+
+        const sellerForm = null;
+
+        const productInput =
+            document.getElementById(
+                "productInput"
+            );
+
+        const sellerInfoInput =
+            document.getElementById(
+                "sellerInfoInput"
+            );
+
+        const confirmSellerButton =
+            document.getElementById(
+                "confirmSellerButton"
+            );
+
+        const cancelSellerButton =
+            document.getElementById(
+                "cancelSellerButton"
+            );
+
+        const searchInput =
+            document.getElementById(
+                "searchInput"
+            );
+
+        const searchButton =
+            document.getElementById(
+                "searchButton"
+            );
+
+        const referenceText =
+            document.getElementById(
+                "referenceText"
+            );
+
+        const chooseSearchZoneButton =
+            document.getElementById("chooseSearchZoneButton");
+
+        const status =
+            document.getElementById(
+                "status"
+            );
+
+        const demandBar =
+            document.getElementById(
+                "demandBar"
+            );
+
+        const demandText =
+            document.getElementById(
+                "demandText"
+            );
+
+        const offerText =
+            document.getElementById(
+                "offerText"
+            );
+
+        const opportunityText =
+            document.getElementById(
+                "opportunityText"
+            );
+
+
+        // ====================================================
+        // ESTADO
+        // ====================================================
+
+        function setStatus(
+            message
+        ) {
+
+            status.innerHTML =
+                message;
+
+        }
+
+
+        // ====================================================
+        // ICONO VERDE
+        // ====================================================
+
+        function greenIcon() {
+
+            return L.divIcon({
+
+                className: "",
+
+                html: `
+                    <div class="coyote-green-marker">
+                    </div>
+                `,
+
+                iconSize:
+                    [22,22],
+
+                iconAnchor:
+                    [11,11]
+
+            });
+
+        }
+
+
+        // ====================================================
+        // ACTIVAR GPS
+        // ====================================================
+
+        activateButton.onclick =
+            function() {
+
+                if (sellerPoint) {
+
+                    sellerProductName.textContent =
+                        sellerPoint.product;
+
+                    updateSellerInbox();
+                    updateSellerPointControls();
+                    showView(sellerDashboardView);
+
+                    setStatus("🟢 Panel del vendedor.");
+                    return;
+                }
+
+                setStatus("📍 Buscando tu ubicación...");
+
+                if (!navigator.geolocation) {
+                    setStatus("❌ Este navegador no permite GPS.");
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+
+                    function(position) {
+
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+
+                        map.setView(
+                            [userLocation.lat, userLocation.lng],
+                            17
+                        );
+
+                        showView(sellerView);
+
+                        setStatus(
+                            "📍 Ubicación encontrada.<br>" +
+                            "Ahora escribe qué vendes."
+                        );
+
+                        productInput.focus();
+                    },
+
+                    function(error) {
+
+                        console.error("GPS:", error);
+
+                        setStatus(
+                            "⚠️ No se pudo obtener tu ubicación."
+                        );
+                    },
+
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            };
+
+
+        // ====================================================
+        // ABRIR BUSCADOR
+        // ====================================================
+
+        openSearchButton.onclick =
+            function() {
+
+                showView(searchView);
+
+                setStatus(
+                    "🔎 Escribe qué necesitas y elige el radio."
+                );
+
+                searchInput.focus();
+
+                if (
+                    !userLocation &&
+                    navigator.geolocation
+                ) {
+
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+
+                            userLocation = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                            };
+
+                            map.setView(
+                                [userLocation.lat, userLocation.lng],
+                                15
+                            );
+                        },
+                        function() {
+                            // La búsqueda sigue disponible aunque el usuario
+                            // no autorice su ubicación.
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 8000,
+                            maximumAge: 30000
+                        }
+                    );
+                }
+            };
+
+
+        // ====================================================
+        // PUNTO AMARILLO — CENTRO MANUAL DE BÚSQUEDA
+        // ====================================================
+
+        function yellowSearchIcon() {
+            return L.divIcon({
+                className: "",
+                html: `<div style="width:24px;height:24px;border-radius:50%;background:#ffd400;border:4px solid white;box-shadow:0 0 0 5px rgba(255,212,0,.22),0 0 20px rgba(255,212,0,.85);"></div>`,
+                iconSize: [24,24],
+                iconAnchor: [12,12]
+            });
+        }
+
+        function buildSearchCirclePoints(center, radiusKm, steps = 96) {
+            const points = [];
+            const earthRadiusKm = 6371;
+            const lat1 = center.lat * Math.PI / 180;
+            const lng1 = center.lng * Math.PI / 180;
+            const angularDistance = radiusKm / earthRadiusKm;
+
+            for (let i = 0; i <= steps; i++) {
+                const bearing = (i / steps) * Math.PI * 2;
+                const lat2 = Math.asin(
+                    Math.sin(lat1) * Math.cos(angularDistance) +
+                    Math.cos(lat1) * Math.sin(angularDistance) * Math.cos(bearing)
+                );
+                const lng2 = lng1 + Math.atan2(
+                    Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(lat1),
+                    Math.cos(angularDistance) - Math.sin(lat1) * Math.sin(lat2)
+                );
+                points.push([lat2 * 180 / Math.PI, lng2 * 180 / Math.PI]);
+            }
+            return points;
+        }
+
+        function updateSearchZoneVisual() {
+            if (searchZoneBoundary) {
+                map.removeLayer(searchZoneBoundary);
+                searchZoneBoundary = null;
+            }
+            if (searchZoneMask) {
+                map.removeLayer(searchZoneMask);
+                searchZoneMask = null;
+            }
+            if (!searchLocation) return;
+
+            const circlePoints = buildSearchCirclePoints(searchLocation, selectedRadius);
+
+            searchZoneBoundary = L.circle(
+                [searchLocation.lat, searchLocation.lng],
+                {
+                    radius: selectedRadius * 1000,
+                    color: "#ffd400",
+                    weight: 2,
+                    opacity: 0.95,
+                    fillColor: "#ffd400",
+                    fillOpacity: 0.035,
+                    interactive: false
+                }
+            ).addTo(map);
+
+            const worldRing = [
+                [-85, -180], [-85, 180], [85, 180], [85, -180], [-85, -180]
+            ];
+
+            searchZoneMask = L.polygon(
+                [worldRing, circlePoints.slice().reverse()],
+                {
+                    stroke: false,
+                    fillColor: "#050505",
+                    fillOpacity: 0.62,
+                    fillRule: "evenodd",
+                    interactive: false
+                }
+            ).addTo(map);
+
+            searchZoneMask.bringToBack();
+            searchZoneBoundary.bringToFront();
+            if (searchZoneMarker) searchZoneMarker.bringToFront();
+            sellerMarkers.forEach(function(marker) { marker.bringToFront(); });
+        }
+
+        function clearSearchZone() {
+            choosingSearchZone = false;
+            searchLocation = null;
+
+            if (searchZoneMarker) {
+                map.removeLayer(searchZoneMarker);
+                searchZoneMarker = null;
+            }
+            if (searchZoneBoundary) {
+                map.removeLayer(searchZoneBoundary);
+                searchZoneBoundary = null;
+            }
+            if (searchZoneMask) {
+                map.removeLayer(searchZoneMask);
+                searchZoneMask = null;
+            }
+
+            clearSellerMarkers();
+            activityView.classList.add("hidden");
+            offerText.textContent = "0 puntos";
+            opportunityText.textContent = "0";
+            demandBar.style.width = "0%";
+            demandText.textContent = "Esperando búsquedas...";
+            chooseSearchZoneButton.textContent = "🟡 ELEGIR ZONA EN EL MAPA";
+            updateReference();
+            setStatus("🟡 Zona retirada. Marca otra zona para volver a mostrar resultados.");
+        }
+
+        chooseSearchZoneButton.onclick = function() {
+            if (searchLocation) {
+                clearSearchZone();
+                return;
+            }
+
+            choosingSearchZone = true;
+            clearSellerMarkers();
+            chooseSearchZoneButton.textContent = "🟡 TOCA UNA ZONA DEL MAPA";
+            setStatus("🟡 Toca cualquier lugar del mapa para marcar la zona de búsqueda.");
+        };
+
+        map.on("click", function(event) {
+            if (!choosingSearchZone) return;
+
+            searchLocation = {
+                lat: event.latlng.lat,
+                lng: event.latlng.lng
+            };
+
+            searchZoneMarker = L.marker(event.latlng, {icon: yellowSearchIcon()})
+                .addTo(map)
+                .bindPopup("🟡 Centro de búsqueda COYOTE");
+
+            choosingSearchZone = false;
+            chooseSearchZoneButton.textContent = "✕ QUITAR ZONA AMARILLA";
+            updateSearchZoneVisual();
+            searchZoneMarker.openPopup();
+            updateReference();
+            setStatus("🟡 Zona marcada. El área clara es el radio activo; pulsa BUSCAR.");
+        });
+
+        cancelSearchButton.onclick =
+            function() {
+
+                showView(homeView);
+
+                setStatus(
+                    "🐺 COYOTE está listo."
+                );
+            };
+
+
+        // ====================================================
+        // CREAR PUNTO VERDE
+        // ====================================================
+
+        confirmSellerButton.onclick =
+            function() {
+
+
+                if (!userLocation) {
+
+                    setStatus(
+                        "❌ Primero activa tu ubicación."
+                    );
+
+                    return;
+
+                }
+
+
+                const product =
+                    productInput.value.trim();
+
+
+                if (!product) {
+
+                    setStatus(
+                        "⚠️ Escribe qué vendes."
+                    );
+
+                    productInput.focus();
+
+                    return;
+
+                }
+
+
+                const previousSellerId =
+                    sellerPoint && sellerPoint.id
+                        ? sellerPoint.id
+                        : "seller_" + Date.now() + "_" +
+                          Math.random().toString(36).slice(2, 8);
+
+                sellerPoint = {
+
+                    id:
+                        previousSellerId,
+
+                    lat:
+                        userLocation.lat,
+
+                    lng:
+                        userLocation.lng,
+
+                    product:
+                        product,
+
+                    info:
+                        sellerInfoInput.value.trim(),
+
+                    active:
+                        true
+
+                };
+
+
+                localStorage.setItem(
+
+                    "coyote_seller_point",
+
+                    JSON.stringify(
+                        sellerPoint
+                    )
+
+                );
+
+
+                showSellerPoint();
+
+
+                sellerProductName.textContent = product;
+                updateSellerInbox();
+                updateSellerPointControls();
+                showView(sellerDashboardView);
+
+                setStatus(
+                    "🟢 <strong>Punto verde activo.</strong><br>" +
+                    "Vendes: " +
+                    escapeHTML(product)
+                );
+
+            };
+
+
+        // ====================================================
+        // CANCELAR
+        // ====================================================
+
+        cancelSellerButton.onclick =
+            function() {
+
+                productInput.value = "";
+                sellerInfoInput.value = "";
+
+                showView(homeView);
+
+                setStatus(
+                    "🐺 COYOTE está listo."
+                );
+
+            };
+
+
+        // ====================================================
+        // PUNTOS VERDES — MÚLTIPLES VENDEDORES
+        // ====================================================
+
+        function getSellerPoints() {
+            // Los puntos compartidos vienen de Supabase.
+            // localStorage queda solo como respaldo de "mi" Punto Verde.
+            return sellerPoints;
+        }
+
+        function saveSellerPoints() {
+            // Ya no guardamos la red completa de vendedores en este dispositivo.
+            // Supabase es la fuente compartida entre celulares.
+        }
+
+        function upsertCurrentSellerPoint() {
+            if (!sellerPoint) return;
+
+            if (coyoteUser) {
+                sellerPoint.id = coyoteUser.id;
+                sellerPoint.sellerId = coyoteUser.id;
+            }
+
+            const index =
+                sellerPoints.findIndex(function(item) {
+                    return item.id === sellerPoint.id;
+                });
+
+            if (index >= 0) {
+                sellerPoints[index] = {...sellerPoint};
+            }
+            else {
+                sellerPoints.push({...sellerPoint});
+            }
+
+            localStorage.setItem(
+                "coyote_seller_point",
+                JSON.stringify(sellerPoint)
+            );
+
+            saveCurrentSellerToSupabase().then(function(saved) {
+                if (!saved) {
+                    console.warn("COYOTE: el punto quedó local, pendiente de sincronizar.");
+                }
+            });
+        }
+
+        function clearSellerMarkers() {
+            sellerMarkers.forEach(function(marker) {
+                if (map.hasLayer(marker)) {
+                    map.removeLayer(marker);
+                }
+            });
+            sellerMarkers = [];
+            sellerMarker = null;
+        }
+
+        function popupHTML(point) {
+            return `
+                <div class="seller-detail-popup">
+                    <div class="popup-title">🟢 ${escapeHTML(point.product)}</div>
+                    <div class="popup-meta">Punto Verde COYOTE</div>
+
+                    ${
+                        point.info
+                            ? `<div><strong>Información adicional</strong><br>${escapeHTML(point.info)}</div>`
+                            : `<div style="color:#777;">Sin información adicional.</div>`
+                    }
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;">
+                        <button
+                            onclick="openChatForSeller('${point.id}')"
+                            style="padding:8px;border:0;border-radius:7px;background:#20242a;color:white;font-weight:bold;"
+                        >💬 MENSAJE</button>
+
+                        <button
+                            onclick="openDirectionsToSeller('${point.id}')"
+                            style="padding:8px;border:0;border-radius:7px;background:#00a8e8;color:white;font-weight:bold;"
+                        >🧭 SEGUIR PUNTO</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSellerPoints(points) {
+            clearSellerMarkers();
+
+            if (sellerPoint) {
+                updateSellerSideSummary();
+            }
+
+            (points || []).forEach(function(point) {
+                if (!point.active) return;
+
+                const marker =
+                    L.marker(
+                        [point.lat, point.lng],
+                        { icon: greenIcon() }
+                    ).addTo(map);
+
+                marker.coyoteSellerId = point.id;
+                marker.bindPopup(popupHTML(point));
+                sellerMarkers.push(marker);
+
+                if (sellerPoint && point.id === sellerPoint.id) {
+                    sellerMarker = marker;
+                }
+            });
+        }
+
+
+        // ====================================================
+        // MOSTRAR PUNTO
+        // ====================================================
+
+        function showSellerPoint() {
+
+            if (!sellerPoint) {
+                return;
+            }
+
+            upsertCurrentSellerPoint();
+            renderSellerPoints(sellerPoints);
+        }
+
+
+        // ====================================================
+        // DISTANCIA ENTRE DOS PUNTOS (HAVERSINE)
+        // ====================================================
+
+        function distanceKm(lat1, lng1, lat2, lng2) {
+
+            const R = 6371;
+            const toRad = value => value * Math.PI / 180;
+
+            const dLat = toRad(lat2 - lat1);
+            const dLng = toRad(lng2 - lng1);
+
+            const a =
+                Math.sin(dLat / 2) ** 2 +
+                Math.cos(toRad(lat1)) *
+                Math.cos(toRad(lat2)) *
+                Math.sin(dLng / 2) ** 2;
+
+            return 2 * R * Math.asin(Math.sqrt(a));
+        }
+
+
+        // ====================================================
+        // BUSCAR
+        // ====================================================
+
+        searchButton.onclick =
+            async function() {
+
+
+                const query =
+                    searchInput.value
+                        .trim()
+                        .toLowerCase();
+
+
+                if (!query) {
+
+                    setStatus(
+                        "⚠️ Escribe qué estás buscando."
+                    );
+
+                    return;
+
+                }
+
+
+                if (!searchLocation) {
+                    clearSellerMarkers();
+                    activityView.classList.add("hidden");
+                    setStatus("🟡 Primero marca una zona amarilla en el mapa.");
+                    return;
+                }
+
+                setStatus("☁️ Buscando vendedores en COYOTE...");
+                await loadSharedSellerPoints();
+
+                lastSearchDone = true;
+                activityView.classList.remove("hidden");
+
+                let found =
+                    false;
+
+                const matches =
+                    sellerPoints.filter(function(point) {
+
+                        if (!point.active) {
+                            return false;
+                        }
+
+                        const productMatches =
+                            (Array.isArray(point.products)
+                                ? point.products.join(" ")
+                                : point.product || "")
+                                .toLowerCase()
+                                .includes(query);
+
+                        if (!productMatches) {
+                            return false;
+                        }
+
+                        const searchCenter = searchLocation;
+
+                        if (!searchCenter) {
+                            return false;
+                        }
+
+                        const km =
+                            distanceKm(
+                                searchCenter.lat,
+                                searchCenter.lng,
+                                point.lat,
+                                point.lng
+                            );
+
+                        return km <= selectedRadius;
+                    });
+
+                found = matches.length > 0;
+
+                renderSellerPoints(matches);
+
+                if (found) {
+
+                    offerText.textContent =
+                        matches.length === 1
+                            ? "1 punto"
+                            : matches.length + " puntos";
+
+                    opportunityText.textContent =
+                        String(matches.length);
+
+                    demandBar.style.width =
+                        "70%";
+
+                    demandText.textContent =
+                        "Búsqueda activa";
+
+                    setStatus(
+                        "🟢 COYOTE encontró " +
+                        escapeHTML(query) +
+                        " en " +
+                        matches.length +
+                        (matches.length === 1
+                            ? " punto disponible."
+                            : " puntos disponibles.")
+                    );
+
+                    const firstMatch = matches[0];
+                    const firstMarker = sellerMarkers.find(function(marker) {
+                        return marker.coyoteSellerId === firstMatch.id;
+                    });
+
+                    if (firstMatch) {
+                        map.setView(
+                            [firstMatch.lat, firstMatch.lng],
+                            17
+                        );
+                    }
+
+                    if (firstMarker) {
+                        firstMarker.openPopup();
+                    }
+
+                }
+
+                else {
+
+                    offerText.textContent =
+                        "0 puntos";
+
+                    opportunityText.textContent =
+                        "0";
+
+                    demandBar.style.width =
+                        "20%";
+
+                    demandText.textContent =
+                        "Sin oferta localizada";
+
+                    setStatus(
+                        "🔎 No encontramos " +
+                        escapeHTML(query) +
+                        " todavía."
+                    );
+
+                }
+
+            };
+
+
+        // ====================================================
+        // RADIOS
+        // ====================================================
+
+        document
+            .querySelectorAll(
+                ".range-button"
+            )
+            .forEach(
+
+                function(button) {
+
+                    button.onclick =
+                        function() {
+
+
+                            document
+                                .querySelectorAll(
+                                    ".range-button"
+                                )
+                                .forEach(
+
+                                    function(item) {
+
+                                        item.classList.remove(
+                                            "active"
+                                        );
+
+                                    }
+
+                                );
+
+
+                            this.classList.add(
+                                "active"
+                            );
+
+
+                            selectedRadius =
+                                Number(
+                                    this.dataset.radius
+                                );
+
+
+                            updateReference();
+                            if (searchLocation) {
+                                updateSearchZoneVisual();
+                                clearSellerMarkers();
+                                activityView.classList.add("hidden");
+                                setStatus("🟡 Radio actualizado. Pulsa BUSCAR para mostrar los puntos de esta zona.");
+                            }
+
+                        };
+
+                }
+
+            );
+
+
+        // ====================================================
+        // REFERENCIA
+        // ====================================================
+
+        function updateReference() {
+
+
+            let description;
+
+
+            if (
+                selectedRadius === 0.05
+            ) {
+
+                description =
+                    "Inmediaciones.";
+
+            }
+
+            else if (
+                selectedRadius === 0.1
+            ) {
+
+                description =
+                    "Unas pocas cuadras.";
+
+            }
+
+            else if (
+                selectedRadius === 0.050
+            ) {
+
+                description =
+                    "Zona comercial cercana.";
+
+            }
+
+            else {
+
+                description =
+                    "Búsqueda local más amplia.";
+
+            }
+
+
+            referenceText.innerHTML = `
+
+                🔎 <strong>
+                    ${Math.round(selectedRadius * 1000)} m
+                </strong>
+
+                <br>
+
+                ${description}
+                <br>
+                <span style="color:${searchLocation ? '#ffd400' : '#999'}">
+                    ${searchLocation ? '🟡 Centro: zona marcada en el mapa' : '🟡 Marca una zona para buscar'}
+                </span>
+
+            `;
+
+        }
+
+
+        // ====================================================
+        // MENSAJE
+        // ====================================================
+
+        let chatMode = "buyer";
+        let chatSellerId = null;
+
+
+        function updateSellerInbox() {
+
+            if (sellerPoint && sellerPoint.id) {
+                chatSellerId = sellerPoint.id;
+            }
+
+            const messages = getChatMessages();
+
+            const buyerMessages =
+                messages.filter(function(item) {
+                    return item.role === "buyer";
+                });
+
+            const lastSellerTime =
+                messages
+                    .filter(function(item) {
+                        return item.role === "seller";
+                    })
+                    .reduce(function(max, item) {
+                        return Math.max(max, item.time || 0);
+                    }, 0);
+
+            const unreadBuyerMessages =
+                buyerMessages.filter(function(item) {
+                    return (item.time || 0) > lastSellerTime;
+                });
+
+            sellerMessageBadge.textContent =
+                unreadBuyerMessages.length;
+
+            sellerInboxPreview.textContent =
+                buyerMessages.length
+                    ? buyerMessages[buyerMessages.length - 1].text
+                    : "No hay mensajes todavía.";
+        }
+
+
+        sellerInboxButton.onclick =
+            function() {
+                chatSellerId = sellerPoint ? sellerPoint.id : null;
+                updateSellerInbox();
+                showView(sellerInboxView);
+                setStatus("💬 Bandeja del vendedor.");
+            };
+
+
+        function updateSellerPointControls() {
+            updateSellerSideSummary();
+
+
+            if (!sellerPoint) {
+                return;
+            }
+
+            if (sellerPoint.active) {
+                toggleSellerPointButton.textContent =
+                    "🔴 DESACTIVAR";
+                sellerProductName.textContent =
+                    sellerPoint.product;
+            }
+            else {
+                toggleSellerPointButton.textContent =
+                    "🟢 ACTIVAR";
+                sellerProductName.textContent =
+                    sellerPoint.product + " · punto desactivado";
+            }
+
+            if (sellerPoint.info) {
+                sellerAdditionalInfo.textContent =
+                    sellerPoint.info;
+                sellerAdditionalInfo.style.display =
+                    "block";
+            }
+            else {
+                sellerAdditionalInfo.textContent = "";
+                sellerAdditionalInfo.style.display =
+                    "none";
+            }
+        }
+
+
+        function updateSellerSideSummary() {
+            if (!sellerPoint) return;
+            sellerSideProduct.textContent =
+                sellerPoint.product || "Tu punto verde";
+            sellerSideState.textContent =
+                sellerPoint.active
+                    ? "🟢 Visible en el mapa"
+                    : "⚫ Punto desactivado";
+        }
+
+
+        function stopSellerRoute(showMessage = true) {
+            if (routeWatchId !== null) {
+                navigator.geolocation.clearWatch(routeWatchId);
+                routeWatchId = null;
+            }
+            routeToggleButton.textContent = "🛣 ACTIVAR RUTA";
+            routeToggleButton.classList.remove("route-button-active");
+            routeStatus.classList.add("hidden");
+            if (showMessage) setStatus("⏹ Ruta detenida.");
+        }
+
+        function startSellerRoute() {
+            if (!sellerPoint || !sellerPoint.active) {
+                setStatus("Activa primero tu Punto Verde.");
+                return;
+            }
+            if (!navigator.geolocation) {
+                setStatus("Tu navegador no permite ubicación.");
+                return;
+            }
+
+            routeToggleButton.textContent = "⏹ DETENER RUTA";
+            routeToggleButton.classList.add("route-button-active");
+            routeStatus.classList.remove("hidden");
+            setStatus("🟢 Activando ruta...");
+
+            routeWatchId = navigator.geolocation.watchPosition(
+                function(position) {
+                    sellerPoint.lat = position.coords.latitude;
+                    sellerPoint.lng = position.coords.longitude;
+                    sellerPoint.updatedAt = Date.now();
+                    upsertCurrentSellerPoint();
+                    renderSellerPoints(sellerPoints);
+                    setStatus("🛣 Ruta activa · ubicación actualizada.");
+                },
+                function(error) {
+                    stopSellerRoute(false);
+                    setStatus(
+                        error.code === 1
+                            ? "Permite tu ubicación para activar la ruta."
+                            : "No se pudo actualizar tu ubicación."
+                    );
+                },
+                {
+                    enableHighAccuracy:true,
+                    maximumAge:5000,
+                    timeout:12000
+                }
+            );
+        }
+
+        routeToggleButton.onclick =
+            function() {
+                routeWatchId === null
+                    ? startSellerRoute()
+                    : stopSellerRoute();
+            };
+
+
+        toggleSellerPointButton.onclick =
+            function() {
+
+                if (!sellerPoint) {
+                    setStatus("⚠️ Todavía no tienes un punto verde.");
+                    return;
+                }
+
+                sellerPoint.active = !sellerPoint.active;
+
+                if (!sellerPoint.active && routeWatchId !== null) {
+                    stopSellerRoute(false);
+                }
+
+                upsertCurrentSellerPoint();
+
+                if (sellerPoint.active) {
+
+                    renderSellerPoints(sellerPoints);
+
+                    map.setView(
+                        [sellerPoint.lat, sellerPoint.lng],
+                        17
+                    );
+
+                    setStatus(
+                        "🟢 <strong>Punto verde activado.</strong><br>" +
+                        "Ya vuelve a estar visible."
+                    );
+                }
+                else {
+
+                    renderSellerPoints(sellerPoints);
+
+                    setStatus(
+                        "🔴 <strong>Punto verde desactivado.</strong><br>" +
+                        "Tu información se conserva para reactivarlo después."
+                    );
+                }
+
+                updateSellerPointControls();
+            };
+
+
+        manageSellerButton.onclick =
+            function() {
+
+                productInput.value =
+                    sellerPoint ? sellerPoint.product : "";
+
+                sellerInfoInput.value =
+                    sellerPoint && sellerPoint.info
+                        ? sellerPoint.info
+                        : "";
+
+                if (sellerPoint) {
+                    userLocation = {
+                        lat: sellerPoint.lat,
+                        lng: sellerPoint.lng
+                    };
+                }
+
+                showView(sellerView);
+
+                setStatus(
+                    "⚙ Puedes actualizar lo que vendes."
+                );
+
+                productInput.focus();
+            };
+
+
+        sellerBackButton.onclick =
+            function() {
+                showView(homeView);
+                setStatus("🐺 COYOTE está listo.");
+            };
+
+
+        sellerInboxBackButton.onclick =
+            function() {
+                showView(sellerDashboardView);
+                setStatus("🟢 Panel del vendedor.");
+            };
+
+
+        openSellerConversationButton.onclick =
+            function() {
+                chatSellerId = sellerPoint ? sellerPoint.id : null;
+                openChat("seller");
+            };
+
+
+        function chatStorageKey() {
+            const id =
+                chatSellerId ||
+                (sellerPoint && sellerPoint.id) ||
+                "default";
+
+            return "coyote_chat_messages_" + id;
+        }
+
+        function getChatMessages() {
+
+            try {
+                return JSON.parse(
+                    localStorage.getItem(chatStorageKey()) || "[]"
+                );
+            }
+            catch(error) {
+                return [];
+            }
+        }
+
+
+        function saveChatMessages(messages) {
+
+            localStorage.setItem(
+                chatStorageKey(),
+                JSON.stringify(messages)
+            );
+        }
+
+
+        function renderChat() {
+
+            const messages = getChatMessages();
+
+            chatMessages.innerHTML = "";
+
+            messages.forEach(function(item) {
+
+                const bubble = document.createElement("div");
+
+                const mine =
+                    item.role === chatMode;
+
+                bubble.className =
+                    "chat-message " +
+                    (mine ? "buyer" : "seller");
+
+                bubble.textContent = item.text;
+
+                chatMessages.appendChild(bubble);
+            });
+
+            chatMessages.scrollTop =
+                chatMessages.scrollHeight;
+        }
+
+
+        function stopBuyerGuide(showMessage = true) {
+
+            if (buyerGuideWatchId !== null) {
+                navigator.geolocation.clearWatch(buyerGuideWatchId);
+                buyerGuideWatchId = null;
+            }
+
+            if (buyerGuideLine && map.hasLayer(buyerGuideLine)) {
+                map.removeLayer(buyerGuideLine);
+            }
+
+            if (buyerGuideMarker && map.hasLayer(buyerGuideMarker)) {
+                map.removeLayer(buyerGuideMarker);
+            }
+
+            buyerGuideLine = null;
+            buyerGuideMarker = null;
+            buyerGuideSellerId = null;
+
+            if (showMessage) {
+                setStatus("🧭 Guía COYOTE detenida.");
+            }
+        }
+
+
+        window.openDirectionsToSeller =
+            function(sellerId) {
+
+                const point =
+                    sellerPoints.find(function(item) {
+                        return item.id === sellerId;
+                    });
+
+                if (!point) {
+                    setStatus("No se encontró este vendedor.");
+                    return;
+                }
+
+                const url =
+                    "https://www.google.com/maps/dir/?api=1" +
+                    "&destination=" +
+                    encodeURIComponent(point.lat + "," + point.lng) +
+                    "&travelmode=walking";
+
+                window.open(url, "_blank");
+            };
+
+
+        window.openChatForSeller =
+            function(sellerId) {
+
+                chatSellerId = sellerId;
+                openChat("buyer");
+            };
+
+
+        function openChat(mode) {
+
+            if (mode === "seller" || mode === "buyer") {
+                chatMode = mode;
+            }
+
+            showView(chatView);
+
+            const chatSeller =
+                sellerPoints.find(function(point) {
+                    return point.id === chatSellerId;
+                }) || sellerPoint;
+
+            chatProduct.textContent =
+                chatSeller
+                    ? (chatMode === "seller"
+                        ? "Respondiendo por: " + chatSeller.product
+                        : "Producto: " + chatSeller.product)
+                    : "";
+
+            renderChat();
+
+            setStatus(
+                "💬 Conversación con el comerciante."
+            );
+
+            setTimeout(function() {
+                chatInput.focus();
+            }, 50);
+        }
+
+
+        function sendChatMessage() {
+
+            const text =
+                chatInput.value.trim();
+
+            if (!text) {
+                return;
+            }
+
+            const messages =
+                getChatMessages();
+
+            messages.push({
+                role: chatMode,
+                text: text,
+                time: Date.now()
+            });
+
+            saveChatMessages(messages);
+
+            chatInput.value = "";
+
+            renderChat();
+            updateSellerInbox();
+
+            setStatus(
+                chatMode === "seller"
+                    ? "💬 Respuesta del vendedor guardada."
+                    : "💬 Mensaje enviado al vendedor."
+            );
+        }
+
+
+        chatSendButton.onclick =
+            sendChatMessage;
+
+
+        chatInput.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (event.key === "Enter") {
+                    sendChatMessage();
+                }
+            }
+        );
+
+
+        closeChatButton.onclick =
+            function() {
+
+                if (chatMode === "seller") {
+                    updateSellerInbox();
+                    showView(sellerInboxView);
+                    setStatus("💬 Bandeja del vendedor.");
+                }
+                else {
+                    showView(searchView);
+                    setStatus("🔎 Continúa buscando productos.");
+                }
+            };
+
+
+        // Herramienta temporal de prueba:
+        // permite simular la respuesta del comerciante desde la consola.
+        window.coyoteSellerReply =
+            function(text) {
+
+                if (!text) {
+                    return;
+                }
+
+                const messages =
+                    getChatMessages();
+
+                messages.push({
+                    role: "seller",
+                    text: String(text),
+                    time: Date.now()
+                });
+
+                saveChatMessages(messages);
+
+                if (!chatView.classList.contains("hidden")) {
+                    renderChat();
+                }
+            };
+
+
+        // Herramienta de prueba local:
+        // coyoteAddDemoSeller("Pan", -12.01, -76.83, "Horario 8 a 6")
+        window.coyoteAddDemoSeller =
+            function(product, lat, lng, info) {
+
+                const point = {
+                    id:
+                        "demo_" + Date.now() + "_" +
+                        Math.random().toString(36).slice(2, 8),
+                    lat: Number(lat),
+                    lng: Number(lng),
+                    product: String(product || "").trim(),
+                    info: String(info || "").trim(),
+                    active: true
+                };
+
+                if (
+                    !point.product ||
+                    !Number.isFinite(point.lat) ||
+                    !Number.isFinite(point.lng)
+                ) {
+                    return false;
+                }
+
+                sellerPoints.push(point);
+                renderSellerPoints(sellerPoints);
+                return point;
+            };
+
+
+        // ====================================================
+        // ESCAPAR HTML
+        // ====================================================
+
+        function escapeHTML(
+            value
+        ) {
+
+            return String(
+                value
+            )
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+        }
+
+
+        // ====================================================
+        // RECUPERAR PUNTO
+        // ====================================================
+
+        async function loadSeller() {
+
+            await initSupabaseAuth();
+            await loadSharedSellerPoints();
+
+            const saved =
+                localStorage.getItem(
+                    "coyote_seller_point"
+                );
+
+            if (saved) {
+                try {
+                    sellerPoint = JSON.parse(saved);
+
+                    if (sellerPoint && coyoteUser) {
+                        // Migramos el identificador local antiguo al UUID anónimo real.
+                        sellerPoint.id = coyoteUser.id;
+                        sellerPoint.sellerId = coyoteUser.id;
+
+                        const ownIndex = sellerPoints.findIndex(function(item) {
+                            return item.id === sellerPoint.id;
+                        });
+
+                        if (ownIndex >= 0) {
+                            sellerPoint = {...sellerPoints[ownIndex]};
+                        }
+
+                        sellerProductName.textContent = sellerPoint.product;
+                        chatSellerId = sellerPoint.id;
+                        updateSellerInbox();
+                        updateSellerPointControls();
+                    }
+                }
+                catch(error) {
+                    console.error("COYOTE:", error);
+                }
+            }
+
+            // En la portada no mostramos todos los vendedores.
+            // Los Puntos Verdes se muestran al buscar dentro de una Zona Amarilla.
+            clearSellerMarkers();
+
+            setStatus(
+                backendReady
+                    ? "☁️ COYOTE conectado · listo para buscar y publicar."
+                    : "⚠️ COYOTE abrió, pero no pudo conectar con el backend."
+            );
+        }
+
+        // ====================================================
+        // INICIAR
+        // ====================================================
+
+        loadSeller();
+
+
+        // ====================================================
+        // IMPORTANTE
+        // REDIBUJAR MAPA
+        // ====================================================
+
+        setTimeout(
+
+            function() {
+
+                map.invalidateSize();
+
+            },
+
+            500
+
+        );
+
+
+        console.log(
+            "COYOTE: LISTO"
+        );
+
+    </script>
+
+</body>
+
+</html>
