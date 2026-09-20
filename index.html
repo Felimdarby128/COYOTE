@@ -1234,6 +1234,8 @@
         // No modifica el mapa base: solo añade un marcador amarillo.
         let searchLocation = null;
         let searchZoneMarker = null;
+        let searchZoneBoundary = null;
+        let searchZoneMask = null;
         let choosingSearchZone = false;
 
         let lastSearchDone =
@@ -1603,10 +1605,113 @@
             });
         }
 
+        function buildSearchCirclePoints(center, radiusKm, steps = 96) {
+            const points = [];
+            const earthRadiusKm = 6371;
+            const lat1 = center.lat * Math.PI / 180;
+            const lng1 = center.lng * Math.PI / 180;
+            const angularDistance = radiusKm / earthRadiusKm;
+
+            for (let i = 0; i <= steps; i++) {
+                const bearing = (i / steps) * Math.PI * 2;
+                const lat2 = Math.asin(
+                    Math.sin(lat1) * Math.cos(angularDistance) +
+                    Math.cos(lat1) * Math.sin(angularDistance) * Math.cos(bearing)
+                );
+                const lng2 = lng1 + Math.atan2(
+                    Math.sin(bearing) * Math.sin(angularDistance) * Math.cos(lat1),
+                    Math.cos(angularDistance) - Math.sin(lat1) * Math.sin(lat2)
+                );
+                points.push([lat2 * 180 / Math.PI, lng2 * 180 / Math.PI]);
+            }
+            return points;
+        }
+
+        function updateSearchZoneVisual() {
+            if (searchZoneBoundary) {
+                map.removeLayer(searchZoneBoundary);
+                searchZoneBoundary = null;
+            }
+            if (searchZoneMask) {
+                map.removeLayer(searchZoneMask);
+                searchZoneMask = null;
+            }
+            if (!searchLocation) return;
+
+            const circlePoints = buildSearchCirclePoints(searchLocation, selectedRadius);
+
+            searchZoneBoundary = L.circle(
+                [searchLocation.lat, searchLocation.lng],
+                {
+                    radius: selectedRadius * 1000,
+                    color: "#ffd400",
+                    weight: 2,
+                    opacity: 0.95,
+                    fillColor: "#ffd400",
+                    fillOpacity: 0.035,
+                    interactive: false
+                }
+            ).addTo(map);
+
+            const worldRing = [
+                [-85, -180], [-85, 180], [85, 180], [85, -180], [-85, -180]
+            ];
+
+            searchZoneMask = L.polygon(
+                [worldRing, circlePoints.slice().reverse()],
+                {
+                    stroke: false,
+                    fillColor: "#050505",
+                    fillOpacity: 0.62,
+                    fillRule: "evenodd",
+                    interactive: false
+                }
+            ).addTo(map);
+
+            searchZoneMask.bringToBack();
+            searchZoneBoundary.bringToFront();
+            if (searchZoneMarker) searchZoneMarker.bringToFront();
+            sellerMarkers.forEach(function(marker) { marker.bringToFront(); });
+        }
+
+        function clearSearchZone() {
+            choosingSearchZone = false;
+            searchLocation = null;
+
+            if (searchZoneMarker) {
+                map.removeLayer(searchZoneMarker);
+                searchZoneMarker = null;
+            }
+            if (searchZoneBoundary) {
+                map.removeLayer(searchZoneBoundary);
+                searchZoneBoundary = null;
+            }
+            if (searchZoneMask) {
+                map.removeLayer(searchZoneMask);
+                searchZoneMask = null;
+            }
+
+            clearSellerMarkers();
+            activityView.classList.add("hidden");
+            offerText.textContent = "0 puntos";
+            opportunityText.textContent = "0";
+            demandBar.style.width = "0%";
+            demandText.textContent = "Esperando búsquedas...";
+            chooseSearchZoneButton.textContent = "🟡 ELEGIR ZONA EN EL MAPA";
+            updateReference();
+            setStatus("🟡 Zona retirada. Marca otra zona para volver a mostrar resultados.");
+        }
+
         chooseSearchZoneButton.onclick = function() {
+            if (searchLocation) {
+                clearSearchZone();
+                return;
+            }
+
             choosingSearchZone = true;
+            clearSellerMarkers();
             chooseSearchZoneButton.textContent = "🟡 TOCA UNA ZONA DEL MAPA";
-            setStatus("🟡 Toca cualquier lugar del mapa para centrar allí tu búsqueda.");
+            setStatus("🟡 Toca cualquier lugar del mapa para marcar la zona de búsqueda.");
         };
 
         map.on("click", function(event) {
@@ -1617,19 +1722,16 @@
                 lng: event.latlng.lng
             };
 
-            if (searchZoneMarker) {
-                searchZoneMarker.setLatLng(event.latlng);
-            } else {
-                searchZoneMarker = L.marker(event.latlng, {icon: yellowSearchIcon()})
-                    .addTo(map)
-                    .bindPopup("🟡 Centro de búsqueda COYOTE");
-            }
+            searchZoneMarker = L.marker(event.latlng, {icon: yellowSearchIcon()})
+                .addTo(map)
+                .bindPopup("🟡 Centro de búsqueda COYOTE");
 
-            searchZoneMarker.openPopup();
             choosingSearchZone = false;
-            chooseSearchZoneButton.textContent = "🟡 CAMBIAR ZONA EN EL MAPA";
+            chooseSearchZoneButton.textContent = "✕ QUITAR ZONA AMARILLA";
+            updateSearchZoneVisual();
+            searchZoneMarker.openPopup();
             updateReference();
-            setStatus("🟡 Zona seleccionada. Elige el radio y pulsa BUSCAR.");
+            setStatus("🟡 Zona marcada. El área clara es el radio activo; pulsa BUSCAR.");
         });
 
         cancelSearchButton.onclick =
@@ -1934,6 +2036,13 @@
                 }
 
 
+                if (!searchLocation) {
+                    clearSellerMarkers();
+                    activityView.classList.add("hidden");
+                    setStatus("🟡 Primero marca una zona amarilla en el mapa.");
+                    return;
+                }
+
                 lastSearchDone = true;
                 activityView.classList.remove("hidden");
 
@@ -1956,10 +2065,10 @@
                             return false;
                         }
 
-                        const searchCenter = searchLocation || userLocation;
+                        const searchCenter = searchLocation;
 
                         if (!searchCenter) {
-                            return true;
+                            return false;
                         }
 
                         const km =
@@ -2091,6 +2200,12 @@
 
 
                             updateReference();
+                            if (searchLocation) {
+                                updateSearchZoneVisual();
+                                clearSellerMarkers();
+                                activityView.classList.add("hidden");
+                                setStatus("🟡 Radio actualizado. Pulsa BUSCAR para mostrar los puntos de esta zona.");
+                            }
 
                         };
 
@@ -2155,7 +2270,7 @@
                 ${description}
                 <br>
                 <span style="color:${searchLocation ? '#ffd400' : '#999'}">
-                    ${searchLocation ? '🟡 Centro: zona elegida en el mapa' : '📍 Centro: tu ubicación'}
+                    ${searchLocation ? '🟡 Centro: zona marcada en el mapa' : '🟡 Marca una zona para buscar'}
                 </span>
 
             `;
