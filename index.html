@@ -1017,27 +1017,27 @@
 
             <div class="range-options">
 
-                <button class="range-button" data-radius="1">
-                    1 km
+                <button class="range-button" data-radius="0.05">
+                    50 m
                 </button>
 
-                <button class="range-button" data-radius="3">
-                    3 km
+                <button class="range-button" data-radius="0.1">
+                    100 m
                 </button>
 
-                <button class="range-button active" data-radius="10">
-                    10 km
+                <button class="range-button active" data-radius="0.25">
+                    250 m
                 </button>
 
-                <button class="range-button" data-radius="20">
-                    20 km
+                <button class="range-button" data-radius="0.5">
+                    500 m
                 </button>
 
             </div>
 
             <div id="referenceText" class="reference">
-                🔎 <strong>10 km</strong><br>
-                Zona amplia alrededor de ti.
+                🔎 <strong>250 m</strong><br>
+                Zona comercial cercana.
             </div>
 
             <button id="chooseSearchZoneButton" class="button" style="background:#ffd400;color:#171300;">
@@ -1228,7 +1228,7 @@
             [];
 
         let selectedRadius =
-            10;
+            0.25;
 
         // Centro opcional elegido manualmente por el comprador.
         // No modifica el mapa base: solo añade un marcador amarillo.
@@ -1240,54 +1240,6 @@
 
         let lastSearchDone =
             false;
-
-        // ====================================================
-        // ANTI-SPAM LOCAL — PREPARADO PARA MIGRAR AL BACKEND
-        // ====================================================
-        const COYOTE_POINT_TTL_MS = 8 * 60 * 60 * 1000; // 8 horas
-        const COYOTE_RATE_WINDOW_MS = 60 * 1000;
-        const COYOTE_RATE_MAX_CHANGES = 6;
-        const COYOTE_CONCENTRATION_RADIUS_KM = 0.25;
-        const COYOTE_CONCENTRATION_REFERENCE = 10;
-
-        function normalizeProducts(value) {
-            return String(value || "")
-                .split(/[\n,;]+/)
-                .map(function(item) { return item.trim(); })
-                .filter(Boolean)
-                .slice(0, 20);
-        }
-
-        function productText(point) {
-            if (Array.isArray(point.products) && point.products.length) {
-                return point.products.join(" · ");
-            }
-            return String(point.product || "");
-        }
-
-        function isPointFresh(point) {
-            if (!point || !point.active) return false;
-            const stamp = Number(point.last_active || point.updatedAt || point.created_at || 0);
-            // Compatibilidad: los puntos antiguos sin fecha siguen visibles en esta fase local.
-            return !stamp || (Date.now() - stamp <= COYOTE_POINT_TTL_MS);
-        }
-
-        function allowManualSellerChange() {
-            const key = "coyote_seller_change_times";
-            const now = Date.now();
-            let times = [];
-            try { times = JSON.parse(localStorage.getItem(key) || "[]"); } catch(e) {}
-            times = (Array.isArray(times) ? times : []).filter(function(t) {
-                return now - Number(t) < COYOTE_RATE_WINDOW_MS;
-            });
-            if (times.length >= COYOTE_RATE_MAX_CHANGES) {
-                setStatus("⚠️ Demasiados cambios seguidos. Espera un momento antes de modificar otra vez tu Punto Verde.");
-                return false;
-            }
-            times.push(now);
-            localStorage.setItem(key, JSON.stringify(times));
-            return true;
-        }
 
 
         // ====================================================
@@ -1829,10 +1781,6 @@
                 }
 
 
-                if (!allowManualSellerChange()) {
-                    return;
-                }
-
                 const previousSellerId =
                     sellerPoint && sellerPoint.id
                         ? sellerPoint.id
@@ -1853,23 +1801,11 @@
                     product:
                         product,
 
-                    products:
-                        normalizeProducts(product),
-
                     info:
                         sellerInfoInput.value.trim(),
 
                     active:
-                        true,
-
-                    created_at:
-                        sellerPoint && sellerPoint.created_at ? sellerPoint.created_at : Date.now(),
-
-                    last_active:
-                        Date.now(),
-
-                    updatedAt:
-                        Date.now()
+                        true
 
                 };
 
@@ -1888,7 +1824,7 @@
                 showSellerPoint();
 
 
-                sellerProductName.textContent = productText(sellerPoint);
+                sellerProductName.textContent = product;
                 updateSellerInbox();
                 updateSellerPointControls();
                 showView(sellerDashboardView);
@@ -1930,23 +1866,7 @@
                 const saved = JSON.parse(
                     localStorage.getItem("coyote_seller_points") || "[]"
                 );
-                if (!Array.isArray(saved)) return [];
-
-                // Anti-duplicado: un ID de vendedor solo puede producir un Punto Verde.
-                const unique = new Map();
-                saved.forEach(function(point) {
-                    if (!point || !point.id) return;
-                    const normalized = {...point};
-                    normalized.products = normalizeProducts(
-                        Array.isArray(point.products) ? point.products.join(",") : point.product
-                    );
-                    normalized.product = normalized.products.join(" · ") || String(point.product || "");
-                    const previous = unique.get(point.id);
-                    const currentStamp = Number(point.updatedAt || point.last_active || 0);
-                    const previousStamp = previous ? Number(previous.updatedAt || previous.last_active || 0) : -1;
-                    if (!previous || currentStamp >= previousStamp) unique.set(point.id, normalized);
-                });
-                return Array.from(unique.values());
+                return Array.isArray(saved) ? saved : [];
             }
             catch(error) {
                 return [];
@@ -1968,14 +1888,6 @@
                     "seller_" + Date.now() + "_" +
                     Math.random().toString(36).slice(2, 8);
             }
-
-            sellerPoint.products = normalizeProducts(
-                Array.isArray(sellerPoint.products) ? sellerPoint.products.join(",") : sellerPoint.product
-            );
-            sellerPoint.product = sellerPoint.products.join(" · ") || String(sellerPoint.product || "");
-            sellerPoint.created_at = sellerPoint.created_at || Date.now();
-            sellerPoint.updatedAt = Date.now();
-            if (sellerPoint.active) sellerPoint.last_active = Date.now();
 
             const index =
                 sellerPoints.findIndex(function(item) {
@@ -2011,7 +1923,7 @@
         function popupHTML(point) {
             return `
                 <div class="seller-detail-popup">
-                    <div class="popup-title">🟢 ${escapeHTML(productText(point))}</div>
+                    <div class="popup-title">🟢 ${escapeHTML(point.product)}</div>
                     <div class="popup-meta">Punto Verde COYOTE</div>
 
                     ${
@@ -2043,7 +1955,7 @@
             }
 
             (points || []).forEach(function(point) {
-                if (!isPointFresh(point)) return;
+                if (!point.active) return;
 
                 const marker =
                     L.marker(
@@ -2099,23 +2011,6 @@
         }
 
 
-        function concentrationLevel(matches, query) {
-            let maxNearby = 0;
-            (matches || []).forEach(function(a) {
-                let nearby = 0;
-                (matches || []).forEach(function(b) {
-                    if (a.id === b.id) return;
-                    if (!productText(b).toLowerCase().includes(query)) return;
-                    if (distanceKm(a.lat, a.lng, b.lat, b.lng) <= COYOTE_CONCENTRATION_RADIUS_KM) nearby++;
-                });
-                maxNearby = Math.max(maxNearby, nearby + 1);
-            });
-            return {
-                count: maxNearby,
-                high: maxNearby >= COYOTE_CONCENTRATION_REFERENCE
-            };
-        }
-
         // ====================================================
         // BUSCAR
         // ====================================================
@@ -2157,12 +2052,12 @@
                 const matches =
                     sellerPoints.filter(function(point) {
 
-                        if (!isPointFresh(point)) {
+                        if (!point.active) {
                             return false;
                         }
 
                         const productMatches =
-                            productText(point)
+                            point.product
                                 .toLowerCase()
                                 .includes(query);
 
@@ -2188,7 +2083,6 @@
                     });
 
                 found = matches.length > 0;
-                const concentration = concentrationLevel(matches, query);
 
                 renderSellerPoints(matches);
 
@@ -2331,36 +2225,36 @@
 
 
             if (
-                selectedRadius === 1
+                selectedRadius === 0.05
             ) {
 
                 description =
-                    "Zona inmediata.";
+                    "Inmediaciones.";
 
             }
 
             else if (
-                selectedRadius === 3
+                selectedRadius === 0.1
             ) {
 
                 description =
-                    "Sectores cercanos.";
+                    "Unas pocas cuadras.";
 
             }
 
             else if (
-                selectedRadius === 10
+                selectedRadius === 0.050
             ) {
 
                 description =
-                    "Zona amplia alrededor de ti.";
+                    "Zona comercial cercana.";
 
             }
 
             else {
 
                 description =
-                    "Varias zonas de tu entorno.";
+                    "Búsqueda local más amplia.";
 
             }
 
@@ -2368,7 +2262,7 @@
             referenceText.innerHTML = `
 
                 🔎 <strong>
-                    ${selectedRadius} km
+                    ${Math.round(selectedRadius * 1000)} m
                 </strong>
 
                 <br>
@@ -2515,7 +2409,6 @@
                     sellerPoint.lat = position.coords.latitude;
                     sellerPoint.lng = position.coords.longitude;
                     sellerPoint.updatedAt = Date.now();
-                    sellerPoint.last_active = Date.now();
                     upsertCurrentSellerPoint();
                     renderSellerPoints(sellerPoints);
                     setStatus("🛣 Ruta activa · ubicación actualizada.");
@@ -2552,12 +2445,7 @@
                     return;
                 }
 
-                if (!allowManualSellerChange()) {
-                    return;
-                }
-
                 sellerPoint.active = !sellerPoint.active;
-                if (sellerPoint.active) sellerPoint.last_active = Date.now();
 
                 if (!sellerPoint.active && routeWatchId !== null) {
                     stopSellerRoute(false);
@@ -2889,12 +2777,8 @@
                     lat: Number(lat),
                     lng: Number(lng),
                     product: String(product || "").trim(),
-                    products: normalizeProducts(product),
                     info: String(info || "").trim(),
-                    active: true,
-                    created_at: Date.now(),
-                    last_active: Date.now(),
-                    updatedAt: Date.now()
+                    active: true
                 };
 
                 if (
@@ -2979,7 +2863,7 @@
                         upsertCurrentSellerPoint();
 
                         sellerProductName.textContent =
-                            productText(sellerPoint);
+                            sellerPoint.product;
 
                         chatSellerId = sellerPoint.id;
                         updateSellerInbox();
