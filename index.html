@@ -1040,6 +1040,10 @@
                 Zona amplia alrededor de ti.
             </div>
 
+            <button id="chooseSearchZoneButton" class="button" style="background:#ffd400;color:#171300;">
+                🟡 ELEGIR ZONA EN EL MAPA
+            </button>
+
             <button
                 id="searchButton"
                 class="button blue"
@@ -1226,6 +1230,12 @@
         let selectedRadius =
             10;
 
+        // Centro opcional elegido manualmente por el comprador.
+        // No modifica el mapa base: solo añade un marcador amarillo.
+        let searchLocation = null;
+        let searchZoneMarker = null;
+        let choosingSearchZone = false;
+
         let lastSearchDone =
             false;
 
@@ -1394,6 +1404,9 @@
             document.getElementById(
                 "referenceText"
             );
+
+        const chooseSearchZoneButton =
+            document.getElementById("chooseSearchZoneButton");
 
         const status =
             document.getElementById(
@@ -1576,6 +1589,48 @@
                 }
             };
 
+
+        // ====================================================
+        // PUNTO AMARILLO — CENTRO MANUAL DE BÚSQUEDA
+        // ====================================================
+
+        function yellowSearchIcon() {
+            return L.divIcon({
+                className: "",
+                html: `<div style="width:24px;height:24px;border-radius:50%;background:#ffd400;border:4px solid white;box-shadow:0 0 0 5px rgba(255,212,0,.22),0 0 20px rgba(255,212,0,.85);"></div>`,
+                iconSize: [24,24],
+                iconAnchor: [12,12]
+            });
+        }
+
+        chooseSearchZoneButton.onclick = function() {
+            choosingSearchZone = true;
+            chooseSearchZoneButton.textContent = "🟡 TOCA UNA ZONA DEL MAPA";
+            setStatus("🟡 Toca cualquier lugar del mapa para centrar allí tu búsqueda.");
+        };
+
+        map.on("click", function(event) {
+            if (!choosingSearchZone) return;
+
+            searchLocation = {
+                lat: event.latlng.lat,
+                lng: event.latlng.lng
+            };
+
+            if (searchZoneMarker) {
+                searchZoneMarker.setLatLng(event.latlng);
+            } else {
+                searchZoneMarker = L.marker(event.latlng, {icon: yellowSearchIcon()})
+                    .addTo(map)
+                    .bindPopup("🟡 Centro de búsqueda COYOTE");
+            }
+
+            searchZoneMarker.openPopup();
+            choosingSearchZone = false;
+            chooseSearchZoneButton.textContent = "🟡 CAMBIAR ZONA EN EL MAPA";
+            updateReference();
+            setStatus("🟡 Zona seleccionada. Elige el radio y pulsa BUSCAR.");
+        });
 
         cancelSearchButton.onclick =
             function() {
@@ -1901,14 +1956,16 @@
                             return false;
                         }
 
-                        if (!userLocation) {
+                        const searchCenter = searchLocation || userLocation;
+
+                        if (!searchCenter) {
                             return true;
                         }
 
                         const km =
                             distanceKm(
-                                userLocation.lat,
-                                userLocation.lng,
+                                searchCenter.lat,
+                                searchCenter.lng,
                                 point.lat,
                                 point.lng
                             );
@@ -2096,6 +2153,10 @@
                 <br>
 
                 ${description}
+                <br>
+                <span style="color:${searchLocation ? '#ffd400' : '#999'}">
+                    ${searchLocation ? '🟡 Centro: zona elegida en el mapa' : '📍 Centro: tu ubicación'}
+                </span>
 
             `;
 
