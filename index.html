@@ -1253,6 +1253,19 @@
             catch(error) {
                 console.error("COYOTE Supabase Auth:", error);
                 backendReady = false;
+
+                const authMessage =
+                    error && error.message
+                        ? error.message
+                        : String(error || "Error desconocido");
+
+                window.coyoteAuthError = authMessage;
+
+                setStatus(
+                    "❌ <strong>AUTH ERROR SUPABASE</strong><br>" +
+                    escapeHTML(authMessage)
+                );
+
                 return false;
             }
         }
@@ -3031,11 +3044,12 @@
             // Los Puntos Verdes se muestran al buscar dentro de una Zona Amarilla.
             clearSellerMarkers();
 
-            setStatus(
-                backendReady
-                    ? "☁️ COYOTE conectado · listo para buscar y publicar."
-                    : "⚠️ COYOTE abrió, pero no pudo conectar con el backend."
-            );
+            if (backendReady) {
+                setStatus("☁️ COYOTE conectado · listo para buscar y publicar.");
+            }
+            else if (!window.coyoteAuthError) {
+                setStatus("⚠️ COYOTE abrió, pero no pudo conectar con el backend.");
+            }
         }
 
         // ====================================================
