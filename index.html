@@ -1301,10 +1301,16 @@
 
             const result = await supabaseClient
                 .from("seller_points")
-                .upsert(payload, { onConflict: "seller_id" });
+                .upsert(payload, { onConflict: "seller_id" })
+                .select("id,seller_id")
+                .single();
 
             if (result.error) {
                 console.error("COYOTE guardado Supabase:", result.error);
+                setStatus(
+                    "❌ Supabase rechazó el Punto Verde.<br>" +
+                    escapeHTML(result.error.message || "Error desconocido")
+                );
                 return false;
             }
 
@@ -1891,7 +1897,7 @@
         // ====================================================
 
         confirmSellerButton.onclick =
-            function() {
+            async function() {
 
 
                 if (!userLocation) {
@@ -1962,7 +1968,7 @@
                 );
 
 
-                showSellerPoint();
+                const savedInCloud = await showSellerPoint();
 
 
                 sellerProductName.textContent = product;
@@ -1970,11 +1976,13 @@
                 updateSellerPointControls();
                 showView(sellerDashboardView);
 
-                setStatus(
-                    "🟢 <strong>Punto verde activo.</strong><br>" +
-                    "Vendes: " +
-                    escapeHTML(product)
-                );
+                if (savedInCloud) {
+                    setStatus(
+                        "☁️🟢 <strong>Punto verde guardado en Supabase.</strong><br>" +
+                        "Vendes: " + escapeHTML(product)
+                    );
+                }
+                // Si falla, saveCurrentSellerToSupabase ya muestra el error exacto.
 
             };
 
@@ -2013,8 +2021,8 @@
             // Supabase es la fuente compartida entre celulares.
         }
 
-        function upsertCurrentSellerPoint() {
-            if (!sellerPoint) return;
+        async function upsertCurrentSellerPoint() {
+            if (!sellerPoint) return false;
 
             if (coyoteUser) {
                 sellerPoint.id = coyoteUser.id;
@@ -2038,11 +2046,12 @@
                 JSON.stringify(sellerPoint)
             );
 
-            saveCurrentSellerToSupabase().then(function(saved) {
-                if (!saved) {
-                    console.warn("COYOTE: el punto quedó local, pendiente de sincronizar.");
-                }
-            });
+            const saved = await saveCurrentSellerToSupabase();
+            if (!saved) {
+                console.warn("COYOTE: el punto quedó local, pendiente de sincronizar.");
+                return false;
+            }
+            return true;
         }
 
         function clearSellerMarkers() {
@@ -2113,14 +2122,15 @@
         // MOSTRAR PUNTO
         // ====================================================
 
-        function showSellerPoint() {
+        async function showSellerPoint() {
 
             if (!sellerPoint) {
-                return;
+                return false;
             }
 
-            upsertCurrentSellerPoint();
+            const saved = await upsertCurrentSellerPoint();
             renderSellerPoints(sellerPoints);
+            return saved;
         }
 
 
