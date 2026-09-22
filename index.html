@@ -11,7 +11,7 @@
     >
 
     <!-- COYOTE v1 BASE ESTABLE: paneles separados + multipuntos + ruta + popup -->
-<title>COYOTE — Inteligencia Comercial</title>
+<title>MAHPE — Inteligencia Comercial</title>
 
 
     <!-- =====================================================
@@ -254,11 +254,9 @@
             width: 22px;
             height: 22px;
             border-radius: 50%;
-            background: #00ff66;
-            border: 4px solid white;
-            box-shadow:
-                0 0 0 5px rgba(0,255,102,.2),
-                0 0 20px rgba(0,255,102,.9);
+            background: #00e965;
+            border: 4px solid #ffffff;
+            box-shadow: 0 0 10px rgba(0,233,101,.38);
         }
 
         #sellerView,
@@ -421,6 +419,84 @@
         .main-action-card:hover {
             background: #262626;
             transform: translateY(-1px);
+        }
+
+        /* =================================================
+           GIRO 3D MAHPE — INDICADOR CIRCULAR
+           Inspirado en el gesto de voltear una paleta,
+           sin copiar su forma física.
+        ================================================= */
+        .mahpe-palette-stage {
+            width: 78px;
+            height: 78px;
+            margin: 2px auto 12px;
+            perspective: 800px;
+        }
+
+        .mahpe-palette {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform .78s cubic-bezier(.2,.75,.2,1);
+        }
+
+        .mahpe-palette.is-active {
+            transform: rotateY(180deg);
+        }
+
+        .mahpe-palette-face {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border: 3px solid rgba(255,255,255,.82);
+            box-shadow: 0 5px 14px rgba(0,0,0,.30);
+        }
+
+        .mahpe-palette-back {
+            background: #3a3a3a;
+            color: #c7c7c7;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: .8px;
+        }
+
+        .mahpe-palette-front {
+            transform: rotateY(180deg);
+            background: #00e965;
+            border: 5px solid #ffffff;
+            box-shadow:
+                0 0 0 1px rgba(0,233,101,.10),
+                0 0 16px rgba(0,233,101,.34),
+                0 5px 14px rgba(0,0,0,.26);
+        }
+
+        /* La cara activa es el propio Punto Verde: sin aro ni círculo interior. */
+        .mahpe-palette-dot {
+            display: none;
+        }
+
+        /* El estado activo se entiende visualmente: no necesita texto externo. */
+        #sellerPointStateTitle {
+            display: none !important;
+        }
+
+        #sellerDashboardView {
+            transition: background .55s ease, border-color .55s ease;
+        }
+        #sellerDashboardView.mahpe-business-live {
+            background: rgba(16,16,16,.95);
+            border-color: rgba(0,255,102,.18);
+            box-shadow: 0 8px 24px rgba(0,0,0,.34);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mahpe-palette { transition: none; }
         }
 
         .green-point-big {
@@ -828,6 +904,239 @@
             }
         }
 
+
+        /* =================================================
+           CAPAS 3–7 — ESTRUCTURA MAHPE
+        ================================================= */
+        .mahpe-iic-panel {
+            margin-top: 12px;
+            padding: 13px;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(35,38,42,.98), rgba(22,24,27,.98));
+            text-align: left;
+            box-shadow: 0 10px 28px rgba(0,0,0,.22);
+        }
+        .mahpe-iic-head {
+            display:flex; align-items:center; justify-content:space-between;
+            gap:8px; font-size:10px; font-weight:900; letter-spacing:.7px;
+        }
+        .mahpe-iic-badge {
+            padding:3px 7px; border-radius:999px; background:#2c3035;
+            font-size:9px; color:#cfd3d7; white-space:nowrap;
+        }
+        .mahpe-iic-score-row {
+            display:flex; align-items:flex-end; justify-content:space-between;
+            margin-top:11px; gap:10px;
+        }
+        .mahpe-iic-score {font-size:28px;font-weight:900;line-height:1;}
+        .mahpe-iic-score small {font-size:10px;color:#8f969d;font-weight:700;}
+        .mahpe-iic-state {font-size:10px;font-weight:900;color:#aeb5bc;}
+        .mahpe-iic-track {
+            position:relative; height:10px; margin-top:9px;
+            background:#34383d; border-radius:20px; overflow:hidden;
+        }
+        .mahpe-iic-fill {
+            height:100%; width:0%; border-radius:20px;
+            transition:width .35s ease, background .35s ease;
+        }
+        .mahpe-iic-marks {
+            display:grid; grid-template-columns:repeat(3,1fr);
+            margin-top:4px; color:#727980; font-size:8px;
+        }
+        .mahpe-iic-marks span:nth-child(2){text-align:center;}
+        .mahpe-iic-marks span:last-child{text-align:right;}
+        .mahpe-iic-stats {
+            display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:11px;
+        }
+        .mahpe-iic-stat {
+            padding:7px 5px; border-radius:8px; background:rgba(255,255,255,.045);
+            text-align:center; font-size:9px; color:#aeb5bc;
+        }
+        .mahpe-iic-stat strong {display:block;color:white;font-size:14px;margin-top:2px;}
+        .mahpe-iic-copy {margin-top:9px;color:#9da4aa;font-size:9px;line-height:1.4;}
+        .mahpe-iic-note {margin-top:7px;color:#6f767c;font-size:8px;}
+
+        .mahpe-interest-box{margin-top:10px;padding:10px;border-radius:10px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10)}
+        .mahpe-interest-label{font-size:9px;font-weight:900;letter-spacing:.7px;color:#b9c0c6}
+        .mahpe-interest-meter{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:7px}
+        .mahpe-interest-meter span{height:7px;border-radius:999px;background:#3a3e43}
+        .mahpe-interest-low .mahpe-interest-meter span:nth-child(1){background:#00e965}
+        .mahpe-interest-medium .mahpe-interest-meter span:nth-child(-n+2){background:#ffd400}
+        .mahpe-interest-high .mahpe-interest-meter span{background:#ff4d4d}
+        .mahpe-interest-level{margin-top:6px;font-size:11px;font-weight:900}
+        .mahpe-interest-low .mahpe-interest-level{color:#00e965}
+        .mahpe-interest-medium .mahpe-interest-level{color:#ffd400}
+        .mahpe-interest-high .mahpe-interest-level{color:#ff4d4d}
+        .mahpe-interest-message{margin-top:4px;font-size:10px;line-height:1.35;color:#e4e6e8}
+        .mahpe-interest-disclaimer{margin-top:5px;font-size:8px;line-height:1.3;color:#858c92}
+\n.mahpe-buyer-interest-scale span:last-child{text-align:right}
+
+
+        /* =====================================================
+           CAPA 3 — CONFIANZA Y CONEXIÓN
+        ====================================================== */
+        .mahpe-trust-card{
+            padding:15px;
+            border-radius:14px;
+            background:linear-gradient(180deg,#202328 0%,#17191c 100%);
+            border:1px solid rgba(255,255,255,.10);
+            box-shadow:0 10px 28px rgba(0,0,0,.28);
+        }
+        .mahpe-trust-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            gap:10px;
+        }
+        .mahpe-trust-kicker{
+            font-size:9px;
+            font-weight:900;
+            letter-spacing:.6px;
+            color:#8d959c;
+        }
+        .mahpe-trust-active{
+            display:flex;
+            align-items:center;
+            gap:7px;
+            margin-top:7px;
+            font-size:10px;
+            font-weight:900;
+            color:#f2f4f5;
+        }
+        .mahpe-trust-dot{
+            width:10px;
+            height:10px;
+            flex:0 0 10px;
+            border-radius:50%;
+            background:#00e965;
+            box-shadow:0 0 9px rgba(0,233,101,.72);
+        }
+        .mahpe-trust-badge{
+            padding:5px 7px;
+            border-radius:999px;
+            background:rgba(0,233,101,.09);
+            border:1px solid rgba(0,233,101,.18);
+            font-size:8px;
+            font-weight:900;
+            color:#00e965;
+        }
+        .mahpe-trust-product-label{
+            margin-top:15px;
+            font-size:8px;
+            font-weight:900;
+            letter-spacing:.55px;
+            color:#747c83;
+        }
+        .mahpe-trust-product{
+            margin-top:3px;
+            font-size:17px;
+            line-height:1.25;
+            font-weight:900;
+            color:#fff;
+            overflow-wrap:anywhere;
+        }
+        .mahpe-trust-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:7px;
+            margin-top:13px;
+        }
+        .mahpe-trust-item{
+            min-width:0;
+            padding:9px;
+            border-radius:9px;
+            background:rgba(255,255,255,.045);
+            border:1px solid rgba(255,255,255,.035);
+        }
+        .mahpe-trust-description{
+            grid-column:1 / -1;
+        }
+        .mahpe-trust-item span{
+            display:block;
+            margin-bottom:4px;
+            font-size:8px;
+            font-weight:900;
+            letter-spacing:.35px;
+            color:#7f878e;
+        }
+        .mahpe-trust-item strong{
+            display:block;
+            font-size:10px;
+            line-height:1.4;
+            font-weight:700;
+            color:#edf0f2;
+            overflow-wrap:anywhere;
+        }
+        .mahpe-trust-message{
+            margin-top:10px;
+            padding:9px 10px;
+            border-radius:9px;
+            background:rgba(0,233,101,.065);
+            border-left:3px solid #00e965;
+            font-size:9px;
+            line-height:1.45;
+            color:#bfc6cb;
+        }
+        .mahpe-trust-actions{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:7px;
+            margin-top:11px;
+        }
+        .mahpe-trust-actions button{
+            min-height:37px;
+            border:0;
+            border-radius:9px;
+            cursor:pointer;
+            font-size:9px;
+            font-weight:900;
+            color:#fff;
+            background:#2a2e33;
+        }
+        #trustRouteButton{
+            background:#00a8e8;
+        }
+        .mahpe-trust-privacy{
+            margin-top:9px;
+            font-size:8px;
+            line-height:1.4;
+            color:#70777d;
+        }
+
+
+        /* =====================================================
+           CAPA 5 — INTELIGENCIA MAHPE
+        ====================================================== */
+        .mahpe-intel-card{
+            padding:15px;border-radius:14px;
+            background:linear-gradient(180deg,#20242a 0%,#15181c 100%);
+            border:1px solid rgba(255,255,255,.10);
+            box-shadow:0 10px 28px rgba(0,0,0,.30);
+        }
+        .mahpe-intel-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+        .mahpe-intel-kicker{font-size:9px;font-weight:900;letter-spacing:.65px;color:#9ca4ab}
+        .mahpe-intel-title{margin-top:4px;font-size:15px;font-weight:900;color:#fff}
+        .mahpe-intel-live{padding:4px 7px;border-radius:999px;background:rgba(0,168,232,.10);border:1px solid rgba(0,168,232,.22);font-size:8px;font-weight:900;color:#54c9f5}
+        .mahpe-intel-product{margin-top:14px;padding:10px;border-radius:10px;background:rgba(255,255,255,.045)}
+        .mahpe-intel-product span{display:block;font-size:8px;font-weight:900;letter-spacing:.45px;color:#777f86}
+        .mahpe-intel-product strong{display:block;margin-top:3px;font-size:15px;color:#fff;overflow-wrap:anywhere}
+        .mahpe-intel-zone{margin-top:8px;font-size:9px;line-height:1.4;color:#aab1b7}
+        .mahpe-intel-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+        .mahpe-intel-metric{min-width:0;padding:9px 5px;border-radius:9px;text-align:center;background:rgba(255,255,255,.045)}
+        .mahpe-intel-metric span{display:block;font-size:7px;font-weight:900;color:#858d94}
+        .mahpe-intel-metric strong{display:block;margin-top:4px;font-size:18px;color:#fff}
+        .mahpe-intel-metric small{display:block;margin-top:2px;font-size:7px;line-height:1.25;color:#6f777e}
+        .mahpe-intel-reading{margin-top:12px;padding:10px;border-radius:10px;background:#121519}
+        .mahpe-intel-reading-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:8px;font-weight:900;color:#858d94}
+        .mahpe-intel-level{font-size:9px;color:#cbd1d6}
+        .mahpe-intel-bar{height:8px;margin-top:7px;border-radius:999px;overflow:hidden;background:#343940}
+        .mahpe-intel-bar-fill{height:100%;width:0;border-radius:999px;background:#00e965;transition:width .3s ease}
+        .mahpe-intel-offer-row{margin-top:10px}
+        .mahpe-intel-opportunity{margin-top:11px;padding:10px;border-radius:10px;border-left:3px solid #ffd400;background:rgba(255,212,0,.065);font-size:9px;line-height:1.45;color:#d8dde1}
+        .mahpe-intel-disclaimer{margin-top:9px;font-size:8px;line-height:1.4;color:#70777d}
+
+        .mahpe-future-layer {display:none !important;}
     </style>
 
 
@@ -888,7 +1197,7 @@
 
     <aside class="panel">
 
-        <div class="logo">COYOTE</div>
+        <div class="logo">MAHPE</div>
         <div class="subtitle">Encuentra lo que hay cerca de ti</div>
         <!-- PANTALLA INICIAL: ELECCIÓN SIMPLE -->
         <div id="homeView" class="coyote-view">
@@ -958,9 +1267,18 @@
         <div id="sellerDashboardView" class="coyote-view hidden">
 
             <div class="seller-dashboard">
-                <span class="green-point-big"></span>
+                <div class="mahpe-palette-stage" aria-label="Estado de tu Punto Verde">
+                    <div id="mahpeSellerPalette" class="mahpe-palette">
+                        <div class="mahpe-palette-face mahpe-palette-back">
+                            INACTIVO
+                        </div>
+                        <div class="mahpe-palette-face mahpe-palette-front">
+                            <span class="mahpe-palette-dot"></span>
+                        </div>
+                    </div>
+                </div>
 
-                <div style="font-size:11px;font-weight:900;">
+                <div id="sellerPointStateTitle" style="font-size:11px;font-weight:900;">
                     TU PUNTO ESTÁ ACTIVO
                 </div>
 
@@ -993,6 +1311,12 @@
                     <button id="manageSellerButton" class="inbox-button">⚙ EDITAR</button>
                     <button id="toggleSellerPointButton" class="inbox-button">🔴 DESACTIVAR</button>
                 </div>
+
+
+                <!-- CAPAS 5–7: puntos de entrada preparados, todavía no públicos -->
+                <div id="mahpeIntelligenceLayer" class="mahpe-future-layer" data-layer="5"></div>
+                <div id="mahpePremiumLayer" class="mahpe-future-layer" data-layer="6"></div>
+                <div id="mahpeSupplyLayer" class="mahpe-future-layer" data-layer="7"></div>
 
                 <button id="sellerBackButton" class="back-button">
                     ← SALIR DEL PANEL
@@ -1040,6 +1364,21 @@
                 Zona comercial cercana.
             </div>
 
+            <!-- CAPA 2 — BUSCAR UNA ZONA CONOCIDA SIN ESTAR FÍSICAMENTE ALLÍ -->
+            <input
+                id="placeSearchInput"
+                type="text"
+                placeholder="Zona o lugar conocido (ej. Mercado Arenera)"
+                autocomplete="off"
+            >
+
+            <button
+                id="placeSearchButton"
+                class="button gray"
+            >
+                🔎 BUSCAR ZONA
+            </button>
+
             <button id="chooseSearchZoneButton" class="button" style="background:#ffd400;color:#171300;">
                 🟡 ELEGIR ZONA EN EL MAPA
             </button>
@@ -1051,6 +1390,10 @@
                 BUSCAR
             </button>
 
+            <button id="openIntelligenceButton" class="button gray">
+                🧠 VER INTELIGENCIA DE ESTA ZONA
+            </button>
+
             <button
                 id="cancelSearchButton"
                 class="back-button"
@@ -1058,6 +1401,141 @@
                 ← VOLVER
             </button>
 
+        </div>
+
+
+        <!-- =====================================================
+             CAPA 3 — CONFIANZA Y CONEXIÓN
+        ====================================================== -->
+        <div id="sellerTrustView" class="coyote-view hidden">
+
+            <div class="mahpe-trust-card">
+                <div class="mahpe-trust-header">
+                    <div>
+                        <div class="mahpe-trust-kicker">🤝 CONFIANZA Y CONEXIÓN</div>
+                        <div class="mahpe-trust-active">
+                            <span class="mahpe-trust-dot"></span>
+                            PUNTO COMERCIAL ACTIVO
+                        </div>
+                    </div>
+                    <span class="mahpe-trust-badge">🟢 ACTIVO</span>
+                </div>
+
+                <div class="mahpe-trust-product-label">PRODUCTO</div>
+                <div id="trustProduct" class="mahpe-trust-product">—</div>
+
+                <div class="mahpe-trust-grid">
+                    <div class="mahpe-trust-item mahpe-trust-description">
+                        <span>📝 DESCRIPCIÓN</span>
+                        <strong id="trustDescription">—</strong>
+                    </div>
+
+                    <div class="mahpe-trust-item">
+                        <span>📍 DISTANCIA</span>
+                        <strong id="trustDistance">—</strong>
+                    </div>
+
+                    <div class="mahpe-trust-item">
+                        <span>🕒 ÚLTIMA ACTIVIDAD</span>
+                        <strong id="trustLastActive">—</strong>
+                    </div>
+                </div>
+
+                <div class="mahpe-trust-message">
+                    Este comerciante indicó recientemente que continúa disponible.
+                </div>
+
+                <div class="mahpe-trust-actions">
+                    <button id="trustContactButton">💬 CONTACTAR</button>
+                    <button id="trustRouteButton">🧭 RUTA</button>
+                </div>
+
+                <div class="mahpe-trust-privacy">
+                    MAHPE muestra el punto comercial para facilitar el encuentro.
+                    No muestra una dirección residencial ni coordenadas al comprador.
+                </div>
+            </div>
+
+            <button id="trustBackButton" class="back-button">
+                ← VOLVER A LA BÚSQUEDA
+            </button>
+        </div>
+
+
+        <!-- =====================================================
+             CAPA 5 — INTELIGENCIA MAHPE
+             Prototipo local para VS Code. No afirma ventas.
+        ====================================================== -->
+        <div id="mahpeIntelligenceView" class="coyote-view hidden">
+
+            <div class="mahpe-intel-card">
+                <div class="mahpe-intel-header">
+                    <div>
+                        <div class="mahpe-intel-kicker">🧠 INTELIGENCIA MAHPE</div>
+                        <div class="mahpe-intel-title">Lectura comercial de la zona</div>
+                    </div>
+                    <span class="mahpe-intel-live">LOCAL</span>
+                </div>
+
+                <div class="mahpe-intel-product">
+                    <span>PRODUCTO ANALIZADO</span>
+                    <strong id="intelProduct">—</strong>
+                </div>
+
+                <div class="mahpe-intel-zone" id="intelZone">
+                    📍 Selecciona una zona amarilla y realiza una búsqueda.
+                </div>
+
+                <div class="mahpe-intel-metrics">
+                    <div class="mahpe-intel-metric">
+                        <span>🔎 BÚSQUEDAS</span>
+                        <strong id="intelSearches">0</strong>
+                        <small>observadas localmente</small>
+                    </div>
+                    <div class="mahpe-intel-metric">
+                        <span>🟢 OFERTA</span>
+                        <strong id="intelOffer">0</strong>
+                        <small>puntos coincidentes</small>
+                    </div>
+                    <div class="mahpe-intel-metric">
+                        <span>🤝 INTERACCIONES</span>
+                        <strong id="intelInteractions">0</strong>
+                        <small>vistas/contactos/rutas</small>
+                    </div>
+                </div>
+
+                <div class="mahpe-intel-reading">
+                    <div class="mahpe-intel-reading-row">
+                        <span>INTERÉS OBSERVADO</span>
+                        <strong id="intelDemandLevel" class="mahpe-intel-level">SIN DATOS</strong>
+                    </div>
+                    <div class="mahpe-intel-bar">
+                        <div id="intelDemandBar" class="mahpe-intel-bar-fill"></div>
+                    </div>
+
+                    <div class="mahpe-intel-reading-row mahpe-intel-offer-row">
+                        <span>OFERTA DISPONIBLE</span>
+                        <strong id="intelOfferLevel" class="mahpe-intel-level">SIN DATOS</strong>
+                    </div>
+                </div>
+
+                <div id="intelOpportunity" class="mahpe-intel-opportunity">
+                    Realiza búsquedas para que MAHPE pueda comparar el interés observado con la oferta disponible.
+                </div>
+
+                <div class="mahpe-intel-disclaimer">
+                    Esta lectura se basa en actividad observada dentro de esta versión local de MAHPE.
+                    No representa ventas, ingresos ni garantiza demanda futura.
+                </div>
+            </div>
+
+            <button id="intelRefreshButton" class="button blue">
+                ↻ ACTUALIZAR LECTURA
+            </button>
+
+            <button id="intelBackButton" class="back-button">
+                ← VOLVER A LA BÚSQUEDA
+            </button>
         </div>
 
 
@@ -1094,7 +1572,7 @@
             <div class="chat-box">
 
                 <div class="chat-header">
-                    🟢 Comerciante COYOTE
+                    🟢 Comerciante MAHPE
                     <div id="chatProduct"
                          style="font-size:9px;color:#999;margin-top:2px;">
                     </div>
@@ -1124,11 +1602,10 @@
 
 
         <!-- ACTIVIDAD: OCULTA HASTA QUE HAYA BÚSQUEDA -->
-        <div id="activityView" class="coyote-view hidden"
-             style="margin-top:8px;">
+        <div id="activityView" class="hidden" style="display:none !important;">
 
             <div style="font-size:10px;color:#aaa;margin-bottom:4px;">
-                📊 Actividad COYOTE
+                📊 Actividad MAHPE
             </div>
 
             <div class="metric">
@@ -1153,7 +1630,7 @@
         </div>
 
         <div id="status" class="status">
-            🐺 COYOTE está listo.
+            🟢 MAHPE está listo.
         </div>
 
     </aside>
@@ -1387,12 +1864,18 @@
         let sellerMarkers =
             [];
 
+        // Capa exclusiva para Puntos Verdes MAHPE.
+        // Permite ocultarlos de verdad con clearLayers(), sin depender
+        // de referencias individuales de Leaflet.
+        const sellerMarkerLayer = L.layerGroup().addTo(map);
+
         let selectedRadius =
             0.25;
 
         // Centro opcional elegido manualmente por el comprador.
         // No modifica el mapa base: solo añade un marcador amarillo.
         let searchLocation = null;
+        let searchLocationName = "";
         let searchZoneMarker = null;
         let searchZoneBoundary = null;
         let searchZoneMask = null;
@@ -1443,19 +1926,10 @@
 
 
         function showView(view) {
-
-            if (view === homeView) {
-                activityView.classList.add("hidden");
-            }
-
-            homeView.classList.add("hidden");
-            sellerView.classList.add("hidden");
-            searchView.classList.add("hidden");
-            chatView.classList.add("hidden");
-            sellerDashboardView.classList.add("hidden");
-            sellerInboxView.classList.add("hidden");
-
-            view.classList.remove("hidden");
+            document.querySelectorAll(".coyote-view").forEach(function(panel) {
+                panel.classList.add("hidden");
+            });
+            if (view) view.classList.remove("hidden");
         }
 
 
@@ -1477,6 +1951,12 @@
 
         const sellerDashboardView =
             document.getElementById("sellerDashboardView");
+
+        const mahpeSellerPalette =
+            document.getElementById("mahpeSellerPalette");
+
+        const sellerPointStateTitle =
+            document.getElementById("sellerPointStateTitle");
 
         const sellerInboxView =
             document.getElementById("sellerInboxView");
@@ -1562,6 +2042,36 @@
                 "searchButton"
             );
 
+        // CAPA 5 — INTELIGENCIA MAHPE
+        const openIntelligenceButton = document.getElementById("openIntelligenceButton");
+        const mahpeIntelligenceView = document.getElementById("mahpeIntelligenceView");
+        const intelProduct = document.getElementById("intelProduct");
+        const intelZone = document.getElementById("intelZone");
+        const intelSearches = document.getElementById("intelSearches");
+        const intelOffer = document.getElementById("intelOffer");
+        const intelInteractions = document.getElementById("intelInteractions");
+        const intelDemandLevel = document.getElementById("intelDemandLevel");
+        const intelOfferLevel = document.getElementById("intelOfferLevel");
+        const intelDemandBar = document.getElementById("intelDemandBar");
+        const intelOpportunity = document.getElementById("intelOpportunity");
+        const intelRefreshButton = document.getElementById("intelRefreshButton");
+        const intelBackButton = document.getElementById("intelBackButton");
+
+        const MAHPE_SEARCH_INTEL_STORAGE = "mahpe_search_intelligence_v1";
+
+
+        // CAPA 3 — CONFIANZA Y CONEXIÓN
+        const sellerTrustView = document.getElementById("sellerTrustView");
+        const trustProduct = document.getElementById("trustProduct");
+        const trustDescription = document.getElementById("trustDescription");
+        const trustDistance = document.getElementById("trustDistance");
+        const trustLastActive = document.getElementById("trustLastActive");
+        const trustContactButton = document.getElementById("trustContactButton");
+        const trustRouteButton = document.getElementById("trustRouteButton");
+        const trustBackButton = document.getElementById("trustBackButton");
+        let selectedCommercialPoint = null;
+
+
         const referenceText =
             document.getElementById(
                 "referenceText"
@@ -1569,6 +2079,12 @@
 
         const chooseSearchZoneButton =
             document.getElementById("chooseSearchZoneButton");
+
+        const placeSearchInput =
+            document.getElementById("placeSearchInput");
+
+        const placeSearchButton =
+            document.getElementById("placeSearchButton");
 
         const status =
             document.getElementById(
@@ -1650,7 +2166,7 @@
 
                     updateSellerInbox();
                     updateSellerPointControls();
-                    showView(sellerDashboardView);
+                        showView(sellerDashboardView);
 
                     setStatus("🟢 Panel del vendedor.");
                     return;
@@ -1837,6 +2353,7 @@
         function clearSearchZone() {
             choosingSearchZone = false;
             searchLocation = null;
+            searchLocationName = "";
 
             if (searchZoneMarker) {
                 map.removeLayer(searchZoneMarker);
@@ -1862,6 +2379,136 @@
             setStatus("🟡 Zona retirada. Marca otra zona para volver a mostrar resultados.");
         }
 
+        // ====================================================
+        // CAPA 2 — BUSCAR ZONA / LUGAR CONOCIDO
+        // Usa geocodificación de OpenStreetMap (Nominatim).
+        // NO crea otro mapa: coloca el mismo Punto Amarillo existente.
+        // ====================================================
+
+        async function searchKnownPlace() {
+
+            const placeQuery = placeSearchInput.value.trim();
+
+            if (!placeQuery) {
+                setStatus("⚠️ Escribe una zona o lugar conocido.");
+                placeSearchInput.focus();
+                return;
+            }
+
+            placeSearchButton.disabled = true;
+            placeSearchButton.textContent = "🔎 BUSCANDO...";
+            setStatus("🔎 Buscando la zona indicada...");
+
+            try {
+
+                const url =
+                    "https://nominatim.openstreetmap.org/search" +
+                    "?format=jsonv2" +
+                    "&limit=1" +
+                    "&countrycodes=pe" +
+                    "&accept-language=es" +
+                    "&q=" + encodeURIComponent(placeQuery);
+
+                const response = await fetch(url, {
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error("No se pudo consultar el buscador de lugares.");
+                }
+
+                const results = await response.json();
+
+                if (!Array.isArray(results) || results.length === 0) {
+                    setStatus(
+                        "⚠️ No encontramos esa zona. Prueba con otro nombre o usa 🟡 ELEGIR ZONA EN EL MAPA."
+                    );
+                    return;
+                }
+
+                const result = results[0];
+                const lat = Number(result.lat);
+                const lng = Number(result.lon);
+
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+                    throw new Error("El lugar encontrado no tiene coordenadas válidas.");
+                }
+
+                // Retirar solamente el Punto Amarillo anterior y sus visuales.
+                // El mapa Leaflet existente NO se reconstruye.
+                if (searchZoneMarker) {
+                    map.removeLayer(searchZoneMarker);
+                    searchZoneMarker = null;
+                }
+                if (searchZoneBoundary) {
+                    map.removeLayer(searchZoneBoundary);
+                    searchZoneBoundary = null;
+                }
+                if (searchZoneMask) {
+                    map.removeLayer(searchZoneMask);
+                    searchZoneMask = null;
+                }
+
+                clearSellerMarkers();
+                activityView.classList.add("hidden");
+
+                searchLocation = { lat: lat, lng: lng };
+                searchLocationName =
+                    String(result.display_name || placeQuery)
+                        .split(",")
+                        .slice(0, 2)
+                        .join(",")
+                        .trim();
+
+                const latlng = L.latLng(lat, lng);
+
+                searchZoneMarker =
+                    L.marker(latlng, { icon: yellowSearchIcon() })
+                        .addTo(map)
+                        .bindPopup(
+                            "🟡 " + escapeHTML(searchLocationName || placeQuery)
+                        );
+
+                choosingSearchZone = false;
+                chooseSearchZoneButton.textContent = "✕ QUITAR ZONA AMARILLA";
+
+                updateSearchZoneVisual();
+                updateReference();
+
+                // Solo mueve la cámara del mapa que ya existe.
+                map.setView(latlng, 16);
+                searchZoneMarker.openPopup();
+
+                setStatus(
+                    "🟡 Zona encontrada: <strong>" +
+                    escapeHTML(searchLocationName || placeQuery) +
+                    "</strong>.<br>Pulsa BUSCAR para ver vendedores dentro del radio."
+                );
+            }
+            catch (error) {
+                console.error("MAHPE búsqueda de zona:", error);
+                setStatus(
+                    "⚠️ No se pudo buscar la zona ahora. Puedes seguir usando 🟡 ELEGIR ZONA EN EL MAPA."
+                );
+            }
+            finally {
+                placeSearchButton.disabled = false;
+                placeSearchButton.textContent = "🔎 BUSCAR ZONA";
+            }
+        }
+
+        placeSearchButton.onclick = searchKnownPlace;
+
+        placeSearchInput.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                searchKnownPlace();
+            }
+        });
+
+
         chooseSearchZoneButton.onclick = function() {
             if (searchLocation) {
                 clearSearchZone();
@@ -1881,10 +2528,11 @@
                 lat: event.latlng.lat,
                 lng: event.latlng.lng
             };
+            searchLocationName = "";
 
             searchZoneMarker = L.marker(event.latlng, {icon: yellowSearchIcon()})
                 .addTo(map)
-                .bindPopup("🟡 Centro de búsqueda COYOTE");
+                .bindPopup("🟡 Centro de búsqueda MAHPE");
 
             choosingSearchZone = false;
             chooseSearchZoneButton.textContent = "✕ QUITAR ZONA AMARILLA";
@@ -1900,7 +2548,7 @@
                 showView(homeView);
 
                 setStatus(
-                    "🐺 COYOTE está listo."
+                    "🟢 MAHPE está listo."
                 );
             };
 
@@ -2013,7 +2661,7 @@
                 showView(homeView);
 
                 setStatus(
-                    "🐺 COYOTE está listo."
+                    "🟢 MAHPE está listo."
                 );
 
             };
@@ -2047,11 +2695,21 @@
                     return item.id === sellerPoint.id;
                 });
 
-            if (index >= 0) {
-                sellerPoints[index] = {...sellerPoint};
+            if (sellerPoint.active) {
+                if (index >= 0) {
+                    sellerPoints[index] = {...sellerPoint};
+                }
+                else {
+                    sellerPoints.push({...sellerPoint});
+                }
             }
             else {
-                sellerPoints.push({...sellerPoint});
+                // Un punto inactivo no debe permanecer en la colección que
+                // alimenta los marcadores visibles del mapa.
+                sellerPoints = sellerPoints.filter(function(item) {
+                    return item.id !== sellerPoint.id &&
+                           (!sellerPoint.sellerId || item.sellerId !== sellerPoint.sellerId);
+                });
             }
 
             localStorage.setItem(
@@ -2068,40 +2726,384 @@
         }
 
         function clearSellerMarkers() {
-            sellerMarkers.forEach(function(marker) {
-                if (map.hasLayer(marker)) {
-                    map.removeLayer(marker);
-                }
-            });
+            // Fuente única de marcadores comerciales: vaciar esta capa
+            // hace desaparecer TODOS los Puntos Verdes del mapa.
+            sellerMarkerLayer.clearLayers();
             sellerMarkers = [];
             sellerMarker = null;
         }
 
+        function removeCurrentSellerMarkerImmediately() {
+            if (!sellerPoint) return;
+
+            const currentIds = new Set(
+                [sellerPoint.id, sellerPoint.sellerId, coyoteUser && coyoteUser.id]
+                    .filter(Boolean)
+            );
+
+            // Eliminar la referencia principal del comerciante actual.
+            if (sellerMarker) {
+                if (sellerMarkerLayer.hasLayer(sellerMarker)) {
+                    sellerMarkerLayer.removeLayer(sellerMarker);
+                }
+                if (map.hasLayer(sellerMarker)) {
+                    map.removeLayer(sellerMarker);
+                }
+                sellerMarker = null;
+            }
+
+            // Eliminar SOLO marcadores pertenecientes al comerciante actual.
+            sellerMarkers = sellerMarkers.filter(function(marker) {
+                const markerId = marker.mahpeSellerId || marker.coyoteSellerId || null;
+                const isMine = markerId && currentIds.has(markerId);
+
+                if (isMine) {
+                    if (sellerMarkerLayer.hasLayer(marker)) {
+                        sellerMarkerLayer.removeLayer(marker);
+                    }
+                    if (map.hasLayer(marker)) {
+                        map.removeLayer(marker);
+                    }
+                    return false;
+                }
+
+                return true;
+            });
+
+            // Red de seguridad para versiones anteriores que hayan añadido
+            // el marcador directamente al mapa, pero siempre por ID propio.
+            const residual = [];
+            map.eachLayer(function(layer) {
+                if (!(layer instanceof L.Marker)) return;
+                if (layer === searchZoneMarker || layer === buyerGuideMarker) return;
+
+                const markerId = layer.mahpeSellerId || layer.coyoteSellerId || null;
+                if (markerId && currentIds.has(markerId)) {
+                    residual.push(layer);
+                }
+            });
+
+            residual.forEach(function(layer) {
+                if (sellerMarkerLayer.hasLayer(layer)) {
+                    sellerMarkerLayer.removeLayer(layer);
+                }
+                if (map.hasLayer(layer)) {
+                    map.removeLayer(layer);
+                }
+            });
+        }
+
+        // ====================================================
+        // CAPAS 3–4 — CONFIANZA + EVENTOS + PULSO PRIVADO
+        // ====================================================
+        function formatLastActive(value) {
+            if (!value) return "Actualización reciente";
+            const ms = Date.now() - new Date(value).getTime();
+            if (!Number.isFinite(ms) || ms < 0) return "Actualización reciente";
+            const min = Math.floor(ms / 60000);
+            if (min < 1) return "Actualizado hace menos de 1 min";
+            if (min < 60) return "Actualizado hace " + min + " min";
+            const h = Math.floor(min / 60);
+            if (h < 24) return "Actualizado hace " + h + " h";
+            return "Actualizado hace " + Math.floor(h / 24) + " d";
+        }
+
+        function sellerDistanceText(point) {
+            if (!searchLocation || !point) return "Distancia no calculada";
+            const km = distanceKm(searchLocation.lat, searchLocation.lng, point.lat, point.lng);
+            return km < 1 ? Math.round(km * 1000) + " m" : km.toFixed(1) + " km";
+        }
+
+        const MAHPE_IIC_STORAGE = "mahpe_iic_events_v1";
+
+        function getLocalCommercialEvents() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem(MAHPE_IIC_STORAGE) || "[]");
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveLocalCommercialEvents(events) {
+            localStorage.setItem(
+                MAHPE_IIC_STORAGE,
+                JSON.stringify((events || []).slice(-600))
+            );
+        }
+
+        function recordCommercialEvent(sellerId, eventType, product) {
+            if (!sellerId || !["view","contact","chat","route"].includes(eventType)) return;
+
+            const events = getLocalCommercialEvents();
+            events.push({
+                sellerId: String(sellerId),
+                eventType: eventType,
+                product: String(product || "").slice(0,120),
+                time: Date.now()
+            });
+            saveLocalCommercialEvents(events);
+
+            if (sellerPoint && String(sellerPoint.id) === String(sellerId)) {
+            }
+        }
+
+        // =====================================================
+        // CAPA 3 — CONFIANZA Y CONEXIÓN
+        // =====================================================
+        function getTrustDescription(point) {
+            if (!point) return "Sin descripción adicional.";
+            return point.info ||
+                   point.description ||
+                   point.descripcion ||
+                   "Sin descripción adicional.";
+        }
+
+        function showSellerTrustCard(point) {
+            if (!point || !sellerTrustView) return;
+
+            selectedCommercialPoint = point;
+
+            trustProduct.textContent =
+                point.product || "Producto no especificado";
+
+            trustDescription.textContent =
+                getTrustDescription(point);
+
+            trustDistance.textContent =
+                sellerDistanceText(point);
+
+            trustLastActive.textContent =
+                formatLastActive(point.lastActive);
+
+            showView(sellerTrustView);
+            sellerTrustView.classList.remove("hidden");
+
+            setStatus("🤝 Punto comercial seleccionado.");
+        }
+
+        trustContactButton.addEventListener("click", function() {
+            if (!selectedCommercialPoint) return;
+
+            recordCommercialEvent(
+                selectedCommercialPoint.id,
+                "contact",
+                selectedCommercialPoint.product
+            );
+
+            openChatForSeller(selectedCommercialPoint.id);
+        });
+
+        trustRouteButton.addEventListener("click", function() {
+            if (!selectedCommercialPoint) return;
+
+            recordCommercialEvent(
+                selectedCommercialPoint.id,
+                "route",
+                selectedCommercialPoint.product
+            );
+
+            openDirectionsToSeller(selectedCommercialPoint.id);
+        });
+
+        trustBackButton.addEventListener("click", function() {
+            showView(searchView);
+            setStatus("🔎 Continúa explorando los puntos encontrados.");
+        });
+
+
+
+        // =====================================================
+        // CAPA 5 — INTELIGENCIA MAHPE (LOCAL / VS CODE)
+        // =====================================================
+        function getMahpeSearchHistory() {
+            try {
+                return JSON.parse(localStorage.getItem(MAHPE_SEARCH_INTEL_STORAGE) || "[]");
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveMahpeSearchHistory(rows) {
+            localStorage.setItem(
+                MAHPE_SEARCH_INTEL_STORAGE,
+                JSON.stringify(rows.slice(-500))
+            );
+        }
+
+        function normalizeMahpeTerm(value) {
+            return String(value || "").trim().toLowerCase();
+        }
+
+        function recordMahpeSearchIntelligence(product, offerCount) {
+            const term = normalizeMahpeTerm(product);
+            if (!term || !searchLocation) return;
+
+            const rows = getMahpeSearchHistory();
+            rows.push({
+                product: term,
+                label: String(product || "").trim(),
+                lat: Number(searchLocation.lat),
+                lng: Number(searchLocation.lng),
+                radiusKm: Number(selectedRadius || 0.25),
+                offerCount: Number(offerCount || 0),
+                time: Date.now()
+            });
+            saveMahpeSearchHistory(rows);
+        }
+
+        function countMahpeInteractionsForProduct(product) {
+            const term = normalizeMahpeTerm(product);
+            if (!term) return 0;
+
+            const now = Date.now();
+            const windowMs = 7 * 24 * 60 * 60 * 1000;
+
+            return getLocalCommercialEvents().filter(event => {
+                const eventProduct = normalizeMahpeTerm(event.product);
+                return now - Number(event.time || 0) <= windowMs &&
+                       eventProduct.includes(term);
+            }).length;
+        }
+
+        function buildMahpeIntelligence() {
+            const product = String(searchInput.value || "").trim();
+            const term = normalizeMahpeTerm(product);
+
+            if (!term || !searchLocation) {
+                intelProduct.textContent = product || "—";
+                intelZone.textContent = "📍 Selecciona una zona amarilla y realiza una búsqueda.";
+                intelSearches.textContent = "0";
+                intelOffer.textContent = "0";
+                intelInteractions.textContent = "0";
+                intelDemandLevel.textContent = "SIN DATOS";
+                intelOfferLevel.textContent = "SIN DATOS";
+                intelDemandBar.style.width = "0%";
+                intelOpportunity.textContent =
+                    "Realiza una búsqueda con Punto Amarillo para generar una lectura comercial local.";
+                return;
+            }
+
+            const now = Date.now();
+            const windowMs = 7 * 24 * 60 * 60 * 1000;
+            const history = getMahpeSearchHistory();
+
+            const relevant = history.filter(row => {
+                if (now - Number(row.time || 0) > windowMs) return false;
+                if (normalizeMahpeTerm(row.product) !== term) return false;
+
+                const rowPoint = { lat:Number(row.lat), lng:Number(row.lng) };
+                return distanceKm(searchLocation, rowPoint) <= Math.max(Number(selectedRadius || .25), Number(row.radiusKm || .25));
+            });
+
+            const searches = relevant.length;
+
+            const matchingOffer = sellerPoints.filter(point => {
+                if (!point || point.active === false) return false;
+                const p = normalizeMahpeTerm(point.product);
+                if (!p.includes(term)) return false;
+                return distanceKm(searchLocation, point) <= Number(selectedRadius || .25);
+            }).length;
+
+            const interactions = countMahpeInteractionsForProduct(product);
+
+            let demandLevel = "BAJO";
+            let demandWidth = 28;
+            if (searches >= 6 || interactions >= 8) {
+                demandLevel = "ALTO";
+                demandWidth = 92;
+            } else if (searches >= 3 || interactions >= 3) {
+                demandLevel = "MODERADO";
+                demandWidth = 60;
+            }
+
+            let offerLevel = "BAJA";
+            if (matchingOffer >= 5) offerLevel = "ALTA";
+            else if (matchingOffer >= 2) offerLevel = "MODERADA";
+
+            intelProduct.textContent = product;
+            intelZone.textContent =
+                "📍 Radio analizado: " + Math.round(Number(selectedRadius || .25) * 1000) + " m" +
+                (searchLocationName ? " · " + searchLocationName : "");
+            intelSearches.textContent = searches;
+            intelOffer.textContent = matchingOffer;
+            intelInteractions.textContent = interactions;
+            intelDemandLevel.textContent = demandLevel;
+            intelOfferLevel.textContent = offerLevel;
+            intelDemandBar.style.width = demandWidth + "%";
+
+            if (demandLevel === "ALTO" && offerLevel === "BAJA") {
+                intelOpportunity.textContent =
+                    "💡 OPORTUNIDAD OBSERVADA: hay bastante actividad de búsqueda/interacción para “" +
+                    product + "” y poca oferta disponible en esta zona.";
+            } else if (demandLevel === "MODERADO" && offerLevel === "BAJA") {
+                intelOpportunity.textContent =
+                    "💡 SEÑAL A OBSERVAR: existe interés reciente por “" +
+                    product + "” y actualmente hay poca oferta visible en esta zona.";
+            } else if (offerLevel === "ALTA") {
+                intelOpportunity.textContent =
+                    "📊 ZONA CON OFERTA: hay varios puntos ofreciendo “" +
+                    product + "”. Conviene observar cómo evoluciona el interés antes de interpretar una oportunidad.";
+            } else {
+                intelOpportunity.textContent =
+                    "📊 LECTURA INICIAL: MAHPE todavía necesita más búsquedas e interacciones locales para identificar un patrón claro.";
+            }
+        }
+
+        openIntelligenceButton.addEventListener("click", function() {
+            const product = String(searchInput.value || "").trim();
+
+            // La inteligencia solo se abre después de definir:
+            // 1) qué producto se busca y 2) una zona amarilla.
+            if (!product) {
+                setStatus("🔎 Primero escribe qué producto quieres analizar.");
+                searchInput.focus();
+                return;
+            }
+
+            if (!searchLocation) {
+                setStatus("🟡 Primero selecciona una zona amarilla y realiza la búsqueda.");
+                return;
+            }
+
+            if (!lastSearchDone) {
+                setStatus("🔎 Primero pulsa BUSCAR para generar datos de esta zona.");
+                return;
+            }
+
+            // Ocultamos explícitamente BUSCAR antes de abrir Inteligencia.
+            // No toca ni reconstruye el mapa.
+            buildMahpeIntelligence();
+            showView(mahpeIntelligenceView);
+
+            setStatus("🧠 Lectura comercial local de MAHPE.");
+        });
+
+        intelRefreshButton.addEventListener("click", function() {
+            buildMahpeIntelligence();
+            setStatus("↻ Lectura actualizada.");
+        });
+
+        intelBackButton.addEventListener("click", function() {
+            showView(searchView);
+            setStatus("🔎 Continúa explorando la zona.");
+        });
+
+
         function popupHTML(point) {
             return `
                 <div class="seller-detail-popup">
-                    <div class="popup-title">🟢 ${escapeHTML(point.product)}</div>
-                    <div class="popup-meta">Punto Verde COYOTE</div>
-
-                    ${
-                        point.info
-                            ? `<div><strong>Información adicional</strong><br>${escapeHTML(point.info)}</div>`
-                            : `<div style="color:#777;">Sin información adicional.</div>`
-                    }
-
+                    <div class="popup-title">🟢 PUNTO COMERCIAL ACTIVO</div>
+                    <div class="popup-meta">Disponible recientemente en MAHPE</div>
+                    <div><strong>Producto</strong><br>${escapeHTML(point.product || "Sin producto")}</div>
+                    <div style="margin-top:6px;"><strong>Descripción</strong><br>${escapeHTML(point.info || "Sin descripción adicional")}</div>
+                    <div style="margin-top:6px;"><strong>Distancia</strong><br>${escapeHTML(sellerDistanceText(point))}</div>
+                    <div style="margin-top:6px;"><strong>Última actualización</strong><br>${escapeHTML(formatLastActive(point.lastActive))}</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;">
-                        <button
-                            onclick="openChatForSeller('${point.id}')"
-                            style="padding:8px;border:0;border-radius:7px;background:#20242a;color:white;font-weight:bold;"
-                        >💬 MENSAJE</button>
-
-                        <button
-                            onclick="openDirectionsToSeller('${point.id}')"
-                            style="padding:8px;border:0;border-radius:7px;background:#00a8e8;color:white;font-weight:bold;"
-                        >🧭 SEGUIR PUNTO</button>
+                        <button onclick="openChatForSeller('${point.id}')" style="padding:8px;border:0;border-radius:7px;background:#20242a;color:white;font-weight:bold;">💬 CONTACTAR</button>
+                        <button onclick="openDirectionsToSeller('${point.id}')" style="padding:8px;border:0;border-radius:7px;background:#00a8e8;color:white;font-weight:bold;">🧭 RUTA</button>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
         function renderSellerPoints(points) {
@@ -2118,10 +3120,17 @@
                     L.marker(
                         [point.lat, point.lng],
                         { icon: greenIcon() }
-                    ).addTo(map);
+                    ).addTo(sellerMarkerLayer);
 
+                // Etiqueta propia para poder borrar el marcador con seguridad.
+                marker.mahpeSellerMarker = true;
                 marker.coyoteSellerId = point.id;
+                marker.mahpeSellerId = point.id;
                 marker.bindPopup(popupHTML(point));
+                marker.on("click", function() {
+                    recordCommercialEvent(point.id, "view", point.product);
+                    showSellerTrustCard(point);
+                });
                 sellerMarkers.push(marker);
 
                 if (sellerPoint && point.id === sellerPoint.id) {
@@ -2197,15 +3206,27 @@
                 if (!searchLocation) {
                     clearSellerMarkers();
                     activityView.classList.add("hidden");
-                    setStatus("🟡 Primero marca una zona amarilla en el mapa.");
+                    setStatus("🟡 Primero busca una zona conocida o marca una zona amarilla en el mapa.");
                     return;
                 }
 
-                setStatus("☁️ Buscando vendedores en COYOTE...");
+                setStatus("☁️ Buscando vendedores en MAHPE...");
                 await loadSharedSellerPoints();
 
                 lastSearchDone = true;
-                activityView.classList.remove("hidden");
+                selectedCommercialPoint = null;
+
+                // Señal local para la futura Capa 5. No contiene dirección ni identidad del comprador.
+                try {
+                    const history = JSON.parse(localStorage.getItem("mahpe_search_signals_v1") || "[]");
+                    history.push({
+                        product: query,
+                        radiusKm: selectedRadius,
+                        zoneLabel: searchLocationName || "zona marcada",
+                        time: Date.now()
+                    });
+                    localStorage.setItem("mahpe_search_signals_v1", JSON.stringify(history.slice(-300)));
+                } catch (error) {}
 
                 let found =
                     false;
@@ -2247,6 +3268,9 @@
 
                 found = matches.length > 0;
 
+                // Registrar la búsqueda con la oferta REAL encontrada.
+                recordMahpeSearchIntelligence(searchInput.value, matches.length);
+
                 renderSellerPoints(matches);
 
                 if (found) {
@@ -2266,7 +3290,7 @@
                         "Búsqueda activa";
 
                     setStatus(
-                        "🟢 COYOTE encontró " +
+                        "🟢 MAHPE encontró " +
                         escapeHTML(query) +
                         " en " +
                         matches.length +
@@ -2406,7 +3430,7 @@
             }
 
             else if (
-                selectedRadius === 0.050
+                selectedRadius === 0.25
             ) {
 
                 description =
@@ -2433,7 +3457,9 @@
                 ${description}
                 <br>
                 <span style="color:${searchLocation ? '#ffd400' : '#999'}">
-                    ${searchLocation ? '🟡 Centro: zona marcada en el mapa' : '🟡 Marca una zona para buscar'}
+                    ${searchLocation
+                        ? ('🟡 Centro: ' + (searchLocationName || 'zona marcada en el mapa'))
+                        : '🟡 Marca una zona para buscar'}
                 </span>
 
             `;
@@ -2503,29 +3529,43 @@
                 return;
             }
 
-            if (sellerPoint.active) {
-                toggleSellerPointButton.textContent =
-                    "🔴 DESACTIVAR";
-                sellerProductName.textContent =
-                    sellerPoint.product;
+            if (mahpeSellerPalette) {
+                mahpeSellerPalette.classList.toggle("is-active", Boolean(sellerPoint.active));
             }
-            else {
-                toggleSellerPointButton.textContent =
-                    "🟢 ACTIVAR";
-                sellerProductName.textContent =
-                    sellerPoint.product + " · punto desactivado";
+            sellerDashboardView.classList.toggle(
+                "mahpe-business-live",
+                Boolean(sellerPoint.active)
+            );
+
+            if (sellerPointStateTitle) {
+                sellerPointStateTitle.textContent = sellerPoint.active
+                    ? "TU PUNTO ESTÁ ACTIVO"
+                    : "TU PUNTO ESTÁ DESACTIVADO";
             }
 
-            if (sellerPoint.info) {
-                sellerAdditionalInfo.textContent =
-                    sellerPoint.info;
-                sellerAdditionalInfo.style.display =
-                    "block";
+            if (sellerPoint.active) {
+                toggleSellerPointButton.textContent = "🔴 DESACTIVAR";
+                sellerProductName.textContent = sellerPoint.product;
+
+                // Solo un Punto Verde activo muestra información comercial.
+                sellerSideSummary.style.display = "block";
+                if (sellerPoint.info) {
+                    sellerAdditionalInfo.textContent = sellerPoint.info;
+                    sellerAdditionalInfo.style.display = "block";
+                } else {
+                    sellerAdditionalInfo.textContent = "";
+                    sellerAdditionalInfo.style.display = "none";
+                }
             }
             else {
+                toggleSellerPointButton.textContent = "🟢 ACTIVAR";
+
+                // INACTIVO = solo queda la cara gris del indicador.
+                // La información del negocio deja de mostrarse.
+                sellerProductName.textContent = "";
                 sellerAdditionalInfo.textContent = "";
-                sellerAdditionalInfo.style.display =
-                    "none";
+                sellerAdditionalInfo.style.display = "none";
+                sellerSideSummary.style.display = "none";
             }
         }
 
@@ -2601,46 +3641,123 @@
 
 
         toggleSellerPointButton.onclick =
-            function() {
+            async function() {
 
                 if (!sellerPoint) {
                     setStatus("⚠️ Todavía no tienes un punto verde.");
                     return;
                 }
 
-                sellerPoint.active = !sellerPoint.active;
+                const previousActive = Boolean(sellerPoint.active);
 
-                if (!sellerPoint.active && routeWatchId !== null) {
-                    stopSellerRoute(false);
-                }
+                // ====================================================
+                // DESACTIVAR
+                // ====================================================
+                if (previousActive) {
+                    sellerPoint.active = false;
 
-                upsertCurrentSellerPoint();
+                    // 1. Interfaz inmediata.
+                    updateSellerPointControls();
 
-                if (sellerPoint.active) {
+                    // 2. Detener ruta antes de tocar el marcador.
+                    if (routeWatchId !== null) {
+                        stopSellerRoute(false);
+                    }
 
-                    renderSellerPoints(sellerPoints);
+                    // 3. El Punto Verde propio desaparece AHORA.
+                    // No esperamos a Supabase y no borramos otros vendedores.
+                    removeCurrentSellerMarkerImmediately();
 
-                    map.setView(
-                        [sellerPoint.lat, sellerPoint.lng],
-                        17
+                    // 4. Sacar el punto propio de la colección visible.
+                    sellerPoints = sellerPoints.filter(function(item) {
+                        const sameId = sellerPoint.id && item.id === sellerPoint.id;
+                        const sameSellerId = sellerPoint.sellerId && item.sellerId === sellerPoint.sellerId;
+                        return !(sameId || sameSellerId);
+                    });
+
+                    localStorage.setItem(
+                        "coyote_seller_point",
+                        JSON.stringify(sellerPoint)
                     );
 
                     setStatus(
-                        "🟢 <strong>Punto verde activado.</strong><br>" +
-                        "Ya vuelve a estar visible."
+                        "⚫ <strong>Punto Verde desactivado.</strong><br>" +
+                        "Tu negocio ya no está visible en el mapa."
                     );
-                }
-                else {
 
-                    renderSellerPoints(sellerPoints);
+                    // 5. Confirmar active=false en Supabase.
+                    const saved = await saveCurrentSellerToSupabase();
 
-                    setStatus(
-                        "🔴 <strong>Punto verde desactivado.</strong><br>" +
-                        "Tu información se conserva para reactivarlo después."
-                    );
+                    if (!saved) {
+                        // Rollback: el servidor no aceptó el cambio.
+                        sellerPoint.active = true;
+
+                        sellerPoints = sellerPoints.filter(function(item) {
+                            const sameId = sellerPoint.id && item.id === sellerPoint.id;
+                            const sameSellerId = sellerPoint.sellerId && item.sellerId === sellerPoint.sellerId;
+                            return !(sameId || sameSellerId);
+                        });
+                        sellerPoints.push({...sellerPoint});
+
+                        localStorage.setItem(
+                            "coyote_seller_point",
+                            JSON.stringify(sellerPoint)
+                        );
+
+                        updateSellerPointControls();
+                        renderSellerPoints(sellerPoints);
+
+                        setStatus(
+                            "⚠️ <strong>No se pudo guardar la desactivación.</strong><br>" +
+                            "El Punto Verde fue restaurado."
+                        );
+                        return;
+                    }
+
+                    // IMPORTANTE: no recargar ni volver a renderizar aquí.
+                    // El marcador propio ya fue retirado físicamente del mapa.
+                    console.log("MAHPE: active=false confirmado por Supabase");
+                    return;
                 }
+
+                // ====================================================
+                // ACTIVAR
+                // ====================================================
+                sellerPoint.active = true;
+
+                // Primero confirmar en Supabase.
+                const saved = await saveCurrentSellerToSupabase();
+
+                if (!saved) {
+                    sellerPoint.active = false;
+                    updateSellerPointControls();
+                    setStatus("❌ <strong>No se pudo activar el Punto Verde.</strong>");
+                    return;
+                }
+
+                // Evitar duplicados y reincorporar el punto propio.
+                sellerPoints = sellerPoints.filter(function(item) {
+                    const sameId = sellerPoint.id && item.id === sellerPoint.id;
+                    const sameSellerId = sellerPoint.sellerId && item.sellerId === sellerPoint.sellerId;
+                    return !(sameId || sameSellerId);
+                });
+                sellerPoints.push({...sellerPoint});
+
+                localStorage.setItem(
+                    "coyote_seller_point",
+                    JSON.stringify(sellerPoint)
+                );
 
                 updateSellerPointControls();
+                renderSellerPoints(sellerPoints);
+                map.setView([sellerPoint.lat, sellerPoint.lng], 17);
+
+                setStatus(
+                    "🟢 <strong>Punto Verde activado.</strong><br>" +
+                    "Tu negocio vuelve a aparecer en el mapa."
+                );
+
+                console.log("MAHPE: active=true confirmado por Supabase");
             };
 
 
@@ -2675,7 +3792,7 @@
         sellerBackButton.onclick =
             function() {
                 showView(homeView);
-                setStatus("🐺 COYOTE está listo.");
+                setStatus("🟢 MAHPE está listo.");
             };
 
 
@@ -2789,6 +3906,8 @@
                     return;
                 }
 
+                recordCommercialEvent(point.id, "route", point.product);
+
                 const url =
                     "https://www.google.com/maps/dir/?api=1" +
                     "&destination=" +
@@ -2803,6 +3922,8 @@
             function(sellerId) {
 
                 chatSellerId = sellerId;
+                const contactPoint = sellerPoints.find(function(item) { return item.id === sellerId; });
+                recordCommercialEvent(sellerId, "contact", contactPoint ? contactPoint.product : "");
                 openChat("buyer");
             };
 
@@ -3081,6 +4202,16 @@
             "COYOTE: LISTO"
         );
 
+
+        // ====================================================
+        // CAPAS 5–7 — CONTRATO DE ARQUITECTURA (NO PÚBLICO AÚN)
+        // ====================================================
+        window.MAHPE_LAYERS = Object.freeze({
+            interestSignal: { layer: 4, enabled: true, visibility: "buyer_on_green_point_click", meaning: "recent_interaction_not_sales", localPrototype: true },
+            intelligence: { layer: 5, enabled: false, inputs: ["searches","zones","products","interactions","offer"] },
+            premium: { layer: 6, enabled: false, features: ["opportunity_gaps","zone_patterns","interest_hours","trends"] },
+            supply: { layer: 7, enabled: false, privacy: "aggregated_only", entities: ["wholesalers","importers"] }
+        });
     </script>
 
 </body>
