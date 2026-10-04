@@ -1,37 +1,98 @@
+/* ============================================================
+   MAHPE v3
+   Mobile-first Business Simulator
+   ============================================================ */
+
+
+/* ============================================================
+   1. VARIABLES
+   ============================================================ */
+
+:root {
+    --bg: #050706;
+    --bg-soft: #080b09;
+
+    --surface: #0d100f;
+    --surface-2: #121614;
+    --surface-3: #181d1a;
+    --surface-4: #202622;
+
+    --text: #f4f7f5;
+    --text-soft: #c3cac6;
+    --muted: #727b76;
+    --muted-2: #4d5551;
+
+    --green: #00e86d;
+    --green-2: #19f283;
+    --green-dark: #003c1d;
+    --green-soft: rgba(0, 232, 109, 0.10);
+
+    --border: rgba(255, 255, 255, 0.075);
+    --border-green: rgba(0, 232, 109, 0.22);
+
+    --danger: #ff4f65;
+    --warning: #ffc857;
+    --purple: #a96cff;
+    --blue: #4d8cff;
+
+    --nav-height: 70px;
+
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+
+    --app-width: 500px;
+
+    --shadow:
+        0 18px 60px rgba(0, 0, 0, 0.42);
+}
+
+
+/* ============================================================
+   2. RESET
+   ============================================================ */
+
 * {
     box-sizing: border-box;
 }
 
-:root {
-    --bg: #08090a;
-    --surface: #111315;
-    --surface-2: #181a1d;
-    --surface-3: #202327;
-
-    --text: #f4f5f5;
-    --muted: #777d82;
-
-    --green: #00e965;
-    --green-dark: #071a0e;
-
-    --border: rgba(255, 255, 255, 0.08);
-
-    --nav-height: 72px;
-}
-
-html,
-body {
+html {
     margin: 0;
+    padding: 0;
+
     width: 100%;
-    height: 100%;
+    min-height: 100%;
 
     background: var(--bg);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    min-height: 100vh;
+
+    overflow-x: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% -10%,
+            rgba(0, 232, 109, 0.06),
+            transparent 32%
+        ),
+        var(--bg);
+
     color: var(--text);
 
     font-family:
+        Inter,
         Arial,
         Helvetica,
         sans-serif;
+
+    -webkit-font-smoothing: antialiased;
 }
 
 button,
@@ -45,14 +106,31 @@ button {
     cursor: pointer;
 }
 
+button,
+input,
+textarea,
+select {
+    -webkit-tap-highlight-color: transparent;
+}
+
 .hidden {
     display: none !important;
 }
 
 
-/* =========================================================
-   VISTAS
-========================================================= */
+/* ============================================================
+   3. APP
+   ============================================================ */
+
+#mahpeApp {
+    width: 100%;
+    min-height: 100vh;
+}
+
+
+/* ============================================================
+   4. VISTAS
+   ============================================================ */
 
 .app-view {
     display: none;
@@ -60,15 +138,15 @@ button {
     width: 100%;
     min-height: 100vh;
 
-    padding-bottom: 105px;
+    padding-bottom: 110px;
 
     background:
         radial-gradient(
-            circle at 50% -15%,
-            #15281c 0,
-            #0b0d0e 34%,
-            #08090a 65%
-        );
+            circle at 50% 0,
+            rgba(0, 232, 109, 0.045),
+            transparent 30%
+        ),
+        var(--bg);
 }
 
 .app-view.active {
@@ -76,40 +154,52 @@ button {
 }
 
 
-/* =========================================================
-   TOPBAR
-========================================================= */
+/* ============================================================
+   5. TOP BAR
+   ============================================================ */
 
 .topbar {
     position: sticky;
     top: 0;
 
-    z-index: 100;
+    z-index: 2000;
+
+    width: 100%;
+    min-height: 68px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    min-height: 72px;
-
-    padding: 14px 24px;
+    padding: 12px 22px;
 
     border-bottom: 1px solid var(--border);
 
-    background: rgba(8, 9, 10, 0.9);
+    background:
+        rgba(5, 7, 6, 0.91);
 
-    backdrop-filter: blur(18px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.brand-area {
+    display: flex;
+    flex-direction: column;
 }
 
 .brand {
-    font-size: 24px;
-    font-weight: 900;
+    color: white;
 
-    letter-spacing: 4px;
+    font-size: 22px;
+    font-weight: 950;
+
+    letter-spacing: 5px;
 }
 
 .brand.small {
     font-size: 18px;
+
+    letter-spacing: 3px;
 }
 
 .brand-subtitle {
@@ -117,13 +207,15 @@ button {
 
     color: var(--muted);
 
-    font-size: 10px;
+    font-size: 8px;
+
+    letter-spacing: 0.2px;
 }
 
 
-/* =========================================================
-   WALLET
-========================================================= */
+/* ============================================================
+   6. WALLET
+   ============================================================ */
 
 .wallet {
     display: flex;
@@ -131,19 +223,20 @@ button {
 
     gap: 8px;
 
-    padding: 8px 12px;
+    padding: 8px 11px;
 
-    border: 1px solid rgba(0, 233, 101, 0.22);
+    border: 1px solid var(--border-green);
 
     border-radius: 13px;
 
-    background: rgba(0, 233, 101, 0.07);
+    background:
+        rgba(0, 232, 109, 0.055);
 }
 
 .wallet > span {
     color: var(--green);
 
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .wallet div {
@@ -152,102 +245,158 @@ button {
 }
 
 .wallet strong {
-    font-size: 13px;
+    color: white;
+
+    font-size: 12px;
+    font-weight: 900;
 }
 
 .wallet small {
-    color: #6c8e78;
+    margin-top: 1px;
 
-    font-size: 7px;
+    color: #4d7a60;
+
+    font-size: 6px;
+    font-weight: 800;
 
     letter-spacing: 1px;
 }
 
 
-/* =========================================================
-   PÁGINAS
-========================================================= */
+/* ============================================================
+   7. CONTENEDOR PRINCIPAL
+   ============================================================ */
 
 .page {
-    width: min(720px, calc(100% - 30px));
+    width: min(
+        var(--app-width),
+        calc(100% - 24px)
+    );
 
-    margin: auto;
+    margin: 0 auto;
 }
 
 .page.narrow {
-    width: min(560px, calc(100% - 30px));
+    width: min(
+        460px,
+        calc(100% - 24px)
+    );
 }
+
+
+/* ============================================================
+   8. HERO
+   ============================================================ */
 
 .hero {
-    padding: 42px 4px 25px;
-}
-
-.hero h1,
-.form-card h1 {
-    margin: 8px 0;
-
-    font-size: clamp(28px, 6vw, 42px);
-
-    line-height: 1;
-}
-
-.hero p,
-.muted {
-    max-width: 470px;
-
-    color: var(--muted);
-
-    font-size: 13px;
-
-    line-height: 1.5;
+    padding:
+        31px 4px
+        20px;
 }
 
 .eyebrow {
+    display: block;
+
+    margin-bottom: 7px;
+
     color: var(--green);
 
-    font-size: 9px;
-    font-weight: 900;
+    font-size: 8px;
+    font-weight: 950;
 
     letter-spacing: 2px;
 }
 
+.hero h1,
+.form-card h1 {
+    margin:
+        0 0
+        8px;
 
-/* =========================================================
-   FEED
-========================================================= */
+    color: white;
+
+    font-size: clamp(
+        27px,
+        7vw,
+        34px
+    );
+
+    line-height: 1.05;
+
+    letter-spacing: -1px;
+}
+
+.hero p,
+.muted {
+    max-width: 420px;
+
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 11px;
+
+    line-height: 1.55;
+}
+
+
+/* ============================================================
+   9. FEED
+   ============================================================ */
 
 .feed {
     display: flex;
     flex-direction: column;
 
-    gap: 20px;
+    gap: 16px;
+
+    padding-bottom: 20px;
 }
+
+
+/* ============================================================
+   10. POST
+   ============================================================ */
 
 .post {
     overflow: hidden;
 
+    width: 100%;
+
     border: 1px solid var(--border);
 
-    border-radius: 22px;
+    border-radius: var(--radius-xl);
 
-    background: var(--surface);
+    background:
+        linear-gradient(
+            180deg,
+            #0f1211,
+            #0b0e0c
+        );
 
     box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.32);
+        0 18px 50px rgba(0, 0, 0, 0.26);
 }
+
+
+/* ============================================================
+   11. POST HEADER
+   ============================================================ */
 
 .post-header {
     display: flex;
     align-items: center;
 
-    gap: 11px;
+    gap: 10px;
 
-    padding: 15px;
+    padding:
+        13px 14px
+        11px;
 }
 
 .company-avatar {
-    width: 43px;
-    height: 43px;
+    width: 40px;
+    height: 40px;
 
     display: flex;
     align-items: center;
@@ -255,19 +404,23 @@ button {
 
     flex-shrink: 0;
 
-    border: 1px solid #303438;
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.11);
 
-    border-radius: 13px;
+    border-radius: 50%;
 
     background:
-        linear-gradient(
-            145deg,
-            #272b2f,
-            #111315
+        radial-gradient(
+            circle at 35% 25%,
+            #28312d,
+            #111512 70%
         );
 
-    font-size: 20px;
-    font-weight: 900;
+    color: white;
+
+    font-size: 17px;
+    font-weight: 950;
 }
 
 .post-company {
@@ -276,27 +429,33 @@ button {
     min-width: 0;
 }
 
-.post-company strong,
+.post-company strong {
+    display: block;
+
+    color: white;
+
+    font-size: 12px;
+    font-weight: 900;
+}
+
 .post-company span {
     display: block;
-}
 
-.post-company strong {
-    font-size: 13px;
-}
-
-.post-company span {
     margin-top: 3px;
 
     color: var(--muted);
 
-    font-size: 9px;
+    font-size: 8px;
 }
 
 .follow-button {
-    padding: 7px 12px;
+    flex-shrink: 0;
 
-    border: 1px solid var(--green);
+    padding: 7px 11px;
+
+    border:
+        1px solid
+        var(--green);
 
     border-radius: 9px;
 
@@ -304,23 +463,33 @@ button {
 
     color: var(--green);
 
-    font-size: 10px;
-    font-weight: 800;
+    font-size: 8px;
+    font-weight: 900;
+
+    transition:
+        0.18s ease;
+}
+
+.follow-button:hover {
+    background:
+        rgba(0, 232, 109, 0.08);
 }
 
 .follow-button.following {
     background: var(--green);
 
-    color: var(--green-dark);
+    color: #001a0c;
 }
 
 
-/* =========================================================
-   VISUAL PUBLICACIÓN
-========================================================= */
+/* ============================================================
+   12. VISUAL DEL POST
+   ============================================================ */
 
 .post-visual {
-    min-height: 310px;
+    position: relative;
+
+    min-height: 300px;
 
     display: flex;
     flex-direction: column;
@@ -328,66 +497,126 @@ button {
     align-items: center;
     justify-content: center;
 
-    margin: 0 12px;
+    margin:
+        0 11px;
 
-    padding: 30px;
+    overflow: hidden;
+
+    padding: 28px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.035);
 
     border-radius: 17px;
 
     background:
         radial-gradient(
-            circle at 50% 25%,
-            #34393e,
-            #191b1e 42%,
-            #090a0b 82%
+            circle at 50% 18%,
+            #29302d,
+            #161a18 42%,
+            #080a09 82%
         );
 
     text-align: center;
 }
 
+.post-visual::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            180deg,
+            transparent 60%,
+            rgba(0, 0, 0, 0.2)
+        );
+}
+
 .post-visual .visual-brand {
-    margin-bottom: 20px;
+    position: relative;
 
-    color: #7d8388;
+    z-index: 2;
 
-    font-size: 9px;
-    font-weight: 900;
+    margin-bottom: 18px;
 
-    letter-spacing: 4px;
+    color: #76807a;
+
+    font-size: 8px;
+    font-weight: 950;
+
+    letter-spacing: 5px;
 }
 
 .post-visual strong {
-    font-size: clamp(24px, 5vw, 36px);
+    position: relative;
+
+    z-index: 2;
+
+    color: white;
+
+    font-size: clamp(
+        25px,
+        6vw,
+        34px
+    );
+
+    line-height: 1.1;
 }
 
 .post-visual p {
-    max-width: 380px;
+    position: relative;
 
-    color: #777;
+    z-index: 2;
 
-    font-size: 12px;
+    max-width: 340px;
 
-    line-height: 1.5;
+    margin:
+        14px 0 0;
+
+    color: #78817c;
+
+    font-size: 10px;
+
+    line-height: 1.55;
 }
 
 
-/* =========================================================
-   POST BODY
-========================================================= */
+/* ============================================================
+   13. POST BODY
+   ============================================================ */
 
 .post-body {
-    padding: 16px;
+    padding:
+        13px 14px
+        14px;
 }
 
 .post-description {
-    margin: 0 0 15px;
+    margin:
+        0 0
+        12px;
 
-    color: #a3a6a8;
+    color: #a0a8a3;
 
-    font-size: 12px;
+    font-size: 10px;
 
-    line-height: 1.5;
+    line-height: 1.55;
 }
+
+.post-description strong {
+    color: white;
+}
+
+
+/* ============================================================
+   14. SEÑALES
+   ============================================================ */
 
 .signals {
     display: grid;
@@ -395,19 +624,38 @@ button {
     grid-template-columns:
         repeat(4, 1fr);
 
-    gap: 7px;
+    gap: 5px;
 }
 
 .signal-button {
-    padding: 10px 3px;
+    min-width: 0;
 
-    border: 1px solid var(--border);
+    padding:
+        9px 3px;
 
-    border-radius: 11px;
+    border:
+        1px solid
+        var(--border);
 
-    background: var(--surface-2);
+    border-radius: 10px;
+
+    background:
+        var(--surface-2);
 
     color: white;
+
+    transition:
+        transform 0.15s ease,
+        border-color 0.15s ease,
+        background 0.15s ease;
+}
+
+.signal-button:hover {
+    transform:
+        translateY(-1px);
+
+    border-color:
+        rgba(0, 232, 109, 0.25);
 }
 
 .signal-button span,
@@ -417,58 +665,87 @@ button {
 }
 
 .signal-button span {
-    margin-bottom: 4px;
+    margin-bottom: 3px;
+
+    font-size: 13px;
 }
 
 .signal-button strong {
-    font-size: 12px;
+    overflow: hidden;
+
+    font-size: 10px;
+
+    text-overflow: ellipsis;
 }
 
 .signal-button small {
     margin-top: 2px;
 
-    color: #686d70;
+    overflow: hidden;
 
-    font-size: 7px;
+    color: var(--muted);
+
+    font-size: 6px;
+
+    text-overflow: ellipsis;
 }
 
 .signal-button.selected {
     border-color:
-        rgba(0, 233, 101, 0.4);
+        rgba(0, 232, 109, 0.4);
 
     background:
-        rgba(0, 233, 101, 0.09);
+        rgba(0, 232, 109, 0.09);
 }
 
 
-/* =========================================================
-   FORMULARIOS
-========================================================= */
+/* ============================================================
+   15. TARJETAS GENERALES
+   ============================================================ */
 
 .form-card,
 .profile-card,
 .info-card,
 .company-card {
-    margin-top: 30px;
+    margin-top: 22px;
 
-    padding: 24px;
+    padding: 20px;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid
+        var(--border);
 
-    border-radius: 22px;
+    border-radius:
+        var(--radius-xl);
 
-    background: var(--surface);
+    background:
+        linear-gradient(
+            180deg,
+            #0f1211,
+            #0b0e0c
+        );
+
+    box-shadow:
+        0 15px 50px
+        rgba(0, 0, 0, 0.22);
 }
+
+
+/* ============================================================
+   16. FORMULARIOS
+   ============================================================ */
 
 label {
     display: block;
 
     margin:
-        18px 0 7px;
+        17px 0
+        6px;
 
-    color: #b4b7b9;
+    color: #aeb6b1;
 
-    font-size: 11px;
+    font-size: 9px;
+    font-weight: 700;
 }
 
 input,
@@ -476,21 +753,37 @@ textarea,
 select {
     width: 100%;
 
-    padding: 13px 14px;
+    padding:
+        12px 13px;
 
-    border: 1px solid #303438;
+    border:
+        1px solid
+        #252b28;
 
-    border-radius: 11px;
+    border-radius:
+        11px;
 
     outline: none;
 
-    background: #191b1e;
+    background:
+        #111512;
 
     color: white;
+
+    font-size: 11px;
+
+    transition:
+        border-color 0.16s ease,
+        box-shadow 0.16s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #505853;
 }
 
 textarea {
-    min-height: 110px;
+    min-height: 100px;
 
     resize: vertical;
 }
@@ -498,72 +791,115 @@ textarea {
 input:focus,
 textarea:focus,
 select:focus {
-    border-color: var(--green);
+    border-color:
+        rgba(0, 232, 109, 0.7);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(0, 232, 109, 0.07);
 }
+
+
+/* ============================================================
+   17. BOTONES
+   ============================================================ */
 
 .primary-button,
 .secondary-button {
     width: 100%;
 
-    padding: 12px;
+    padding:
+        12px 14px;
 
     border: 0;
 
-    border-radius: 11px;
+    border-radius:
+        11px;
 
-    font-size: 12px;
-    font-weight: 900;
+    font-size: 10px;
+    font-weight: 950;
+
+    transition:
+        transform 0.15s ease,
+        opacity 0.15s ease;
 }
 
 .primary-button {
-    background: var(--green);
+    background:
+        var(--green);
 
-    color: var(--green-dark);
+    color:
+        #002110;
 }
 
 .secondary-button {
-    background: #292d30;
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        var(--surface-3);
 
     color: white;
 }
 
-.primary-button.big {
-    margin-top: 24px;
+.primary-button:hover,
+.secondary-button:hover {
+    transform:
+        translateY(-1px);
+}
 
-    padding: 15px;
+.primary-button:active,
+.secondary-button:active {
+    transform:
+        scale(0.99);
+}
+
+.primary-button.big {
+    margin-top: 22px;
+
+    padding: 14px;
 }
 
 .form-message {
-    margin-top: 13px;
+    margin-top: 12px;
 
-    color: var(--green);
+    color:
+        var(--green);
 
-    font-size: 11px;
+    font-size: 9px;
 
     line-height: 1.5;
 }
 
 
-/* =========================================================
-   EMPRESA
-========================================================= */
+/* ============================================================
+   18. EMPRESA
+   ============================================================ */
 
 .company-hero {
-    margin-top: 30px;
+    position: relative;
 
-    padding: 28px;
+    overflow: hidden;
 
-    border: 1px solid var(--border);
+    margin-top: 22px;
 
-    border-radius: 24px;
+    padding: 21px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        var(--radius-xl);
 
     background:
         radial-gradient(
-            circle at 80% 0,
-            rgba(0, 233, 101, 0.12),
-            transparent 40%
+            circle at 90% 0,
+            rgba(0, 232, 109, 0.11),
+            transparent 36%
         ),
-        var(--surface);
+        #0e110f;
 }
 
 .company-hero-top {
@@ -571,65 +907,86 @@ select:focus {
 
     align-items: center;
 
-    gap: 15px;
+    gap: 13px;
 }
 
 .company-big-avatar {
-    width: 65px;
-    height: 65px;
+    width: 59px;
+    height: 59px;
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
-    border: 1px solid #34383c;
+    flex-shrink: 0;
 
-    border-radius: 18px;
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.12);
 
-    background: #1b1e21;
+    border-radius:
+        50%;
 
-    font-size: 30px;
-    font-weight: 900;
+    background:
+        radial-gradient(
+            circle at 35% 25%,
+            #28312d,
+            #111512 70%
+        );
+
+    color: white;
+
+    font-size: 26px;
+    font-weight: 950;
 }
 
 .company-hero h1 {
     margin: 0;
 
-    font-size: 28px;
+    color: white;
+
+    font-size: 24px;
+
+    letter-spacing: -0.5px;
 }
 
 .company-stage {
     display: inline-block;
 
-    margin-top: 7px;
+    margin-top: 6px;
 
-    padding: 5px 8px;
+    padding:
+        4px 7px;
 
-    border-radius: 7px;
+    border-radius:
+        20px;
 
     background:
-        rgba(0, 233, 101, 0.09);
+        var(--green-soft);
 
-    color: var(--green);
+    color:
+        var(--green);
 
-    font-size: 9px;
-    font-weight: 900;
+    font-size: 7px;
+    font-weight: 950;
 }
 
 .company-description {
-    margin-top: 18px;
+    margin-top: 16px;
 
-    color: #909599;
+    color:
+        #858e89;
 
-    font-size: 12px;
+    font-size: 10px;
 
     line-height: 1.6;
 }
 
 
-/* =========================================================
-   STATS
-========================================================= */
+/* ============================================================
+   19. ESTADÍSTICAS
+   ============================================================ */
 
 .stats-grid {
     display: grid;
@@ -637,19 +994,25 @@ select:focus {
     grid-template-columns:
         repeat(2, 1fr);
 
-    gap: 10px;
+    gap: 8px;
 
-    margin-top: 18px;
+    margin-top: 14px;
 }
 
 .stat-card {
-    padding: 17px;
+    min-width: 0;
 
-    border: 1px solid var(--border);
+    padding: 14px;
 
-    border-radius: 16px;
+    border:
+        1px solid
+        var(--border);
 
-    background: var(--surface);
+    border-radius:
+        14px;
+
+    background:
+        var(--surface);
 }
 
 .stat-card span,
@@ -659,50 +1022,60 @@ select:focus {
 }
 
 .stat-card span {
-    margin-bottom: 7px;
+    margin-bottom: 6px;
+
+    font-size: 14px;
 }
 
 .stat-card strong {
-    font-size: 22px;
+    color: white;
+
+    font-size: 19px;
+    font-weight: 950;
 }
 
 .stat-card small {
     margin-top: 3px;
 
-    color: var(--muted);
+    color:
+        var(--muted);
 
-    font-size: 9px;
+    font-size: 7px;
 }
 
 
-/* =========================================================
-   PUBLICAR
-========================================================= */
+/* ============================================================
+   20. PUBLICADOR
+   ============================================================ */
 
 .publisher {
-    margin-top: 18px;
+    margin-top: 14px;
 
-    padding: 20px;
+    padding: 17px;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid
+        var(--border);
 
-    border-radius: 18px;
+    border-radius:
+        17px;
 
-    background: var(--surface);
+    background:
+        var(--surface);
 }
 
 
-/* =========================================================
-   PERFIL
-========================================================= */
+/* ============================================================
+   21. PERFIL
+   ============================================================ */
 
 .profile-card {
     text-align: center;
 }
 
 .profile-avatar {
-    width: 70px;
-    height: 70px;
+    width: 64px;
+    height: 64px;
 
     display: flex;
 
@@ -710,46 +1083,63 @@ select:focus {
     justify-content: center;
 
     margin:
-        0 auto 13px;
+        0 auto
+        12px;
 
-    border-radius: 22px;
+    border-radius:
+        21px;
 
-    background: var(--green);
+    background:
+        linear-gradient(
+            145deg,
+            var(--green-2),
+            #00c85c
+        );
 
-    color: var(--green-dark);
+    color:
+        #00210f;
 
-    font-size: 30px;
-    font-weight: 900;
+    font-size: 27px;
+    font-weight: 950;
+
+    box-shadow:
+        0 12px 30px
+        rgba(0, 232, 109, 0.14);
 }
 
 .profile-card h2 {
     margin: 0;
+
+    font-size: 20px;
 }
 
 .profile-card p,
 .info-card p {
-    color: var(--muted);
+    color:
+        var(--muted);
 
-    font-size: 12px;
+    font-size: 10px;
 
     line-height: 1.6;
 }
 
 
-/* =========================================================
-   MAPA
-========================================================= */
+/* ============================================================
+   22. COYOTE / MAPA
+   ============================================================ */
 
 #mapView {
     position: relative;
 
+    width: 100%;
     height: 100vh;
 
     padding: 0;
 
     overflow: hidden;
 
-    background: #111;
+    background:
+        #080a09;
 }
 
 #map {
@@ -757,72 +1147,122 @@ select:focus {
 
     inset: 0;
 
+    z-index: 1;
+
     width: 100%;
     height: 100%;
 }
+
+
+/* ============================================================
+   23. PANEL COYOTE
+   ============================================================ */
 
 .map-panel {
     position: absolute;
 
     z-index: 1000;
 
-    top: 15px;
-    left: 15px;
+    top: 14px;
+    left: 50%;
 
-    width: 310px;
+    transform:
+        translateX(-50%);
+
+    width:
+        min(
+            390px,
+            calc(100% - 24px)
+        );
 
     max-height:
-        calc(100vh - 115px);
+        calc(100vh - 105px);
 
     overflow-y: auto;
 
-    padding: 18px;
+    padding: 16px;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.09);
 
-    border-radius: 18px;
+    border-radius:
+        20px;
 
     background:
-        rgba(15, 16, 18, 0.95);
+        rgba(8, 11, 9, 0.92);
 
     color: white;
 
     box-shadow:
-        0 15px 45px rgba(0, 0, 0, 0.4);
+        0 20px 60px
+        rgba(0, 0, 0, 0.45);
 
-    backdrop-filter: blur(12px);
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+}
+
+.map-panel::-webkit-scrollbar {
+    width: 4px;
+}
+
+.map-panel::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+
+    background:
+        #29302c;
 }
 
 .map-panel-header {
-    margin-bottom: 15px;
+    margin-bottom: 13px;
 }
 
 .map-panel-header small {
-    color: #777;
+    color:
+        var(--muted);
 
-    font-size: 9px;
+    font-size: 8px;
 }
 
 .map-section {
-    padding: 14px 0;
+    padding:
+        13px 0;
 
-    border-top: 1px solid var(--border);
+    border-top:
+        1px solid
+        var(--border);
 }
 
 .map-section h3 {
     margin:
-        0 0 7px;
+        0 0
+        6px;
 
-    font-size: 14px;
+    color: white;
+
+    font-size: 13px;
 }
 
 .map-section p {
-    color: #888;
+    margin:
+        0 0
+        11px;
 
-    font-size: 10px;
+    color:
+        var(--muted);
+
+    font-size: 9px;
 
     line-height: 1.5;
 }
+
+
+/* ============================================================
+   24. RANGO
+   ============================================================ */
 
 .range-options {
     display: grid;
@@ -837,53 +1277,77 @@ select:focus {
 }
 
 .range-button {
-    padding: 8px 3px;
+    padding:
+        8px 2px;
 
-    border: 1px solid #35393d;
+    border:
+        1px solid
+        #282e2a;
 
-    border-radius: 8px;
+    border-radius:
+        8px;
 
-    background: #1b1e21;
+    background:
+        #111512;
 
-    color: #aaa;
+    color:
+        #7d8681;
 
-    font-size: 9px;
+    font-size: 8px;
 }
 
 .range-button.active {
-    border-color: var(--green);
+    border-color:
+        var(--green);
 
-    background: var(--green);
+    background:
+        var(--green);
 
-    color: var(--green-dark);
+    color:
+        #00210f;
 
-    font-weight: 900;
+    font-weight: 950;
 }
+
+
+/* ============================================================
+   25. COYOTE STATUS
+   ============================================================ */
 
 .reference,
 .status {
     margin:
-        9px 0;
+        8px 0;
 
-    padding: 10px;
+    padding:
+        9px;
 
-    border-radius: 9px;
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.04);
 
-    background: #1b1e21;
+    border-radius:
+        9px;
 
-    color: #9b9fa2;
+    background:
+        #111512;
 
-    font-size: 9px;
+    color:
+        #8b948f;
+
+    font-size: 8px;
 
     line-height: 1.5;
 }
 
 .metric {
-    margin-bottom: 12px;
+    margin-bottom:
+        11px;
 
-    color: #888;
+    color:
+        #7d8681;
 
-    font-size: 10px;
+    font-size: 9px;
 }
 
 .metric strong {
@@ -895,7 +1359,7 @@ select:focus {
 }
 
 .bar {
-    height: 8px;
+    height: 6px;
 
     margin-top: 7px;
 
@@ -903,7 +1367,8 @@ select:focus {
 
     border-radius: 20px;
 
-    background: #292d30;
+    background:
+        #252b28;
 }
 
 .bar-fill {
@@ -911,68 +1376,128 @@ select:focus {
 
     height: 100%;
 
-    border-radius: 20px;
+    border-radius:
+        20px;
 
-    background: var(--green);
+    background:
+        var(--green);
 
     transition:
         width 0.4s ease;
 }
 
+
+/* ============================================================
+   26. PUNTO VERDE
+   ============================================================ */
+
 .green-marker {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
 
-    border: 4px solid white;
+    border:
+        3px solid white;
 
-    border-radius: 50%;
+    border-radius:
+        50%;
 
-    background: var(--green);
+    background:
+        var(--green);
 
     box-shadow:
-        0 0 0 5px rgba(0, 233, 101, 0.2),
-        0 0 18px rgba(0, 233, 101, 0.8);
+        0 0 0 5px
+        rgba(0, 232, 109, 0.16),
+        0 0 20px
+        rgba(0, 232, 109, 0.7);
 }
 
 
-/* =========================================================
-   NAVEGACIÓN PRINCIPAL
-========================================================= */
+/* ============================================================
+   27. LEAFLET DARK
+   ============================================================ */
+
+.leaflet-container {
+    background:
+        #0b0e0c;
+}
+
+.leaflet-control-zoom a {
+    border-color:
+        var(--border) !important;
+
+    background:
+        #101411 !important;
+
+    color:
+        white !important;
+}
+
+.leaflet-control-attribution {
+    background:
+        rgba(5, 7, 6, 0.72) !important;
+
+    color:
+        #626a65 !important;
+
+    font-size:
+        7px !important;
+}
+
+.leaflet-control-attribution a {
+    color:
+        #88918c !important;
+}
+
+
+/* ============================================================
+   28. NAVEGACIÓN INFERIOR
+   ============================================================ */
 
 #mahpeMainNav {
     position: fixed;
 
-    z-index: 5000;
+    z-index: 9999;
 
     left: 50%;
-    bottom: 17px;
+    bottom: 12px;
 
     transform:
         translateX(-50%);
 
     width:
-        min(560px, calc(100% - 30px));
+        min(
+            480px,
+            calc(100% - 22px)
+        );
 
-    height: var(--nav-height);
+    height:
+        var(--nav-height);
 
     display: flex;
-
     align-items: center;
 
-    padding: 7px;
+    padding:
+        6px;
 
-    border: 1px solid var(--border);
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.08);
 
-    border-radius: 22px;
+    border-radius:
+        22px;
 
     background:
-        rgba(13, 14, 16, 0.96);
+        rgba(8, 11, 9, 0.94);
 
     box-shadow:
-        0 15px 50px rgba(0, 0, 0, 0.5);
+        0 16px 55px
+        rgba(0, 0, 0, 0.52);
 
     backdrop-filter:
-        blur(18px);
+        blur(22px);
+
+    -webkit-backdrop-filter:
+        blur(22px);
 }
 
 .nav-button {
@@ -980,7 +1505,7 @@ select:focus {
 
     flex: 1;
 
-    height: 54px;
+    height: 55px;
 
     display: flex;
     flex-direction: column;
@@ -992,25 +1517,43 @@ select:focus {
 
     border: 0;
 
-    border-radius: 13px;
+    border-radius:
+        13px;
 
-    background: transparent;
+    background:
+        transparent;
 
-    color: #686d70;
+    color:
+        #555d59;
+
+    transition:
+        color 0.15s ease,
+        background 0.15s ease;
 }
 
 .nav-button > span {
-    font-size: 20px;
+    font-size: 17px;
 }
 
 .nav-button > small {
-    font-size: 8px;
-    font-weight: 800;
+    font-size: 7px;
+    font-weight: 900;
 }
 
 .nav-button.active {
-    color: var(--green);
+    color:
+        var(--green);
 }
+
+.nav-button:hover {
+    background:
+        rgba(255, 255, 255, 0.025);
+}
+
+
+/* ============================================================
+   29. BOTÓN CREAR CENTRAL
+   ============================================================ */
 
 .create-nav > span {
     width: 39px;
@@ -1021,76 +1564,324 @@ select:focus {
     align-items: center;
     justify-content: center;
 
-    margin-top: -18px;
+    margin-top:
+        -17px;
 
-    border-radius: 13px;
+    border-radius:
+        13px;
 
-    background: var(--green);
+    background:
+        var(--green);
 
-    color: var(--green-dark);
+    color:
+        #00210f;
 
-    font-size: 27px;
+    font-size:
+        25px;
+
+    font-weight:
+        500;
 
     box-shadow:
-        0 8px 20px rgba(0, 233, 101, 0.2);
+        0 9px 25px
+        rgba(0, 232, 109, 0.22);
+}
+
+.create-nav small {
+    margin-top:
+        -2px;
 }
 
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
+/* ============================================================
+   30. BUSINESS ENGINE
+   Compatibilidad con elementos generados por script.js
+   ============================================================ */
+
+.business-engine,
+.business-engine-card,
+.engine-card,
+.decision-card,
+.business-card {
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        17px;
+
+    background:
+        var(--surface);
+
+    color:
+        var(--text);
+}
+
+.business-engine {
+    margin-top:
+        14px;
+
+    padding:
+        17px;
+}
+
+.business-engine h2,
+.business-engine h3,
+.engine-card h2,
+.engine-card h3 {
+    color:
+        white;
+}
+
+.business-engine p,
+.engine-card p {
+    color:
+        var(--muted);
+}
+
+.decision-card {
+    padding:
+        13px;
+
+    transition:
+        border-color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.decision-card:hover {
+    transform:
+        translateY(-1px);
+
+    border-color:
+        rgba(0, 232, 109, 0.25);
+}
+
+
+/* ============================================================
+   31. DESKTOP
+   ============================================================ */
+
+@media (min-width: 800px) {
+
+    .topbar {
+        padding-left:
+            24px;
+
+        padding-right:
+            24px;
+    }
+
+    #feedView .page,
+    #createView .page,
+    #companyView .page,
+    #profileView .page {
+        width:
+            min(
+                var(--app-width),
+                calc(100% - 40px)
+            );
+    }
+
+    .post-visual {
+        min-height:
+            300px;
+    }
+}
+
+
+/* ============================================================
+   32. MOBILE
+   ============================================================ */
 
 @media (max-width: 600px) {
 
+    :root {
+        --nav-height:
+            66px;
+    }
+
+    body {
+        background:
+            var(--bg);
+    }
+
     .topbar {
-        min-height: 65px;
+        min-height:
+            63px;
 
         padding:
-            12px 15px;
+            11px 14px;
     }
 
     .brand {
-        font-size: 20px;
+        font-size:
+            19px;
+
+        letter-spacing:
+            4px;
     }
 
-    .page {
+    .page,
+    .page.narrow {
         width:
-            calc(100% - 18px);
+            calc(100% - 16px);
     }
 
     .hero {
         padding:
-            30px 5px 18px;
+            24px 4px
+            17px;
+    }
+
+    .hero h1 {
+        font-size:
+            27px;
+    }
+
+    .post {
+        border-radius:
+            19px;
     }
 
     .post-visual {
-        min-height: 280px;
+        min-height:
+            275px;
+
+        margin:
+            0 8px;
+
+        padding:
+            22px;
     }
 
-    .map-panel {
-        top: 8px;
-        left: 8px;
-        right: 8px;
-
-        width: auto;
-
-        max-height:
-            calc(100vh - 105px);
-    }
-
-    #mahpeMainNav {
-        bottom: 9px;
-
-        width:
-            calc(100% - 18px);
-
-        height: 65px;
-
-        border-radius: 19px;
+    .post-body {
+        padding:
+            12px;
     }
 
     .signals {
-        gap: 4px;
+        gap:
+            4px;
     }
 
+    .signal-button {
+        padding:
+            8px 2px;
+    }
+
+    .form-card,
+    .profile-card,
+    .info-card,
+    .company-card {
+        margin-top:
+            14px;
+
+        padding:
+            17px;
+
+        border-radius:
+            19px;
+    }
+
+    .company-hero {
+        margin-top:
+            14px;
+
+        padding:
+            18px;
+    }
+
+    #mahpeMainNav {
+        bottom:
+            8px;
+
+        width:
+            calc(100% - 14px);
+
+        height:
+            var(--nav-height);
+
+        border-radius:
+            19px;
+    }
+
+    .nav-button {
+        height:
+            52px;
+    }
+
+    .map-panel {
+        top:
+            8px;
+
+        width:
+            calc(100% - 16px);
+
+        max-height:
+            calc(100vh - 93px);
+
+        padding:
+            14px;
+
+        border-radius:
+            17px;
+    }
 }
+
+
+/* ============================================================
+   33. TELÉFONOS PEQUEÑOS
+   ============================================================ */
+
+@media (max-width: 390px) {
+
+    .wallet {
+        padding:
+            7px 8px;
+    }
+
+    .wallet strong {
+        font-size:
+            11px;
+    }
+
+    .hero h1 {
+        font-size:
+            25px;
+    }
+
+    .post-visual {
+        min-height:
+            245px;
+    }
+
+    .signals {
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr));
+    }
+
+    .signal-button strong {
+        font-size:
+            9px;
+    }
+
+    .nav-button > span {
+        font-size:
+            16px;
+    }
+
+    .nav-button > small {
+        font-size:
+            6px;
+    }
+
+    .create-nav > span {
+        width:
+            37px;
+
+        height:
+            37px;
+    }
+}
+
+
