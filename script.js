@@ -1312,3 +1312,176 @@ function escapeHTML(text) {
 ========================================================= */
 
 initializeMap();
+/* =========================================================
+   MAHPE — NAVEGACIÓN PRINCIPAL
+   CAPA NUEVA / COYOTE BLINDADO
+========================================================= */
+
+const mahpeNavButtons =
+    document.querySelectorAll(".mahpe-nav-item");
+
+
+/*
+ * Estado principal de MAHPE.
+ *
+ * COYOTE / MAPA sigue funcionando de manera independiente.
+ */
+
+let mahpeCurrentView = "map";
+
+
+/* =========================================================
+   CAMBIAR VISTA MAHPE
+========================================================= */
+
+function changeMahpeView(viewName) {
+
+    mahpeCurrentView = viewName;
+
+
+    /* -------------------------
+       ACTUALIZAR NAVEGACIÓN
+    ------------------------- */
+
+    mahpeNavButtons.forEach(function(button) {
+
+        button.classList.remove("active");
+
+        if (
+            button.dataset.mahpeView === viewName
+        ) {
+
+            button.classList.add("active");
+
+        }
+
+    });
+
+
+    /* -------------------------
+       MAPA
+    ------------------------- */
+
+    if (viewName === "map") {
+
+        console.log(
+            "MAHPE → MAPA / COYOTE"
+        );
+
+
+        /*
+         * Leaflet ya existe.
+         * No recreamos el mapa.
+         *
+         * Solo corregimos su tamaño por seguridad.
+         */
+
+        if (map) {
+
+            setTimeout(function() {
+
+                map.invalidateSize();
+
+            }, 100);
+
+        }
+
+        return;
+    }
+
+
+    /* -------------------------
+       INICIO
+    ------------------------- */
+
+    if (viewName === "feed") {
+
+        console.log(
+            "MAHPE → INICIO"
+        );
+
+        return;
+    }
+
+
+    /* -------------------------
+       CREAR
+    ------------------------- */
+
+    if (viewName === "create") {
+
+        console.log(
+            "MAHPE → CREAR EMPRESA"
+        );
+
+        return;
+    }
+
+
+    /* -------------------------
+       EMPRESA
+    ------------------------- */
+
+    if (viewName === "company") {
+
+        console.log(
+            "MAHPE → EMPRESA"
+        );
+
+        return;
+    }
+
+
+    /* -------------------------
+       PERFIL
+    ------------------------- */
+
+    if (viewName === "profile") {
+
+        console.log(
+            "MAHPE → PERFIL"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   EVENTOS DE LA BARRA MAHPE
+========================================================= */
+
+mahpeNavButtons.forEach(function(button) {
+
+    button.addEventListener(
+        "click",
+        function() {
+
+            const targetView =
+                this.dataset.mahpeView;
+
+            if (!targetView) {
+                return;
+            }
+
+
+            changeMahpeView(
+                targetView
+            );
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   MAHPE ARRANCA EN MAPA
+========================================================= */
+
+changeMahpeView("map");
+
+
+console.log(
+    "MAHPE: navegación principal preparada."
+);
