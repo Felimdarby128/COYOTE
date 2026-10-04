@@ -1,7 +1,7 @@
 /* =========================================================
-   MAHPE v1
+   MAHPE v1.1
    JUEGO + SIMULADOR EMPRESARIAL
-   COYOTE = MOTOR TERRITORIAL
+   COYOTE = MOTOR TERRITORIAL + BUSINESS ENGINE
 ========================================================= */
 
 
@@ -17,7 +17,9 @@ const DEFAULT_STATE = {
 
     posts: [],
 
-    interactions: {}
+    interactions: {},
+
+    decisionHistory: []
 
 };
 
@@ -33,7 +35,7 @@ let currentCompanyId =
 
 
 /* =========================================================
-   EMPRESA DEMO
+   EMPRESA DEMO — SURANO
 ========================================================= */
 
 const demoCompany = {
@@ -59,6 +61,8 @@ const demoCompany = {
         "En desarrollo",
 
     followers: 84,
+
+    interactions: 84,
 
     interested: 21,
 
@@ -130,11 +134,39 @@ function loadMahpeState() {
 
     try {
 
-        return JSON.parse(
-            saved
-        );
+        const parsed =
+            JSON.parse(saved);
 
-    } catch (error) {
+
+        if (!Array.isArray(parsed.companies)) {
+            parsed.companies = [];
+        }
+
+        if (!Array.isArray(parsed.posts)) {
+            parsed.posts = [];
+        }
+
+        if (!parsed.interactions) {
+            parsed.interactions = {};
+        }
+
+        if (!Array.isArray(parsed.decisionHistory)) {
+            parsed.decisionHistory = [];
+        }
+
+        if (
+            typeof parsed.mahpes !==
+            "number"
+        ) {
+            parsed.mahpes = 1250;
+        }
+
+
+        return parsed;
+
+    }
+
+    catch (error) {
 
         console.error(
             "No se pudo cargar MAHPE:",
@@ -179,8 +211,10 @@ function escapeHTML(text) {
             "div"
         );
 
+
     div.textContent =
         text ?? "";
+
 
     return div.innerHTML;
 
@@ -195,7 +229,25 @@ function generateId(prefix) {
         Date.now() +
         "-" +
         Math.floor(
-            Math.random() * 100000
+            Math.random() *
+            100000
+        )
+    );
+
+}
+
+
+function clamp(
+    value,
+    min = 0,
+    max = 100
+) {
+
+    return Math.max(
+        min,
+        Math.min(
+            max,
+            Math.round(value)
         )
     );
 
@@ -204,11 +256,170 @@ function generateId(prefix) {
 
 function getCurrentCompany() {
 
-    return mahpeState.companies.find(
-        company =>
-            company.id ===
-            currentCompanyId
-    ) || null;
+    return (
+        mahpeState.companies.find(
+            company =>
+                company.id ===
+                currentCompanyId
+        ) || null
+    );
+
+}
+
+
+/* =========================================================
+   MIGRACIÓN BUSINESS ENGINE
+========================================================= */
+
+function migrateCompanyBusinessData(
+    company
+) {
+
+    if (
+        typeof company.activity !==
+        "number"
+    ) {
+        company.activity = 20;
+    }
+
+
+    if (
+        typeof company.marketResponse !==
+        "number"
+    ) {
+        company.marketResponse = 20;
+    }
+
+
+    if (
+        typeof company.locationStrength !==
+        "number"
+    ) {
+        company.locationStrength = 20;
+    }
+
+
+    if (
+        typeof company.risk !==
+        "number"
+    ) {
+        company.risk = 15;
+    }
+
+
+    if (
+        typeof company.designLevel !==
+        "number"
+    ) {
+        company.designLevel = 20;
+    }
+
+
+    if (
+        typeof company.productValidation !==
+        "number"
+    ) {
+        company.productValidation = 10;
+    }
+
+
+    if (
+        typeof company.marketKnowledge !==
+        "number"
+    ) {
+        company.marketKnowledge = 10;
+    }
+
+
+    if (
+        typeof company.campaignPower !==
+        "number"
+    ) {
+        company.campaignPower = 0;
+    }
+
+
+    if (
+        typeof company.interactions !==
+        "number"
+    ) {
+        company.interactions = 0;
+    }
+
+
+    if (
+        typeof company.interested !==
+        "number"
+    ) {
+        company.interested = 0;
+    }
+
+
+    if (
+        typeof company.committed !==
+        "number"
+    ) {
+        company.committed = 0;
+    }
+
+
+    if (
+        typeof company.followers !==
+        "number"
+    ) {
+        company.followers = 0;
+    }
+
+
+    if (
+        typeof company.value !==
+        "number"
+    ) {
+        company.value = 500;
+    }
+
+
+    if (
+        typeof company.capital !==
+        "number"
+    ) {
+        company.capital = 500;
+    }
+
+
+    if (
+        !Array.isArray(
+            company.decisions
+        )
+    ) {
+        company.decisions = [];
+    }
+
+}
+
+
+function migrateMahpeBusinessState() {
+
+    if (
+        !Array.isArray(
+            mahpeState.decisionHistory
+        )
+    ) {
+        mahpeState.decisionHistory = [];
+    }
+
+
+    mahpeState.companies.forEach(
+        migrateCompanyBusinessData
+    );
+
+
+    localStorage.setItem(
+        "mahpe_state_v1",
+        JSON.stringify(
+            mahpeState
+        )
+    );
 
 }
 
@@ -259,6 +470,7 @@ function openView(viewId) {
 
         button.classList.toggle(
             "active",
+
             button.dataset.view ===
                 viewId
         );
@@ -266,29 +478,41 @@ function openView(viewId) {
     });
 
 
-    if (viewId === "mapView") {
+    if (
+        viewId ===
+        "mapView"
+    ) {
 
-        setTimeout(() => {
+        setTimeout(
+            function() {
 
-            if (map) {
+                if (map) {
 
-                map.invalidateSize();
+                    map.invalidateSize();
 
-            }
+                }
 
-        }, 120);
+            },
+            150
+        );
 
     }
 
 
-    if (viewId === "companyView") {
+    if (
+        viewId ===
+        "companyView"
+    ) {
 
         renderCompanyDashboard();
 
     }
 
 
-    if (viewId === "profileView") {
+    if (
+        viewId ===
+        "profileView"
+    ) {
 
         updateProfile();
 
@@ -301,6 +525,7 @@ navButtons.forEach(button => {
 
     button.addEventListener(
         "click",
+
         function() {
 
             openView(
@@ -320,11 +545,34 @@ navButtons.forEach(button => {
 function getAllPosts() {
 
     return [
+
         demoPost,
+
         ...mahpeState.posts
             .slice()
             .reverse()
+
     ];
+
+}
+
+
+function getPostCompany(post) {
+
+    if (post.demo) {
+
+        return demoCompany;
+
+    }
+
+
+    return (
+        mahpeState.companies.find(
+            company =>
+                company.id ===
+                post.companyId
+        ) || null
+    );
 
 }
 
@@ -338,212 +586,274 @@ function renderFeed() {
 
 
     if (!container) {
+
         return;
+
     }
 
 
     container.innerHTML = "";
 
 
-    getAllPosts().forEach(post => {
+    getAllPosts()
+        .forEach(post => {
 
-        const company =
-            post.demo
-                ? demoCompany
-                : mahpeState.companies
-                    .find(
-                        item =>
-                            item.id ===
-                            post.companyId
-                    );
+            const company =
+                getPostCompany(post);
 
 
-        if (!company) {
-            return;
-        }
+            if (!company) {
+
+                return;
+
+            }
 
 
-        const article =
-            document.createElement(
-                "article"
+            const article =
+                document.createElement(
+                    "article"
+                );
+
+
+            article.className =
+                "post";
+
+
+            const interactionKey =
+                post.id +
+                "-interaction";
+
+
+            const interestKey =
+                post.id +
+                "-interest";
+
+
+            const commitmentKey =
+                post.id +
+                "-commitment";
+
+
+            article.innerHTML = `
+
+                <div class="post-header">
+
+                    <div class="company-avatar">
+
+                        ${escapeHTML(
+                            company.name
+                                .charAt(0)
+                        )}
+
+                    </div>
+
+
+                    <div class="post-company">
+
+                        <strong>
+
+                            ${escapeHTML(
+                                company.name
+                            )}
+
+                        </strong>
+
+
+                        <span>
+
+                            ${escapeHTML(
+                                company.category
+                            )}
+
+                            ·
+
+                            ${escapeHTML(
+                                company.stage
+                            )}
+
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        class="follow-button"
+                        data-company="${company.id}"
+                    >
+                        Seguir
+                    </button>
+
+                </div>
+
+
+                <div class="post-visual">
+
+                    <div class="visual-brand">
+
+                        ${escapeHTML(
+                            company.name
+                        )}
+
+                    </div>
+
+
+                    <strong>
+
+                        ${escapeHTML(
+                            post.title
+                        )}
+
+                    </strong>
+
+
+                    <p>
+
+                        ${escapeHTML(
+                            post.text
+                        )}
+
+                    </p>
+
+                </div>
+
+
+                <div class="post-body">
+
+                    <p class="post-description">
+
+                        <strong>
+
+                            ${escapeHTML(
+                                company.name
+                            )}
+
+                        </strong>
+
+                        ·
+
+                        ${escapeHTML(
+                            post.text
+                        )}
+
+                    </p>
+
+
+                    <div class="signals">
+
+
+                        <button
+                            class="signal-button"
+                            data-post="${post.id}"
+                            data-signal="view"
+                        >
+
+                            <span>
+                                👁
+                            </span>
+
+                            <strong>
+                                ${post.views || 0}
+                            </strong>
+
+                            <small>
+                                Vistas
+                            </small>
+
+                        </button>
+
+
+                        <button
+                            class="signal-button ${
+                                mahpeState.interactions[
+                                    interactionKey
+                                ]
+                                    ? "selected"
+                                    : ""
+                            }"
+                            data-post="${post.id}"
+                            data-signal="interaction"
+                        >
+
+                            <span>
+                                ♡
+                            </span>
+
+                            <strong>
+                                ${post.interactions || 0}
+                            </strong>
+
+                            <small>
+                                Interacción
+                            </small>
+
+                        </button>
+
+
+                        <button
+                            class="signal-button ${
+                                mahpeState.interactions[
+                                    interestKey
+                                ]
+                                    ? "selected"
+                                    : ""
+                            }"
+                            data-post="${post.id}"
+                            data-signal="interest"
+                        >
+
+                            <span>
+                                🔥
+                            </span>
+
+                            <strong>
+                                ${post.interested || 0}
+                            </strong>
+
+                            <small>
+                                Interesado
+                            </small>
+
+                        </button>
+
+
+                        <button
+                            class="signal-button ${
+                                mahpeState.interactions[
+                                    commitmentKey
+                                ]
+                                    ? "selected"
+                                    : ""
+                            }"
+                            data-post="${post.id}"
+                            data-signal="commitment"
+                        >
+
+                            <span>
+                                💰
+                            </span>
+
+                            <strong>
+                                ${post.committed || 0}
+                            </strong>
+
+                            <small>
+                                Comprometido
+                            </small>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                article
             );
 
-
-        article.className =
-            "post";
-
-
-        article.innerHTML = `
-
-            <div class="post-header">
-
-                <div class="company-avatar">
-                    ${escapeHTML(
-                        company.name.charAt(0)
-                    )}
-                </div>
-
-                <div class="post-company">
-
-                    <strong>
-                        ${escapeHTML(
-                            company.name
-                        )}
-                    </strong>
-
-                    <span>
-                        ${escapeHTML(
-                            company.category
-                        )}
-                        ·
-                        ${escapeHTML(
-                            company.stage
-                        )}
-                    </span>
-
-                </div>
-
-                <button
-                    class="follow-button"
-                    data-company="${company.id}"
-                >
-                    Seguir
-                </button>
-
-            </div>
-
-
-            <div class="post-visual">
-
-                <div class="visual-brand">
-                    ${escapeHTML(
-                        company.name
-                    )}
-                </div>
-
-                <strong>
-                    ${escapeHTML(
-                        post.title
-                    )}
-                </strong>
-
-                <p>
-                    ${escapeHTML(
-                        post.text
-                    )}
-                </p>
-
-            </div>
-
-
-            <div class="post-body">
-
-                <p class="post-description">
-
-                    <strong>
-                        ${escapeHTML(
-                            company.name
-                        )}
-                    </strong>
-
-                    ·
-
-                    ${escapeHTML(
-                        post.text
-                    )}
-
-                </p>
-
-
-                <div class="signals">
-
-                    <button
-                        class="signal-button"
-                        data-post="${post.id}"
-                        data-signal="view"
-                    >
-
-                        <span>👁</span>
-
-                        <strong>
-                            ${post.views || 0}
-                        </strong>
-
-                        <small>
-                            Vistas
-                        </small>
-
-                    </button>
-
-
-                    <button
-                        class="signal-button"
-                        data-post="${post.id}"
-                        data-signal="interaction"
-                    >
-
-                        <span>♡</span>
-
-                        <strong>
-                            ${post.interactions || 0}
-                        </strong>
-
-                        <small>
-                            Interacción
-                        </small>
-
-                    </button>
-
-
-                    <button
-                        class="signal-button"
-                        data-post="${post.id}"
-                        data-signal="interest"
-                    >
-
-                        <span>🔥</span>
-
-                        <strong>
-                            ${post.interested || 0}
-                        </strong>
-
-                        <small>
-                            Interesado
-                        </small>
-
-                    </button>
-
-
-                    <button
-                        class="signal-button"
-                        data-post="${post.id}"
-                        data-signal="commitment"
-                    >
-
-                        <span>💰</span>
-
-                        <strong>
-                            ${post.committed || 0}
-                        </strong>
-
-                        <small>
-                            Comprometido
-                        </small>
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        `;
-
-
-        container.appendChild(
-            article
-        );
-
-    });
+        });
 
 
     bindFeedEvents();
@@ -552,7 +862,7 @@ function renderFeed() {
 
 
 /* =========================================================
-   INTERACCIONES FEED
+   INTERACCIONES DEL FEED
 ========================================================= */
 
 function bindFeedEvents() {
@@ -565,7 +875,12 @@ function bindFeedEvents() {
 
             button.addEventListener(
                 "click",
+
                 function() {
+
+                    const companyId =
+                        this.dataset.company;
+
 
                     this.classList.toggle(
                         "following"
@@ -586,8 +901,28 @@ function bindFeedEvents() {
 
                     if (following) {
 
+                        const company =
+                            mahpeState
+                                .companies
+                                .find(
+                                    item =>
+                                        item.id ===
+                                        companyId
+                                );
+
+
+                        if (company) {
+
+                            company.followers += 1;
+
+                            company.value += 4;
+
+                        }
+
+
                         mahpeState.mahpes +=
                             2;
+
 
                         saveMahpeState();
 
@@ -607,10 +942,12 @@ function bindFeedEvents() {
 
             button.addEventListener(
                 "click",
+
                 function() {
 
                     const postId =
                         this.dataset.post;
+
 
                     const signal =
                         this.dataset.signal;
@@ -650,11 +987,6 @@ function bindFeedEvents() {
                         ] = true;
 
 
-                    this.classList.add(
-                        "selected"
-                    );
-
-
                     applySignal(
                         postId,
                         signal
@@ -680,16 +1012,16 @@ function applySignal(
     const post =
         mahpeState.posts.find(
             item =>
-                item.id === postId
+                item.id ===
+                postId
         );
 
 
     /*
-     * SURANO es demo.
-     * Permitimos interacción visual,
-     * pero no modifica una empresa
-     * real del usuario.
-     */
+        Si el post pertenece a SURANO demo,
+        la interacción se registra pero no
+        altera una empresa real del usuario.
+    */
 
     if (!post) {
 
@@ -713,8 +1045,15 @@ function applySignal(
 
 
     if (!company) {
+
         return;
+
     }
+
+
+    migrateCompanyBusinessData(
+        company
+    );
 
 
     if (
@@ -725,6 +1064,11 @@ function applySignal(
         post.interactions += 1;
 
         company.interactions += 1;
+
+        company.activity =
+            clamp(
+                company.activity + 1
+            );
 
         company.value += 5;
 
@@ -740,6 +1084,16 @@ function applySignal(
 
         company.interested += 1;
 
+        company.marketResponse =
+            clamp(
+                company.marketResponse + 2
+            );
+
+        company.productValidation =
+            clamp(
+                company.productValidation + 1
+            );
+
         company.value += 20;
 
     }
@@ -753,6 +1107,16 @@ function applySignal(
         post.committed += 1;
 
         company.committed += 1;
+
+        company.marketResponse =
+            clamp(
+                company.marketResponse + 4
+            );
+
+        company.productValidation =
+            clamp(
+                company.productValidation + 3
+            );
 
         company.value += 50;
 
@@ -838,14 +1202,21 @@ function recalculateCompanyStage(
    CREAR EMPRESA
 ========================================================= */
 
-document
-    .getElementById(
+const createCompanyButton =
+    document.getElementById(
         "createCompanyButton"
-    )
-    .addEventListener(
-        "click",
-        createCompany
     );
+
+
+if (createCompanyButton) {
+
+    createCompanyButton
+        .addEventListener(
+            "click",
+            createCompany
+        );
+
+}
 
 
 function createCompany() {
@@ -960,6 +1331,24 @@ function createCompany() {
 
         capital: 500,
 
+        activity: 20,
+
+        marketResponse: 20,
+
+        locationStrength: 20,
+
+        risk: 15,
+
+        designLevel: 20,
+
+        productValidation: 10,
+
+        marketKnowledge: 10,
+
+        campaignPower: 0,
+
+        decisions: [],
+
         createdAt:
             new Date()
                 .toISOString()
@@ -977,11 +1366,6 @@ function createCompany() {
     currentCompanyId =
         company.id;
 
-
-    /*
-     * Recompensa por crear
-     * una empresa.
-     */
 
     mahpeState.mahpes +=
         100;
@@ -1010,7 +1394,7 @@ function createCompany() {
             );
 
         },
-        400
+        350
     );
 
 }
@@ -1018,18 +1402,32 @@ function createCompany() {
 
 function clearCompanyForm() {
 
-    [
-        "companyNameInput",
-        "companyDescriptionInput",
-        "companyProductInput",
-        "companyPriceInput",
-        "companyAudienceInput"
-    ]
-    .forEach(id => {
+    const fields = [
 
-        document
-            .getElementById(id)
-            .value = "";
+        "companyNameInput",
+
+        "companyDescriptionInput",
+
+        "companyProductInput",
+
+        "companyPriceInput",
+
+        "companyAudienceInput"
+
+    ];
+
+
+    fields.forEach(id => {
+
+        const element =
+            document.getElementById(id);
+
+
+        if (element) {
+
+            element.value = "";
+
+        }
 
     });
 
@@ -1037,7 +1435,1159 @@ function clearCompanyForm() {
 
 
 /* =========================================================
-   DASHBOARD EMPRESA
+   COYOTE BUSINESS ENGINE
+========================================================= */
+
+const COYOTE_DECISIONS = {
+
+    product: {
+
+        icon:
+            "🧪",
+
+        name:
+            "Probar producto",
+
+        cost:
+            40,
+
+        description:
+            "Valida el producto frente al mercado virtual."
+
+    },
+
+
+    design: {
+
+        icon:
+            "🎨",
+
+        name:
+            "Mejorar diseño",
+
+        cost:
+            60,
+
+        description:
+            "Refuerza presentación, identidad y percepción."
+
+    },
+
+
+    campaign: {
+
+        icon:
+            "📣",
+
+        name:
+            "Hacer campaña",
+
+        cost:
+            100,
+
+        description:
+            "Aumenta exposición, pero no garantiza interés."
+
+    },
+
+
+    research: {
+
+        icon:
+            "🔎",
+
+        name:
+            "Investigar mercado",
+
+        cost:
+            70,
+
+        description:
+            "Reduce incertidumbre y mejora conocimiento."
+
+    },
+
+
+    location: {
+
+        icon:
+            "📍",
+
+        name:
+            "Probar ubicación",
+
+        cost:
+            50,
+
+        description:
+            "Conecta la empresa con el mapa territorial COYOTE."
+
+    }
+
+};
+
+
+/* =========================================================
+   SEÑALES EMPRESARIALES
+========================================================= */
+
+function getCompanySignalScore(
+    company
+) {
+
+    const interactions =
+        Number(
+            company.interactions || 0
+        );
+
+
+    const interested =
+        Number(
+            company.interested || 0
+        );
+
+
+    const committed =
+        Number(
+            company.committed || 0
+        );
+
+
+    return Math.min(
+
+        100,
+
+        interactions * 0.4 +
+
+        interested * 2 +
+
+        committed * 5
+
+    );
+
+}
+
+
+/* =========================================================
+   ÍNDICE COYOTE
+========================================================= */
+
+function calculateCoyoteBusinessScore(
+    company
+) {
+
+    migrateCompanyBusinessData(
+        company
+    );
+
+
+    const signalScore =
+        getCompanySignalScore(
+            company
+        );
+
+
+    const score =
+
+        company.activity *
+            0.15 +
+
+        company.marketResponse *
+            0.20 +
+
+        company.locationStrength *
+            0.10 +
+
+        company.designLevel *
+            0.10 +
+
+        company.productValidation *
+            0.15 +
+
+        company.marketKnowledge *
+            0.10 +
+
+        signalScore *
+            0.20 -
+
+        company.risk *
+            0.10;
+
+
+    return clamp(score);
+
+}
+
+
+function getCoyoteBusinessLabel(
+    score
+) {
+
+    if (
+        score >= 80
+    ) {
+
+        return "IMPULSO FUERTE";
+
+    }
+
+
+    if (
+        score >= 60
+    ) {
+
+        return "CRECIMIENTO";
+
+    }
+
+
+    if (
+        score >= 40
+    ) {
+
+        return "VALIDACIÓN";
+
+    }
+
+
+    if (
+        score >= 20
+    ) {
+
+        return "EXPLORACIÓN";
+
+    }
+
+
+    return "RIESGO ALTO";
+
+}
+
+
+/* =========================================================
+   RESULTADO DE DECISIONES
+========================================================= */
+
+function getDecisionRoll(
+    company,
+    decisionKey
+) {
+
+    const source =
+        company.id +
+        "-" +
+        decisionKey +
+        "-" +
+        Date.now();
+
+
+    let seed = 0;
+
+
+    for (
+        let i = 0;
+        i < source.length;
+        i++
+    ) {
+
+        seed =
+            (
+                seed * 31 +
+                source.charCodeAt(i)
+            ) %
+            100000;
+
+    }
+
+
+    return seed % 100;
+
+}
+
+
+/* =========================================================
+   EJECUTAR DECISIÓN
+========================================================= */
+
+function executeBusinessDecision(
+    decisionKey
+) {
+
+    const company =
+        getCurrentCompany();
+
+
+    const decision =
+        COYOTE_DECISIONS[
+            decisionKey
+        ];
+
+
+    if (
+        !company ||
+        !decision
+    ) {
+
+        return;
+
+    }
+
+
+    migrateCompanyBusinessData(
+        company
+    );
+
+
+    if (
+        mahpeState.mahpes <
+        decision.cost
+    ) {
+
+        showBusinessResult(
+
+            "⚠️ No tienes suficientes Mahpes para esta decisión.",
+
+            "warning"
+
+        );
+
+
+        return;
+
+    }
+
+
+    mahpeState.mahpes -=
+        decision.cost;
+
+
+    const roll =
+        getDecisionRoll(
+            company,
+            decisionKey
+        );
+
+
+    const signalScore =
+        getCompanySignalScore(
+            company
+        );
+
+
+    let valueDelta = 0;
+
+    let resultText = "";
+
+
+/* =========================================================
+   DECISIÓN: PROBAR PRODUCTO
+========================================================= */
+
+    if (
+        decisionKey ===
+        "product"
+    ) {
+
+        company.activity =
+            clamp(
+                company.activity + 6
+            );
+
+
+        company.productValidation =
+            clamp(
+
+                company.productValidation +
+
+                (
+                    roll >= 35
+                        ? 12
+                        : 5
+                )
+
+            );
+
+
+        company.marketResponse =
+            clamp(
+
+                company.marketResponse +
+
+                (
+                    signalScore >= 20
+                        ? 8
+                        : 3
+                )
+
+            );
+
+
+        if (
+            roll >= 35
+        ) {
+
+            valueDelta = 90;
+
+
+            resultText =
+                "El producto respondió bien a la prueba. Aumentó su validación.";
+
+        }
+
+        else {
+
+            valueDelta = 30;
+
+
+            company.risk =
+                clamp(
+                    company.risk + 2
+                );
+
+
+            resultText =
+                "La respuesta fue débil. No fue un fracaso total: COYOTE obtuvo información del mercado.";
+
+        }
+
+    }
+
+
+/* =========================================================
+   DECISIÓN: MEJORAR DISEÑO
+========================================================= */
+
+    if (
+        decisionKey ===
+        "design"
+    ) {
+
+        company.designLevel =
+            clamp(
+                company.designLevel + 14
+            );
+
+
+        company.marketResponse =
+            clamp(
+
+                company.marketResponse +
+
+                (
+                    roll >= 30
+                        ? 6
+                        : 2
+                )
+
+            );
+
+
+        company.risk =
+            clamp(
+                company.risk - 2
+            );
+
+
+        valueDelta =
+            roll >= 30
+                ? 75
+                : 35;
+
+
+        resultText =
+            "La identidad del producto mejoró. COYOTE actualizó su percepción de mercado.";
+
+    }
+
+
+/* =========================================================
+   DECISIÓN: CAMPAÑA
+========================================================= */
+
+    if (
+        decisionKey ===
+        "campaign"
+    ) {
+
+        company.activity =
+            clamp(
+                company.activity + 15
+            );
+
+
+        company.campaignPower =
+            clamp(
+                company.campaignPower + 15
+            );
+
+
+        if (
+            signalScore >= 25 ||
+            roll >= 55
+        ) {
+
+            company.marketResponse =
+                clamp(
+                    company.marketResponse + 10
+                );
+
+
+            company.interested +=
+                2;
+
+
+            company.followers +=
+                5;
+
+
+            valueDelta =
+                130;
+
+
+            resultText =
+                "La campaña encontró tracción. Aumentó la exposición y aparecieron nuevos interesados.";
+
+        }
+
+        else {
+
+            company.risk =
+                clamp(
+                    company.risk + 7
+                );
+
+
+            company.followers +=
+                2;
+
+
+            valueDelta =
+                25;
+
+
+            resultText =
+                "La campaña consiguió exposición, pero poca intención real. COYOTE detecta riesgo de gastar sin validar.";
+
+        }
+
+    }
+
+
+/* =========================================================
+   DECISIÓN: INVESTIGAR MERCADO
+========================================================= */
+
+    if (
+        decisionKey ===
+        "research"
+    ) {
+
+        company.marketKnowledge =
+            clamp(
+                company.marketKnowledge + 18
+            );
+
+
+        company.risk =
+            clamp(
+                company.risk - 10
+            );
+
+
+        company.marketResponse =
+            clamp(
+                company.marketResponse + 4
+            );
+
+
+        valueDelta =
+            60;
+
+
+        resultText =
+            "La investigación redujo incertidumbre y mejoró el conocimiento del mercado.";
+
+    }
+
+
+/* =========================================================
+   DECISIÓN: PROBAR UBICACIÓN
+========================================================= */
+
+    if (
+        decisionKey ===
+        "location"
+    ) {
+
+        company.locationStrength =
+            clamp(
+                company.locationStrength + 8
+            );
+
+
+        company.marketKnowledge =
+            clamp(
+                company.marketKnowledge + 5
+            );
+
+
+        valueDelta =
+            45;
+
+
+        resultText =
+            "COYOTE preparó una prueba territorial. El siguiente paso es contrastar la empresa sobre el mapa.";
+
+    }
+
+
+/* =========================================================
+   ACTUALIZAR EMPRESA
+========================================================= */
+
+    company.value =
+        Math.max(
+
+            0,
+
+            Number(
+                company.value || 0
+            ) +
+
+            valueDelta
+
+        );
+
+
+    recalculateCompanyStage(
+        company
+    );
+
+
+    const businessScore =
+        calculateCoyoteBusinessScore(
+            company
+        );
+
+
+    const historyItem = {
+
+        id:
+            generateId(
+                "decision"
+            ),
+
+        companyId:
+            company.id,
+
+        decision:
+            decision.name,
+
+        decisionKey,
+
+        cost:
+            decision.cost,
+
+        valueDelta,
+
+        score:
+            businessScore,
+
+        result:
+            resultText,
+
+        createdAt:
+            new Date()
+                .toISOString()
+
+    };
+
+
+    company.decisions.unshift(
+        historyItem
+    );
+
+
+    company.decisions =
+        company.decisions.slice(
+            0,
+            12
+        );
+
+
+    mahpeState
+        .decisionHistory
+        .unshift(
+            historyItem
+        );
+
+
+    mahpeState.decisionHistory =
+        mahpeState
+            .decisionHistory
+            .slice(
+                0,
+                50
+            );
+
+
+    saveMahpeState();
+
+
+    renderCompanyDashboard();
+
+
+    setTimeout(
+        function() {
+
+            showBusinessResult(
+
+                resultText +
+
+                " Valor empresarial: +" +
+
+                valueDelta +
+
+                ". Índice COYOTE: " +
+
+                businessScore +
+
+                "/100.",
+
+                "success"
+
+            );
+
+        },
+        30
+    );
+
+
+    if (
+        decisionKey ===
+        "location"
+    ) {
+
+        setTimeout(
+            function() {
+
+                openView(
+                    "mapView"
+                );
+
+
+                updateStatus(
+
+                    "📍 <strong>Prueba empresarial activa.</strong><br>" +
+
+                    "Usa Punto Verde y la búsqueda para observar el territorio de " +
+
+                    escapeHTML(
+                        company.name
+                    ) +
+
+                    "."
+
+                );
+
+            },
+            1100
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   MENSAJE BUSINESS ENGINE
+========================================================= */
+
+function showBusinessResult(
+    message,
+    type = "success"
+) {
+
+    const box =
+        document.getElementById(
+            "coyoteBusinessResult"
+        );
+
+
+    if (!box) {
+
+        return;
+
+    }
+
+
+    box.className =
+        "coyote-business-result " +
+        type;
+
+
+    box.textContent =
+        message;
+
+}
+
+
+/* =========================================================
+   MÉTRICA BUSINESS ENGINE
+========================================================= */
+
+function renderBusinessMetric(
+    label,
+    value
+) {
+
+    return `
+
+        <div class="coyote-business-metric">
+
+            <div>
+
+                <span>
+                    ${escapeHTML(label)}
+                </span>
+
+                <strong>
+                    ${clamp(value)}
+                </strong>
+
+            </div>
+
+
+            <div class="coyote-business-bar">
+
+                <div
+                    style="width:${clamp(value)}%"
+                ></div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   RENDER COYOTE BUSINESS ENGINE
+========================================================= */
+
+function renderBusinessEngine(
+    company
+) {
+
+    migrateCompanyBusinessData(
+        company
+    );
+
+
+    const score =
+        calculateCoyoteBusinessScore(
+            company
+        );
+
+
+    const label =
+        getCoyoteBusinessLabel(
+            score
+        );
+
+
+    const decisionsHTML =
+        Object.entries(
+            COYOTE_DECISIONS
+        )
+        .map(
+            ([key, decision]) => `
+
+                <button
+                    class="coyote-decision-button"
+                    onclick="executeBusinessDecision('${key}')"
+                >
+
+                    <span
+                        class="coyote-decision-icon"
+                    >
+
+                        ${decision.icon}
+
+                    </span>
+
+
+                    <span
+                        class="coyote-decision-copy"
+                    >
+
+                        <strong>
+
+                            ${escapeHTML(
+                                decision.name
+                            )}
+
+                        </strong>
+
+
+                        <small>
+
+                            ${escapeHTML(
+                                decision.description
+                            )}
+
+                        </small>
+
+                    </span>
+
+
+                    <span
+                        class="coyote-decision-cost"
+                    >
+
+                        ◈ ${decision.cost}
+
+                    </span>
+
+                </button>
+
+            `
+        )
+        .join("");
+
+
+    const historyHTML =
+        company.decisions.length
+
+            ? company.decisions
+                .slice(
+                    0,
+                    5
+                )
+                .map(
+                    item => `
+
+                        <div
+                            class="coyote-history-item"
+                        >
+
+                            <div>
+
+                                <strong>
+
+                                    ${escapeHTML(
+                                        item.decision
+                                    )}
+
+                                </strong>
+
+
+                                <small>
+
+                                    ${new Date(
+                                        item.createdAt
+                                    ).toLocaleString(
+                                        "es-PE"
+                                    )}
+
+                                </small>
+
+                            </div>
+
+
+                            <span>
+
+                                +${item.valueDelta}
+
+                            </span>
+
+                        </div>
+
+                    `
+                )
+                .join("")
+
+            : `
+
+                <div
+                    class="coyote-history-empty"
+                >
+
+                    Todavía no has tomado
+                    decisiones empresariales.
+
+                </div>
+
+            `;
+
+
+    return `
+
+        <section
+            class="coyote-business-engine"
+        >
+
+            <div
+                class="coyote-engine-heading"
+            >
+
+                <div>
+
+                    <span class="eyebrow">
+
+                        COYOTE BUSINESS ENGINE
+
+                    </span>
+
+
+                    <h2>
+
+                        Decide. Prueba. Aprende.
+
+                    </h2>
+
+
+                    <p class="muted">
+
+                        Tus decisiones consumen Mahpes
+                        y modifican la evolución simulada
+                        de la empresa.
+
+                    </p>
+
+                </div>
+
+
+                <div class="coyote-score">
+
+                    <strong>
+
+                        ${score}
+
+                    </strong>
+
+
+                    <small>
+
+                        /100
+
+                    </small>
+
+
+                    <span>
+
+                        ${label}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="coyote-business-metrics"
+            >
+
+                ${renderBusinessMetric(
+                    "Actividad",
+                    company.activity
+                )}
+
+
+                ${renderBusinessMetric(
+                    "Mercado",
+                    company.marketResponse
+                )}
+
+
+                ${renderBusinessMetric(
+                    "Producto",
+                    company.productValidation
+                )}
+
+
+                ${renderBusinessMetric(
+                    "Diseño",
+                    company.designLevel
+                )}
+
+
+                ${renderBusinessMetric(
+                    "Ubicación",
+                    company.locationStrength
+                )}
+
+
+                ${renderBusinessMetric(
+                    "Conocimiento",
+                    company.marketKnowledge
+                )}
+
+            </div>
+
+
+            <div
+                class="coyote-risk-line"
+            >
+
+                <span>
+
+                    Riesgo empresarial
+
+                </span>
+
+
+                <strong>
+
+                    ${company.risk}/100
+
+                </strong>
+
+            </div>
+
+
+            <div
+                class="coyote-decision-grid"
+            >
+
+                ${decisionsHTML}
+
+            </div>
+
+
+            <div
+                id="coyoteBusinessResult"
+                class="coyote-business-result"
+            ></div>
+
+
+            <div
+                class="coyote-history"
+            >
+
+                <h3>
+
+                    Últimas decisiones
+
+                </h3>
+
+
+                ${historyHTML}
+
+            </div>
+
+        </section>
+
+    `;
+
+}
+
+
+/* =========================================================
+   DASHBOARD DE EMPRESA
 ========================================================= */
 
 function renderCompanyDashboard() {
@@ -1046,6 +2596,13 @@ function renderCompanyDashboard() {
         document.getElementById(
             "companyDashboard"
         );
+
+
+    if (!container) {
+
+        return;
+
+    }
 
 
     const company =
@@ -1067,8 +2624,11 @@ function renderCompanyDashboard() {
                 </h1>
 
                 <p class="muted">
-                    Ve a Crear y construye tu
-                    primera empresa dentro de MAHPE.
+
+                    Ve a Crear y construye
+                    tu primera empresa
+                    dentro de MAHPE.
+
                 </p>
 
                 <button
@@ -1082,9 +2642,15 @@ function renderCompanyDashboard() {
 
         `;
 
+
         return;
 
     }
+
+
+    migrateCompanyBusinessData(
+        company
+    );
 
 
     container.innerHTML = `
@@ -1093,23 +2659,32 @@ function renderCompanyDashboard() {
 
             <div class="company-hero-top">
 
-                <div class="company-big-avatar">
+                <div
+                    class="company-big-avatar"
+                >
 
                     ${escapeHTML(
-                        company.name.charAt(0)
+                        company.name
+                            .charAt(0)
                     )}
 
                 </div>
 
+
                 <div>
 
                     <h1>
+
                         ${escapeHTML(
                             company.name
                         )}
+
                     </h1>
 
-                    <div class="company-stage">
+
+                    <div
+                        class="company-stage"
+                    >
 
                         ${escapeHTML(
                             company.stage
@@ -1122,7 +2697,9 @@ function renderCompanyDashboard() {
             </div>
 
 
-            <p class="company-description">
+            <p
+                class="company-description"
+            >
 
                 ${escapeHTML(
                     company.description
@@ -1137,7 +2714,9 @@ function renderCompanyDashboard() {
 
             <div class="stat-card">
 
-                <span>📈</span>
+                <span>
+                    📈
+                </span>
 
                 <strong>
                     ${company.value}
@@ -1152,7 +2731,9 @@ function renderCompanyDashboard() {
 
             <div class="stat-card">
 
-                <span>◈</span>
+                <span>
+                    ◈
+                </span>
 
                 <strong>
                     ${company.capital}
@@ -1167,7 +2748,9 @@ function renderCompanyDashboard() {
 
             <div class="stat-card">
 
-                <span>🔥</span>
+                <span>
+                    🔥
+                </span>
 
                 <strong>
                     ${company.interested}
@@ -1182,7 +2765,9 @@ function renderCompanyDashboard() {
 
             <div class="stat-card">
 
-                <span>💰</span>
+                <span>
+                    💰
+                </span>
 
                 <strong>
                     ${company.committed}
@@ -1203,17 +2788,20 @@ function renderCompanyDashboard() {
                 PRODUCTO
             </span>
 
+
             <h2>
+
                 ${escapeHTML(
                     company.product
                 )}
+
             </h2>
+
 
             <p class="muted">
 
                 Precio estimado:
-                S/
-                ${company.price}
+                S/ ${company.price}
 
                 <br><br>
 
@@ -1227,20 +2815,33 @@ function renderCompanyDashboard() {
         </section>
 
 
+        ${renderBusinessEngine(
+            company
+        )}
+
+
         <section class="publisher">
 
             <span class="eyebrow">
+
                 PUBLICAR
+
             </span>
 
+
             <h2>
+
                 Lanza una prueba al mercado
+
             </h2>
 
 
             <label>
+
                 Título
+
             </label>
+
 
             <input
                 id="postTitleInput"
@@ -1249,8 +2850,11 @@ function renderCompanyDashboard() {
 
 
             <label>
+
                 ¿Qué quieres mostrar?
+
             </label>
+
 
             <textarea
                 id="postTextInput"
@@ -1262,7 +2866,9 @@ function renderCompanyDashboard() {
                 class="primary-button big"
                 onclick="publishCompanyPost()"
             >
+
                 PUBLICAR
+
             </button>
 
         </section>
@@ -1283,7 +2889,9 @@ function publishCompanyPost() {
 
 
     if (!company) {
+
         return;
+
     }
 
 
@@ -1299,19 +2907,41 @@ function publishCompanyPost() {
         );
 
 
-    const title =
-        titleInput.value.trim();
-
-
-    const text =
-        textInput.value.trim();
-
-
-    if (!title || !text) {
+    if (
+        !titleInput ||
+        !textInput
+    ) {
 
         return;
 
     }
+
+
+    const title =
+        titleInput
+            .value
+            .trim();
+
+
+    const text =
+        textInput
+            .value
+            .trim();
+
+
+    if (
+        !title ||
+        !text
+    ) {
+
+        return;
+
+    }
+
+
+    migrateCompanyBusinessData(
+        company
+    );
 
 
     const post = {
@@ -1337,7 +2967,8 @@ function publishCompanyPost() {
         views:
             Math.floor(
                 10 +
-                Math.random() * 35
+                Math.random() *
+                35
             ),
 
         interactions: 0,
@@ -1358,14 +2989,18 @@ function publishCompanyPost() {
     );
 
 
-    /*
-     * Actividad empresarial
-     * genera crecimiento inicial.
-     */
+    company.value +=
+        25;
 
-    company.value += 25;
 
-    mahpeState.mahpes += 10;
+    company.activity =
+        clamp(
+            company.activity + 3
+        );
+
+
+    mahpeState.mahpes +=
+        10;
 
 
     recalculateCompanyStage(
@@ -1394,35 +3029,65 @@ function publishCompanyPost() {
 
 function updateProfile() {
 
-    document
-        .getElementById(
+    const profileMahpes =
+        document.getElementById(
             "profileMahpes"
-        )
-        .textContent =
+        );
+
+
+    const profileCompanies =
+        document.getElementById(
+            "profileCompanies"
+        );
+
+
+    const profileInterest =
+        document.getElementById(
+            "profileInterest"
+        );
+
+
+    const profileCommitment =
+        document.getElementById(
+            "profileCommitment"
+        );
+
+
+    if (profileMahpes) {
+
+        profileMahpes.textContent =
             mahpeState.mahpes;
 
+    }
 
-    document
-        .getElementById(
-            "profileCompanies"
-        )
-        .textContent =
+
+    if (profileCompanies) {
+
+        profileCompanies.textContent =
             mahpeState
                 .companies
                 .length;
+
+    }
 
 
     const totalInterest =
         mahpeState
             .companies
             .reduce(
+
                 (
                     total,
                     company
                 ) =>
+
                     total +
-                    company.interested,
+                    Number(
+                        company.interested || 0
+                    ),
+
                 0
+
             );
 
 
@@ -1430,30 +3095,36 @@ function updateProfile() {
         mahpeState
             .companies
             .reduce(
+
                 (
                     total,
                     company
                 ) =>
+
                     total +
-                    company.committed,
+                    Number(
+                        company.committed || 0
+                    ),
+
                 0
+
             );
 
 
-    document
-        .getElementById(
-            "profileInterest"
-        )
-        .textContent =
+    if (profileInterest) {
+
+        profileInterest.textContent =
             totalInterest;
 
+    }
 
-    document
-        .getElementById(
-            "profileCommitment"
-        )
-        .textContent =
+
+    if (profileCommitment) {
+
+        profileCommitment.textContent =
             totalCommitment;
+
+    }
 
 }
 
@@ -1484,24 +3155,652 @@ function updateGlobalUI() {
 
 
 /* =========================================================
+   FIN DE PARTE 1/2
+   NO CIERRES EL ARCHIVO.
+   LA PARTE 2 EMPIEZA CON LOS ESTILOS DEL BUSINESS ENGINE
+   Y CONTINÚA CON TODO EL MAPA COYOTE.
+========================================================= */
+/* =========================================================
+   ESTILOS COYOTE BUSINESS ENGINE
+========================================================= */
+
+function injectCoyoteBusinessStyles() {
+
+    if (
+        document.getElementById(
+            "coyoteBusinessStyles"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const style =
+        document.createElement(
+            "style"
+        );
+
+
+    style.id =
+        "coyoteBusinessStyles";
+
+
+    style.textContent = `
+
+        .coyote-business-engine {
+
+            margin-top: 18px;
+
+            padding: 22px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.08);
+
+            border-radius: 22px;
+
+            background:
+                #111315;
+
+        }
+
+
+        .coyote-engine-heading {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            gap: 18px;
+
+            align-items:
+                flex-start;
+
+        }
+
+
+        .coyote-engine-heading h2 {
+
+            margin:
+                7px 0 5px;
+
+        }
+
+
+        .coyote-score {
+
+            min-width: 94px;
+
+            padding: 13px;
+
+            text-align:
+                center;
+
+            border:
+                1px solid
+                rgba(0,233,101,.25);
+
+            border-radius:
+                16px;
+
+            background:
+                rgba(0,233,101,.07);
+
+        }
+
+
+        .coyote-score strong {
+
+            font-size:
+                27px;
+
+            color:
+                #00e965;
+
+        }
+
+
+        .coyote-score small {
+
+            color:
+                #6f7772;
+
+        }
+
+
+        .coyote-score span {
+
+            display:
+                block;
+
+            margin-top:
+                4px;
+
+            font-size:
+                7px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                1px;
+
+            color:
+                #00e965;
+
+        }
+
+
+        .coyote-business-metrics {
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap:
+                9px;
+
+            margin-top:
+                18px;
+
+        }
+
+
+        .coyote-business-metric {
+
+            padding:
+                11px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.06);
+
+            border-radius:
+                12px;
+
+            background:
+                #181a1d;
+
+        }
+
+
+        .coyote-business-metric
+        > div:first-child {
+
+            display:
+                flex;
+
+            justify-content:
+                space-between;
+
+            gap:
+                8px;
+
+            font-size:
+                9px;
+
+            color:
+                #8a9094;
+
+        }
+
+
+        .coyote-business-metric strong {
+
+            color:
+                white;
+
+        }
+
+
+        .coyote-business-bar {
+
+            height:
+                5px;
+
+            margin-top:
+                8px;
+
+            overflow:
+                hidden;
+
+            border-radius:
+                20px;
+
+            background:
+                #292d30;
+
+        }
+
+
+        .coyote-business-bar div {
+
+            height:
+                100%;
+
+            border-radius:
+                20px;
+
+            background:
+                #00e965;
+
+        }
+
+
+        .coyote-risk-line {
+
+            display:
+                flex;
+
+            justify-content:
+                space-between;
+
+            margin:
+                11px 0 17px;
+
+            padding:
+                10px 12px;
+
+            border-radius:
+                11px;
+
+            background:
+                rgba(255,255,255,.035);
+
+            color:
+                #8b9094;
+
+            font-size:
+                10px;
+
+        }
+
+
+        .coyote-risk-line strong {
+
+            color:
+                #f2f2f2;
+
+        }
+
+
+        .coyote-decision-grid {
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap:
+                9px;
+
+        }
+
+
+        .coyote-decision-button {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                10px;
+
+            min-height:
+                76px;
+
+            padding:
+                11px;
+
+            border:
+                1px solid
+                rgba(255,255,255,.07);
+
+            border-radius:
+                14px;
+
+            background:
+                #181a1d;
+
+            color:
+                white;
+
+            text-align:
+                left;
+
+            cursor:
+                pointer;
+
+            transition:
+                .18s ease;
+
+        }
+
+
+        .coyote-decision-button:hover {
+
+            border-color:
+                rgba(0,233,101,.4);
+
+            background:
+                rgba(0,233,101,.06);
+
+            transform:
+                translateY(-1px);
+
+        }
+
+
+        .coyote-decision-icon {
+
+            font-size:
+                20px;
+
+        }
+
+
+        .coyote-decision-copy {
+
+            flex:
+                1;
+
+        }
+
+
+        .coyote-decision-copy strong,
+        .coyote-decision-copy small {
+
+            display:
+                block;
+
+        }
+
+
+        .coyote-decision-copy strong {
+
+            font-size:
+                10px;
+
+        }
+
+
+        .coyote-decision-copy small {
+
+            margin-top:
+                4px;
+
+            color:
+                #777d82;
+
+            font-size:
+                8px;
+
+            line-height:
+                1.35;
+
+        }
+
+
+        .coyote-decision-cost {
+
+            white-space:
+                nowrap;
+
+            color:
+                #00e965;
+
+            font-size:
+                9px;
+
+            font-weight:
+                900;
+
+        }
+
+
+        .coyote-business-result {
+
+            display:
+                none;
+
+            margin-top:
+                13px;
+
+            padding:
+                12px;
+
+            border-radius:
+                12px;
+
+            font-size:
+                10px;
+
+            line-height:
+                1.5;
+
+        }
+
+
+        .coyote-business-result.success {
+
+            display:
+                block;
+
+            border:
+                1px solid
+                rgba(0,233,101,.2);
+
+            background:
+                rgba(0,233,101,.07);
+
+            color:
+                #bdf8d1;
+
+        }
+
+
+        .coyote-business-result.warning {
+
+            display:
+                block;
+
+            border:
+                1px solid
+                rgba(255,190,60,.25);
+
+            background:
+                rgba(255,190,60,.08);
+
+            color:
+                #ffd68b;
+
+        }
+
+
+        .coyote-history {
+
+            margin-top:
+                20px;
+
+            padding-top:
+                15px;
+
+            border-top:
+                1px solid
+                rgba(255,255,255,.07);
+
+        }
+
+
+        .coyote-history h3 {
+
+            margin:
+                0 0 10px;
+
+            font-size:
+                12px;
+
+        }
+
+
+        .coyote-history-item {
+
+            display:
+                flex;
+
+            justify-content:
+                space-between;
+
+            gap:
+                10px;
+
+            padding:
+                9px 0;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,.05);
+
+        }
+
+
+        .coyote-history-item strong,
+        .coyote-history-item small {
+
+            display:
+                block;
+
+        }
+
+
+        .coyote-history-item strong {
+
+            font-size:
+                9px;
+
+        }
+
+
+        .coyote-history-item small {
+
+            margin-top:
+                3px;
+
+            color:
+                #6f7478;
+
+            font-size:
+                7px;
+
+        }
+
+
+        .coyote-history-item > span {
+
+            color:
+                #00e965;
+
+            font-size:
+                10px;
+
+            font-weight:
+                900;
+
+        }
+
+
+        .coyote-history-empty {
+
+            color:
+                #686e72;
+
+            font-size:
+                9px;
+
+        }
+
+
+        @media (
+            max-width: 600px
+        ) {
+
+            .coyote-engine-heading {
+
+                flex-direction:
+                    column;
+
+            }
+
+
+            .coyote-score {
+
+                width:
+                    100%;
+
+            }
+
+
+            .coyote-decision-grid {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .coyote-business-metrics {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+        }
+
+    `;
+
+
+    document.head.appendChild(
+        style
+    );
+
+}
+
+
+/* =========================================================
    COYOTE — MAPA
 ========================================================= */
 
 let map;
 
-let userLocation = null;
+let userLocation =
+    null;
 
-let userMarker = null;
+let userMarker =
+    null;
 
-let selectedRadius = 10;
+let selectedRadius =
+    10;
 
-let followWatchId = null;
+let followWatchId =
+    null;
 
-let followUserMarker = null;
+let followUserMarker =
+    null;
 
-let followLine = null;
+let followLine =
+    null;
 
-let followedSellerPoint = null;
+let followedSellerPoint =
+    null;
 
 
 /* =========================================================
@@ -1510,16 +3809,43 @@ let followedSellerPoint = null;
 
 function initializeMap() {
 
+    if (map) {
+
+        return;
+
+    }
+
+
+    const mapElement =
+        document.getElementById(
+            "map"
+        );
+
+
+    if (!mapElement) {
+
+        console.error(
+            "No existe #map."
+        );
+
+        return;
+
+    }
+
+
     map =
         L.map(
             "map"
         )
         .setView(
+
             [
                 -12.025,
                 -76.925
             ],
+
             14
+
         );
 
 
@@ -1529,14 +3855,16 @@ function initializeMap() {
 
         {
 
-            maxZoom: 19,
+            maxZoom:
+                19,
 
             attribution:
                 "&copy; OpenStreetMap contributors"
 
         }
 
-    ).addTo(
+    )
+    .addTo(
         map
     );
 
@@ -1547,17 +3875,24 @@ function initializeMap() {
 
 
 /* =========================================================
-   ACTIVAR PUNTO
+   ACTIVAR PUNTO VERDE
 ========================================================= */
 
-document
-    .getElementById(
+const activateButton =
+    document.getElementById(
         "activateButton"
-    )
-    .addEventListener(
-        "click",
-        activateSeller
     );
+
+
+if (activateButton) {
+
+    activateButton
+        .addEventListener(
+            "click",
+            activateSeller
+        );
+
+}
 
 
 function activateSeller() {
@@ -1587,49 +3922,72 @@ function activateSeller() {
             function(position) {
 
                 const lat =
-                    position.coords.latitude;
+                    position
+                        .coords
+                        .latitude;
+
 
                 const lng =
-                    position.coords.longitude;
+                    position
+                        .coords
+                        .longitude;
 
 
                 userLocation = {
+
                     lat,
+
                     lng
+
                 };
 
 
                 map.setView(
+
                     [
                         lat,
                         lng
                     ],
+
                     17
+
                 );
 
 
-                document
-                    .getElementById(
-                        "sellerForm"
-                    )
-                    .classList
-                    .remove(
-                        "hidden"
-                    );
+                const sellerForm =
+                    document
+                        .getElementById(
+                            "sellerForm"
+                        );
 
 
-                document
-                    .getElementById(
-                        "activateButton"
-                    )
-                    .classList
-                    .add(
-                        "hidden"
-                    );
+                if (sellerForm) {
+
+                    sellerForm
+                        .classList
+                        .remove(
+                            "hidden"
+                        );
+
+                }
+
+
+                if (activateButton) {
+
+                    activateButton
+                        .classList
+                        .add(
+                            "hidden"
+                        );
+
+                }
 
 
                 updateStatus(
-                    "📍 Ubicación encontrada. Ahora indica qué vendes."
+
+                    "📍 Ubicación encontrada. " +
+                    "Ahora indica qué vendes."
+
                 );
 
             },
@@ -1638,7 +3996,8 @@ function activateSeller() {
             function(error) {
 
                 if (
-                    error.code === 1
+                    error.code ===
+                    1
                 ) {
 
                     updateStatus(
@@ -1680,14 +4039,21 @@ function activateSeller() {
    CREAR PUNTO VERDE
 ========================================================= */
 
-document
-    .getElementById(
+const confirmSellerButton =
+    document.getElementById(
         "confirmSellerButton"
-    )
-    .addEventListener(
-        "click",
-        createSellerPoint
     );
+
+
+if (confirmSellerButton) {
+
+    confirmSellerButton
+        .addEventListener(
+            "click",
+            createSellerPoint
+        );
+
+}
 
 
 function createSellerPoint() {
@@ -1709,8 +4075,17 @@ function createSellerPoint() {
         );
 
 
+    if (!input) {
+
+        return;
+
+    }
+
+
     const product =
-        input.value.trim();
+        input
+            .value
+            .trim();
 
 
     if (!product) {
@@ -1746,10 +4121,13 @@ function createSellerPoint() {
 
 
     localStorage.setItem(
+
         "coyote_seller_point",
+
         JSON.stringify(
             point
         )
+
     );
 
 
@@ -1758,29 +4136,50 @@ function createSellerPoint() {
     );
 
 
-    document
-        .getElementById(
+    const sellerForm =
+        document.getElementById(
             "sellerForm"
-        )
-        .classList
-        .add(
-            "hidden"
         );
 
 
+    if (sellerForm) {
+
+        sellerForm
+            .classList
+            .add(
+                "hidden"
+            );
+
+    }
+
+
     updateStatus(
+
         "🟢 <strong>Punto activo.</strong><br>" +
-        escapeHTML(product)
+
+        escapeHTML(
+            product
+        )
+
     );
 
 }
 
 
 /* =========================================================
-   MOSTRAR PUNTO
+   MOSTRAR PUNTO VERDE
 ========================================================= */
 
-function showGreenPoint(point) {
+function showGreenPoint(
+    point
+) {
+
+    if (!map) {
+
+        return;
+
+    }
+
 
     if (userMarker) {
 
@@ -1794,7 +4193,8 @@ function showGreenPoint(point) {
     const greenIcon =
         L.divIcon({
 
-            className: "",
+            className:
+                "",
 
             html:
                 '<div class="green-marker"></div>',
@@ -1825,7 +4225,9 @@ function showGreenPoint(point) {
             }
 
         )
-        .addTo(map);
+        .addTo(
+            map
+        );
 
 
     const popup = `
@@ -1833,7 +4235,9 @@ function showGreenPoint(point) {
         <div>
 
             <strong>
+
                 🟢 Punto MAHPE
+
             </strong>
 
             <br><br>
@@ -1841,23 +4245,31 @@ function showGreenPoint(point) {
             Vende:
 
             <strong>
+
                 ${escapeHTML(
                     point.product
                 )}
+
             </strong>
 
             <br><br>
 
+
             <button
                 onclick="followSellerPoint()"
             >
+
                 🧭 Seguir
+
             </button>
+
 
             <button
                 onclick="deactivateSeller()"
             >
+
                 Desactivar
+
             </button>
 
         </div>
@@ -1873,7 +4285,7 @@ function showGreenPoint(point) {
 
 
 /* =========================================================
-   CARGAR PUNTO
+   CARGAR PUNTO GUARDADO
 ========================================================= */
 
 function loadSavedSeller() {
@@ -1885,7 +4297,9 @@ function loadSavedSeller() {
 
 
     if (!saved) {
+
         return;
+
     }
 
 
@@ -1929,6 +4343,7 @@ function loadSavedSeller() {
     catch (error) {
 
         console.error(
+            "Error cargando Punto Verde:",
             error
         );
 
@@ -1938,7 +4353,7 @@ function loadSavedSeller() {
 
 
 /* =========================================================
-   DESACTIVAR
+   DESACTIVAR PUNTO
 ========================================================= */
 
 function deactivateSeller() {
@@ -1953,25 +4368,31 @@ function deactivateSeller() {
     );
 
 
-    if (userMarker) {
+    if (
+        userMarker &&
+        map
+    ) {
 
         map.removeLayer(
             userMarker
         );
 
-        userMarker = null;
+
+        userMarker =
+            null;
 
     }
 
 
-    document
-        .getElementById(
-            "activateButton"
-        )
-        .classList
-        .remove(
-            "hidden"
-        );
+    if (activateButton) {
+
+        activateButton
+            .classList
+            .remove(
+                "hidden"
+            );
+
+    }
 
 
     updateStatus(
@@ -1982,7 +4403,7 @@ function deactivateSeller() {
 
 
 /* =========================================================
-   RADIO
+   RADIO DE BÚSQUEDA
 ========================================================= */
 
 const rangeButtons =
@@ -1991,39 +4412,50 @@ const rangeButtons =
     );
 
 
-rangeButtons.forEach(button => {
+rangeButtons.forEach(
+    button => {
 
-    button.addEventListener(
-        "click",
-        function() {
+        button.addEventListener(
 
-            rangeButtons
-                .forEach(item => {
+            "click",
 
-                    item.classList.remove(
+            function() {
+
+                rangeButtons
+                    .forEach(
+                        item => {
+
+                            item
+                                .classList
+                                .remove(
+                                    "active"
+                                );
+
+                        }
+                    );
+
+
+                this
+                    .classList
+                    .add(
                         "active"
                     );
 
-                });
+
+                selectedRadius =
+                    Number(
+                        this.dataset.radius
+                    );
 
 
-            this.classList.add(
-                "active"
-            );
+                updateReference();
 
+            }
 
-            selectedRadius =
-                Number(
-                    this.dataset.radius
-                );
+        );
 
-
-            updateReference();
-
-        }
-    );
-
-});
+    }
+);
 
 
 function updateReference() {
@@ -2033,7 +4465,8 @@ function updateReference() {
 
 
     if (
-        selectedRadius === 1
+        selectedRadius ===
+        1
     ) {
 
         text =
@@ -2043,7 +4476,8 @@ function updateReference() {
 
 
     if (
-        selectedRadius === 3
+        selectedRadius ===
+        3
     ) {
 
         text =
@@ -2053,7 +4487,19 @@ function updateReference() {
 
 
     if (
-        selectedRadius === 20
+        selectedRadius ===
+        10
+    ) {
+
+        text =
+            "Una zona amplia alrededor de ti.";
+
+    }
+
+
+    if (
+        selectedRadius ===
+        20
     ) {
 
         text =
@@ -2062,41 +4508,67 @@ function updateReference() {
     }
 
 
-    document
-        .getElementById(
+    const reference =
+        document.getElementById(
             "referenceText"
-        )
-        .innerHTML =
+        );
+
+
+    if (reference) {
+
+        reference.innerHTML =
 
             "🔎 " +
+
             selectedRadius +
+
             " km<br>" +
+
             text;
+
+    }
 
 }
 
 
 /* =========================================================
-   BUSCAR
+   BUSCAR PRODUCTOS
 ========================================================= */
 
-document
-    .getElementById(
+const searchButton =
+    document.getElementById(
         "searchButton"
-    )
-    .addEventListener(
-        "click",
-        searchProducts
     );
+
+
+if (searchButton) {
+
+    searchButton
+        .addEventListener(
+            "click",
+            searchProducts
+        );
+
+}
 
 
 function searchProducts() {
 
+    const searchInput =
+        document.getElementById(
+            "searchInput"
+        );
+
+
+    if (!searchInput) {
+
+        return;
+
+    }
+
+
     const search =
-        document
-            .getElementById(
-                "searchInput"
-            )
+        searchInput
             .value
             .trim()
             .toLowerCase();
@@ -2133,12 +4605,17 @@ function searchProducts() {
 
 
             if (
+
                 point.active &&
+
+                point.product &&
+
                 point.product
                     .toLowerCase()
                     .includes(
                         search
                     )
+
             ) {
 
                 matches.push(
@@ -2160,45 +4637,70 @@ function searchProducts() {
     }
 
 
-    document
-        .getElementById(
+    const offerText =
+        document.getElementById(
             "offerText"
-        )
-        .textContent =
+        );
+
+
+    if (offerText) {
+
+        offerText.textContent =
 
             matches.length +
+
             " punto(s)";
+
+    }
 
 
     const intensity =
         Math.min(
+
             100,
+
             20 +
+
             matches.length *
             30
+
         );
 
 
-    document
-        .getElementById(
+    const demandBar =
+        document.getElementById(
             "demandBar"
-        )
-        .style
-        .width =
+        );
+
+
+    if (demandBar) {
+
+        demandBar.style.width =
 
             intensity +
+
             "%";
 
+    }
 
-    document
-        .getElementById(
+
+    const demandText =
+        document.getElementById(
             "demandText"
-        )
-        .textContent =
+        );
+
+
+    if (demandText) {
+
+        demandText.textContent =
 
             matches.length
+
                 ? "Actividad detectada"
+
                 : "Actividad inicial";
+
+    }
 
 
     if (
@@ -2229,11 +4731,15 @@ function searchProducts() {
 
 
         updateStatus(
+
             "🟢 Encontramos un punto de " +
+
             escapeHTML(
                 search
             ) +
+
             "."
+
         );
 
     }
@@ -2241,11 +4747,15 @@ function searchProducts() {
     else {
 
         updateStatus(
+
             "🔎 Todavía no encontramos puntos de " +
+
             escapeHTML(
                 search
             ) +
+
             "."
+
         );
 
     }
@@ -2285,7 +4795,11 @@ function followSellerPoint() {
 
     }
 
-    catch {
+    catch (error) {
+
+        console.error(
+            error
+        );
 
         return;
 
@@ -2295,6 +4809,10 @@ function followSellerPoint() {
     if (
         !navigator.geolocation
     ) {
+
+        updateStatus(
+            "❌ Tu navegador no permite seguimiento."
+        );
 
         return;
 
@@ -2354,9 +4872,11 @@ function followSellerPoint() {
 
                                 {
 
-                                    radius: 7,
+                                    radius:
+                                        7,
 
-                                    weight: 3
+                                    weight:
+                                        3
 
                                 }
 
@@ -2371,16 +4891,20 @@ function followSellerPoint() {
 
                         followUserMarker
                             .setLatLng(
+
                                 [
                                     buyerLat,
                                     buyerLng
                                 ]
+
                             );
 
                     }
 
 
-                    if (!followLine) {
+                    if (
+                        !followLine
+                    ) {
 
                         followLine =
                             L.polyline(
@@ -2401,7 +4925,8 @@ function followSellerPoint() {
 
                                 {
 
-                                    weight: 4,
+                                    weight:
+                                        4,
 
                                     dashArray:
                                         "9 8"
@@ -2475,7 +5000,9 @@ function followSellerPoint() {
                         "Distancia: " +
 
                         "<strong>" +
+
                         distanceText +
+
                         "</strong>"
 
                     );
@@ -2512,7 +5039,12 @@ function followSellerPoint() {
                 },
 
 
-                function() {
+                function(error) {
+
+                    console.error(
+                        error
+                    );
+
 
                     stopFollowingSeller(
                         false
@@ -2571,10 +5103,15 @@ function stopFollowingSeller(
 
 
     if (
+
         followUserMarker &&
+
+        map &&
+
         map.hasLayer(
             followUserMarker
         )
+
     ) {
 
         map.removeLayer(
@@ -2585,10 +5122,15 @@ function stopFollowingSeller(
 
 
     if (
+
         followLine &&
+
+        map &&
+
         map.hasLayer(
             followLine
         )
+
     ) {
 
         map.removeLayer(
@@ -2600,6 +5142,7 @@ function stopFollowingSeller(
 
     followUserMarker =
         null;
+
 
     followLine =
         null;
@@ -2617,14 +5160,19 @@ function stopFollowingSeller(
 
 
 /* =========================================================
-   DISTANCIA
+   CALCULAR DISTANCIA
 ========================================================= */
 
 function calculateDistanceKm(
+
     lat1,
+
     lng1,
+
     lat2,
+
     lng2
+
 ) {
 
     const R =
@@ -2633,8 +5181,11 @@ function calculateDistanceKm(
 
     const toRad =
         value =>
+
             value *
+
             Math.PI /
+
             180;
 
 
@@ -2678,7 +5229,9 @@ function calculateDistanceKm(
     return (
 
         2 *
+
         R *
+
         Math.asin(
             Math.sqrt(
                 a
@@ -2694,7 +5247,9 @@ function calculateDistanceKm(
    ESTADO COYOTE
 ========================================================= */
 
-function updateStatus(message) {
+function updateStatus(
+    message
+) {
 
     const element =
         document.getElementById(
@@ -2713,16 +5268,112 @@ function updateStatus(message) {
 
 
 /* =========================================================
-   ARRANQUE
+   CONECTAR EMPRESA CON COYOTE
 ========================================================= */
+
+function syncCompanyWithCoyotePoint() {
+
+    const company =
+        getCurrentCompany();
+
+
+    if (!company) {
+
+        return;
+
+    }
+
+
+    const saved =
+        localStorage.getItem(
+            "coyote_seller_point"
+        );
+
+
+    if (!saved) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const point =
+            JSON.parse(
+                saved
+            );
+
+
+        if (
+            point &&
+            point.active
+        ) {
+
+            migrateCompanyBusinessData(
+                company
+            );
+
+
+            company.locationStrength =
+                clamp(
+                    company.locationStrength +
+                    3
+                );
+
+
+            company.marketKnowledge =
+                clamp(
+                    company.marketKnowledge +
+                    2
+                );
+
+
+            saveMahpeState();
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ACTUALIZAR REFERENCIA INICIAL
+========================================================= */
+
+updateReference();
+
+
+/* =========================================================
+   ARRANQUE MAHPE v1.1
+========================================================= */
+
+migrateMahpeBusinessState();
+
+
+injectCoyoteBusinessStyles();
+
 
 initializeMap();
 
+
 renderFeed();
+
 
 renderCompanyDashboard();
 
+
 updateGlobalUI();
+
 
 openView(
     "feedView"
@@ -2730,9 +5381,15 @@ openView(
 
 
 console.log(
-    "MAHPE v1 iniciado."
+    "MAHPE v1.1 iniciado."
 );
 
+
 console.log(
-    "COYOTE activo como motor territorial."
+    "COYOTE activo como motor territorial + empresarial."
 );
+
+
+/* =========================================================
+   FIN MAHPE v1.1
+========================================================= */
