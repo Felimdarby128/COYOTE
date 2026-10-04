@@ -1314,24 +1314,17 @@ function escapeHTML(text) {
 initializeMap();
 /* =========================================================
    MAHPE — NAVEGACIÓN PRINCIPAL
-   CAPA NUEVA / COYOTE BLINDADO
+   COYOTE PERMANECE BLINDADO
 ========================================================= */
 
 const mahpeNavButtons =
     document.querySelectorAll(".mahpe-nav-item");
 
-
-/*
- * Estado principal de MAHPE.
- *
- * COYOTE / MAPA sigue funcionando de manera independiente.
- */
-
-let mahpeCurrentView = "map";
+let mahpeCurrentView = "feed";
 
 
 /* =========================================================
-   CAMBIAR VISTA MAHPE
+   CAMBIAR VISTA PRINCIPAL DE MAHPE
 ========================================================= */
 
 function changeMahpeView(viewName) {
@@ -1339,9 +1332,9 @@ function changeMahpeView(viewName) {
     mahpeCurrentView = viewName;
 
 
-    /* -------------------------
-       ACTUALIZAR NAVEGACIÓN
-    ------------------------- */
+    /* =====================================================
+       ACTUALIZAR BOTÓN ACTIVO
+    ===================================================== */
 
     mahpeNavButtons.forEach(function(button) {
 
@@ -1358,22 +1351,37 @@ function changeMahpeView(viewName) {
     });
 
 
-    /* -------------------------
-       MAPA
-    ------------------------- */
+    /* =====================================================
+       LIMPIAR MODOS ANTERIORES
+    ===================================================== */
+
+    document.body.classList.remove(
+        "mahpe-map-mode",
+        "mahpe-feed-mode",
+        "mahpe-create-mode",
+        "mahpe-company-mode",
+        "mahpe-profile-mode"
+    );
+
+
+    /* =====================================================
+       MAPA / COYOTE
+    ===================================================== */
 
     if (viewName === "map") {
 
-        console.log(
-            "MAHPE → MAPA / COYOTE"
+        document.body.classList.add(
+            "mahpe-map-mode"
         );
 
 
         /*
-         * Leaflet ya existe.
-         * No recreamos el mapa.
+         * Leaflet ya fue creado por initializeMap().
+         * NO creamos otro mapa.
          *
-         * Solo corregimos su tamaño por seguridad.
+         * invalidateSize solamente obliga a Leaflet
+         * a recalcular el tamaño después de volver
+         * desde otra pantalla.
          */
 
         if (map) {
@@ -1382,33 +1390,49 @@ function changeMahpeView(viewName) {
 
                 map.invalidateSize();
 
-            }, 100);
+            }, 120);
 
         }
 
-        return;
-    }
-
-
-    /* -------------------------
-       INICIO
-    ------------------------- */
-
-    if (viewName === "feed") {
 
         console.log(
-            "MAHPE → INICIO"
+            "MAHPE → MAPA / COYOTE"
         );
 
         return;
     }
 
 
-    /* -------------------------
-       CREAR
-    ------------------------- */
+    /* =====================================================
+       INICIO / FEED
+    ===================================================== */
+
+    if (viewName === "feed") {
+
+        document.body.classList.add(
+            "mahpe-feed-mode"
+        );
+
+
+        console.log(
+            "MAHPE → INICIO / FEED"
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       CREAR EMPRESA
+       La pantalla completa se conectará después.
+    ===================================================== */
 
     if (viewName === "create") {
+
+        document.body.classList.add(
+            "mahpe-create-mode"
+        );
+
 
         console.log(
             "MAHPE → CREAR EMPRESA"
@@ -1418,11 +1442,16 @@ function changeMahpeView(viewName) {
     }
 
 
-    /* -------------------------
+    /* =====================================================
        EMPRESA
-    ------------------------- */
+    ===================================================== */
 
     if (viewName === "company") {
+
+        document.body.classList.add(
+            "mahpe-company-mode"
+        );
+
 
         console.log(
             "MAHPE → EMPRESA"
@@ -1432,23 +1461,29 @@ function changeMahpeView(viewName) {
     }
 
 
-    /* -------------------------
+    /* =====================================================
        PERFIL
-    ------------------------- */
+    ===================================================== */
 
     if (viewName === "profile") {
+
+        document.body.classList.add(
+            "mahpe-profile-mode"
+        );
+
 
         console.log(
             "MAHPE → PERFIL"
         );
 
+        return;
     }
 
 }
 
 
 /* =========================================================
-   EVENTOS DE LA BARRA MAHPE
+   EVENTOS DE NAVEGACIÓN
 ========================================================= */
 
 mahpeNavButtons.forEach(function(button) {
@@ -1460,8 +1495,11 @@ mahpeNavButtons.forEach(function(button) {
             const targetView =
                 this.dataset.mahpeView;
 
+
             if (!targetView) {
+
                 return;
+
             }
 
 
@@ -1476,12 +1514,111 @@ mahpeNavButtons.forEach(function(button) {
 
 
 /* =========================================================
-   MAHPE ARRANCA EN MAPA
+   BOTÓN SEGUIR EMPRESA — PRIMERA INTERACCIÓN SOCIAL
 ========================================================= */
 
-changeMahpeView("map");
+const mahpeFollowButtons =
+    document.querySelectorAll(
+        ".mahpe-follow-button"
+    );
+
+
+mahpeFollowButtons.forEach(function(button) {
+
+    button.addEventListener(
+        "click",
+        function() {
+
+            const isFollowing =
+                this.classList.contains(
+                    "following"
+                );
+
+
+            if (isFollowing) {
+
+                this.classList.remove(
+                    "following"
+                );
+
+                this.textContent =
+                    "Seguir";
+
+            } else {
+
+                this.classList.add(
+                    "following"
+                );
+
+                this.textContent =
+                    "Siguiendo";
+
+            }
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   SEÑALES DEL FEED
+   VISTAS / INTERACCIONES / INTERÉS / COMPROMISO
+========================================================= */
+
+const mahpeSignalButtons =
+    document.querySelectorAll(
+        ".mahpe-signals button"
+    );
+
+
+mahpeSignalButtons.forEach(function(button) {
+
+    button.addEventListener(
+        "click",
+        function() {
+
+            /*
+             * Por ahora registramos visualmente
+             * la interacción.
+             *
+             * Más adelante estos eventos serán
+             * enviados al motor COYOTE.
+             */
+
+            this.classList.toggle(
+                "selected"
+            );
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   INICIAR MAHPE
+========================================================= */
+
+/*
+ * COYOTE ya fue inicializado anteriormente con:
+ *
+ * initializeMap();
+ *
+ * Por eso aquí NO volvemos a ejecutar initializeMap().
+ *
+ * MAHPE arranca mostrando el Feed.
+ */
+
+changeMahpeView(
+    "feed"
+);
 
 
 console.log(
-    "MAHPE: navegación principal preparada."
+    "MAHPE iniciado."
+);
+
+console.log(
+    "COYOTE permanece activo como motor del mapa."
 );
