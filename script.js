@@ -5393,3 +5393,3061 @@ console.log(
 /* =========================================================
    FIN MAHPE v1.1
 ========================================================= */
+/* ============================================================
+   MAHPE
+   SCRIPT.JS DEFINITIVO
+
+   PARTE 2 DE 2
+
+   PEGAR INMEDIATAMENTE DEBAJO DE LA PARTE 1
+
+   - Dashboard de empresa
+   - Publicador
+   - Business Engine
+   - COYOTE
+   - Leaflet
+   - Punto Verde
+   - Buscador
+   - Distancias
+   - Seguimiento
+   - Arranque final
+============================================================ */
+
+
+/* ============================================================
+   31. DASHBOARD DE EMPRESA
+============================================================ */
+
+function renderCompanyDashboard() {
+
+    const container =
+        document.getElementById(
+            "companyDashboard"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    if (!mahpeState.companies.length) {
+
+        container.innerHTML = `
+            <section class="empty-state">
+
+                <strong>
+                    Todavía no tienes una empresa
+                </strong>
+
+                <p>
+                    Crea tu primera empresa para
+                    empezar a probar productos,
+                    mercado, diseño y ubicación.
+                </p>
+
+                <button
+                    id="emptyCreateCompanyButton"
+                    class="primary-button"
+                    type="button"
+                    style="
+                        margin-top:16px;
+                        max-width:260px;
+                    "
+                >
+                    CREAR EMPRESA
+                </button>
+
+            </section>
+        `;
+
+
+        const createButton =
+            document.getElementById(
+                "emptyCreateCompanyButton"
+            );
+
+
+        if (createButton) {
+
+            createButton.addEventListener(
+                "click",
+                function () {
+
+                    openView(
+                        "createView"
+                    );
+
+                }
+            );
+
+        }
+
+
+        return;
+
+    }
+
+
+    let company =
+        getCurrentCompany();
+
+
+    if (!company) {
+
+        currentCompanyId =
+            mahpeState
+                .companies[0]
+                .id;
+
+
+        company =
+            getCurrentCompany();
+
+    }
+
+
+    if (!company) {
+        return;
+    }
+
+
+    migrateCompanyBusinessData(
+        company
+    );
+
+
+    recalculateCompanyStage(
+        company
+    );
+
+
+    const score =
+        calculateBusinessScore(
+            company
+        );
+
+
+    const scoreInfo =
+        getBusinessScoreLabel(
+            score
+        );
+
+
+    const companyOptions =
+        mahpeState
+            .companies
+            .map(
+                item => `
+                    <option
+                        value="${escapeHTML(
+                            item.id
+                        )}"
+                        ${
+                            item.id ===
+                            company.id
+                                ? "selected"
+                                : ""
+                        }
+                    >
+                        ${escapeHTML(
+                            item.name
+                        )}
+                    </option>
+                `
+            )
+            .join("");
+
+
+    container.innerHTML = `
+
+        <section
+            style="
+                margin-top:18px;
+            "
+        >
+
+            <label
+                for="companySelector"
+                style="
+                    margin-top:0;
+                "
+            >
+                EMPRESA ACTIVA
+            </label>
+
+            <select id="companySelector">
+                ${companyOptions}
+            </select>
+
+        </section>
+
+
+        <section class="company-hero">
+
+            <div class="company-hero-top">
+
+                <div class="company-big-avatar">
+                    ${escapeHTML(
+                        getInitials(
+                            company.name
+                        )
+                    )}
+                </div>
+
+
+                <div
+                    style="
+                        min-width:0;
+                        flex:1;
+                    "
+                >
+
+                    <h1>
+                        ${escapeHTML(
+                            company.name
+                        )}
+                    </h1>
+
+
+                    <div class="company-stage">
+                        ${escapeHTML(
+                            company.stage
+                        )}
+                    </div>
+
+
+                    <div
+                        style="
+                            margin-top:6px;
+                            color:#727b76;
+                            font-size:8px;
+                        "
+                    >
+                        ${escapeHTML(
+                            company.category
+                        )}
+                    </div>
+
+                </div>
+
+
+                <div
+                    style="
+                        flex-shrink:0;
+                        text-align:right;
+                    "
+                >
+
+                    <strong
+                        style="
+                            display:block;
+                            color:#00e86d;
+                            font-size:23px;
+                        "
+                    >
+                        ${score}
+                    </strong>
+
+                    <small
+                        style="
+                            color:#727b76;
+                            font-size:7px;
+                        "
+                    >
+                        SCORE
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <p class="company-description">
+                ${escapeHTML(
+                    company.description
+                )}
+            </p>
+
+
+            <div
+                style="
+                    display:flex;
+                    flex-wrap:wrap;
+                    gap:6px;
+                    margin-top:12px;
+                "
+            >
+
+                <span class="badge green">
+                    ${escapeHTML(
+                        scoreInfo.label
+                    )}
+                </span>
+
+                <span class="badge">
+                    ${escapeHTML(
+                        company.product
+                    )}
+                </span>
+
+                <span class="badge">
+                    ${formatMoney(
+                        company.price
+                    )}
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <span>◈</span>
+
+                <strong>
+                    ${formatNumber(
+                        company.value
+                    )}
+                </strong>
+
+                <small>
+                    Valor virtual
+                </small>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>💼</span>
+
+                <strong>
+                    ${formatNumber(
+                        company.capital
+                    )}
+                </strong>
+
+                <small>
+                    Capital
+                </small>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>♡</span>
+
+                <strong>
+                    ${formatNumber(
+                        company.interactions
+                    )}
+                </strong>
+
+                <small>
+                    Interacciones
+                </small>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>🔥</span>
+
+                <strong>
+                    ${formatNumber(
+                        company.interested
+                    )}
+                </strong>
+
+                <small>
+                    Interesados
+                </small>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>💰</span>
+
+                <strong>
+                    ${formatNumber(
+                        company.committed
+                    )}
+                </strong>
+
+                <small>
+                    Comprometidos
+                </small>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>👥</span>
+
+                <strong>
+                    ${formatNumber(
+                        company.followers
+                    )}
+                </strong>
+
+                <small>
+                    Seguidores
+                </small>
+
+            </div>
+
+        </section>
+
+
+        <section class="publisher">
+
+            <span class="eyebrow">
+                PUBLICAR
+            </span>
+
+            <h3>
+                Prueba una idea en el mercado
+            </h3>
+
+            <p>
+                Publica un producto, concepto o
+                propuesta para recibir señales.
+            </p>
+
+
+            <label for="companyPostTitle">
+                Título
+            </label>
+
+            <input
+                id="companyPostTitle"
+                type="text"
+                autocomplete="off"
+                placeholder="Ej. Nueva colección"
+            >
+
+
+            <label for="companyPostText">
+                Publicación
+            </label>
+
+            <textarea
+                id="companyPostText"
+                placeholder="Cuenta qué estás probando..."
+            ></textarea>
+
+
+            <button
+                id="publishCompanyPostButton"
+                class="primary-button"
+                type="button"
+                style="
+                    margin-top:12px;
+                "
+            >
+                PUBLICAR EN MAHPE
+            </button>
+
+
+            <div
+                id="publisherStatus"
+                class="form-message"
+            ></div>
+
+        </section>
+
+
+        ${renderBusinessEngine(
+            company
+        )}
+
+
+        <section
+            class="info-card"
+            style="
+                margin-bottom:25px;
+            "
+        >
+
+            <span class="eyebrow">
+                EMPRESA
+            </span>
+
+            <h2>
+                ${escapeHTML(
+                    company.product
+                )}
+            </h2>
+
+            <p>
+                Público:
+                ${escapeHTML(
+                    company.audience
+                )}
+            </p>
+
+            <p>
+                Precio estimado:
+                ${formatMoney(
+                    company.price
+                )}
+            </p>
+
+
+            <button
+                id="openCompanyMapButton"
+                class="secondary-button"
+                type="button"
+                style="
+                    margin-top:8px;
+                "
+            >
+                📍 ABRIR EN COYOTE
+            </button>
+
+
+            <button
+                id="deleteCompanyButton"
+                class="secondary-button"
+                type="button"
+                style="
+                    margin-top:8px;
+                    color:#ff6478;
+                "
+            >
+                ELIMINAR EMPRESA
+            </button>
+
+        </section>
+
+    `;
+
+
+    bindCompanyDashboardEvents();
+
+}
+
+
+/* ============================================================
+   32. EVENTOS DEL DASHBOARD
+============================================================ */
+
+function bindCompanyDashboardEvents() {
+
+    const selector =
+        document.getElementById(
+            "companySelector"
+        );
+
+
+    if (selector) {
+
+        selector.addEventListener(
+            "change",
+            function () {
+
+                selectCompany(
+                    this.value
+                );
+
+            }
+        );
+
+    }
+
+
+    const publishButton =
+        document.getElementById(
+            "publishCompanyPostButton"
+        );
+
+
+    if (publishButton) {
+
+        publishButton.addEventListener(
+            "click",
+            function () {
+
+                const title =
+                    document.getElementById(
+                        "companyPostTitle"
+                    );
+
+
+                const text =
+                    document.getElementById(
+                        "companyPostText"
+                    );
+
+
+                const status =
+                    document.getElementById(
+                        "publisherStatus"
+                    );
+
+
+                const company =
+                    getCurrentCompany();
+
+
+                if (
+                    !company ||
+                    !title ||
+                    !text
+                ) {
+                    return;
+                }
+
+
+                if (
+                    !title.value.trim() ||
+                    !text.value.trim()
+                ) {
+
+                    if (status) {
+
+                        status.textContent =
+                            "⚠️ Completa el título y la publicación.";
+
+                    }
+
+                    return;
+
+                }
+
+
+                const success =
+                    createCompanyPost(
+
+                        company.id,
+
+                        title.value,
+
+                        text.value
+
+                    );
+
+
+                if (success) {
+
+                    title.value = "";
+                    text.value = "";
+
+
+                    if (status) {
+
+                        status.textContent =
+                            "✓ Publicación enviada al mercado.";
+
+                    }
+
+
+                    renderCompanyDashboard();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(
+            "[data-business-decision]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        executeBusinessDecision(
+                            this.dataset
+                                .businessDecision
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    const mapButton =
+        document.getElementById(
+            "openCompanyMapButton"
+        );
+
+
+    if (mapButton) {
+
+        mapButton.addEventListener(
+            "click",
+            function () {
+
+                openView(
+                    "mapView"
+                );
+
+
+                setTimeout(
+                    () => {
+
+                        const company =
+                            getCurrentCompany();
+
+
+                        if (company) {
+
+                            updateStatus(
+                                "📍 COYOTE listo para analizar a " +
+                                escapeHTML(
+                                    company.name
+                                ) +
+                                "."
+                            );
+
+                        }
+
+                    },
+                    200
+                );
+
+            }
+        );
+
+    }
+
+
+    const deleteButton =
+        document.getElementById(
+            "deleteCompanyButton"
+        );
+
+
+    if (deleteButton) {
+
+        deleteButton.addEventListener(
+            "click",
+            function () {
+
+                const company =
+                    getCurrentCompany();
+
+
+                if (!company) {
+                    return;
+                }
+
+
+                const confirmed =
+                    window.confirm(
+                        "¿Eliminar " +
+                        company.name +
+                        "? Sus publicaciones también serán eliminadas."
+                    );
+
+
+                if (confirmed) {
+
+                    deleteCompany(
+                        company.id
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   33. VARIABLES COYOTE
+============================================================ */
+
+let map = null;
+
+let userLocation = null;
+
+let userMarker = null;
+
+let radiusCircle = null;
+
+let selectedRadius = 10;
+
+let sellerMarker = null;
+
+let searchMarkers = [];
+
+let commercialPoints = [];
+
+let followWatchId = null;
+
+let followUserMarker = null;
+
+let followLine = null;
+
+
+/* ============================================================
+   34. ELEMENTOS COYOTE
+============================================================ */
+
+const activateButton =
+    document.getElementById(
+        "activateButton"
+    );
+
+
+const sellerForm =
+    document.getElementById(
+        "sellerForm"
+    );
+
+
+const sellerProductInput =
+    document.getElementById(
+        "productInput"
+    );
+
+
+const confirmSellerButton =
+    document.getElementById(
+        "confirmSellerButton"
+    );
+
+
+const searchInput =
+    document.getElementById(
+        "searchInput"
+    );
+
+
+const searchButton =
+    document.getElementById(
+        "searchButton"
+    );
+
+
+const referenceText =
+    document.getElementById(
+        "referenceText"
+    );
+
+
+const offerText =
+    document.getElementById(
+        "offerText"
+    );
+
+
+const demandBar =
+    document.getElementById(
+        "demandBar"
+    );
+
+
+const demandText =
+    document.getElementById(
+        "demandText"
+    );
+
+
+/* ============================================================
+   35. ICONOS LEAFLET
+============================================================ */
+
+function createGreenIcon() {
+
+    if (
+        typeof L ===
+        "undefined"
+    ) {
+        return null;
+    }
+
+
+    return L.divIcon({
+
+        className: "",
+
+        html:
+            '<div class="green-marker"></div>',
+
+        iconSize:
+            [24, 24],
+
+        iconAnchor:
+            [12, 12],
+
+        popupAnchor:
+            [0, -14]
+
+    });
+
+}
+
+
+function createCoyoteIcon() {
+
+    if (
+        typeof L ===
+        "undefined"
+    ) {
+        return null;
+    }
+
+
+    return L.divIcon({
+
+        className: "",
+
+        html:
+            '<div class="coyote-marker">●</div>',
+
+        iconSize:
+            [28, 28],
+
+        iconAnchor:
+            [14, 14],
+
+        popupAnchor:
+            [0, -16]
+
+    });
+
+}
+
+
+/* ============================================================
+   36. INICIALIZAR MAPA
+============================================================ */
+
+function initializeMap() {
+
+    if (
+        typeof L ===
+        "undefined"
+    ) {
+
+        console.error(
+            "Leaflet no está disponible."
+        );
+
+        return;
+
+    }
+
+
+    const mapElement =
+        document.getElementById(
+            "map"
+        );
+
+
+    if (!mapElement) {
+        return;
+    }
+
+
+    if (map) {
+
+        setTimeout(
+            () => {
+                map.invalidateSize();
+            },
+            100
+        );
+
+        return;
+
+    }
+
+
+    /*
+       Vista inicial general de Lima.
+       No se interpreta como ubicación
+       exacta del usuario.
+    */
+
+    map =
+        L.map(
+            "map",
+            {
+                zoomControl: true
+            }
+        );
+
+
+    map.setView(
+        [-12.0464, -77.0428],
+        11
+    );
+
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+
+            maxZoom:
+                19,
+
+            attribution:
+                "&copy; OpenStreetMap"
+
+        }
+    ).addTo(
+        map
+    );
+
+
+    map.on(
+        "click",
+        function (event) {
+
+            if (
+                sellerForm &&
+                !sellerForm.classList.contains(
+                    "hidden"
+                )
+            ) {
+
+                userLocation = {
+                    lat:
+                        event.latlng.lat,
+
+                    lng:
+                        event.latlng.lng
+                };
+
+
+                updateStatus(
+                    "📍 Punto seleccionado. Escribe qué vendes y confirma."
+                );
+
+            }
+
+        }
+    );
+
+
+    restoreSellerPoint();
+
+
+    setTimeout(
+        () => {
+            map.invalidateSize();
+        },
+        250
+    );
+
+}
+
+
+/* ============================================================
+   37. OBTENER UBICACIÓN CON CONSENTIMIENTO
+============================================================ */
+
+function requestUserLocation(
+    callback
+) {
+
+    if (
+        !navigator.geolocation
+    ) {
+
+        updateStatus(
+            "⚠️ Tu navegador no permite geolocalización."
+        );
+
+        if (callback) {
+            callback(null);
+        }
+
+        return;
+
+    }
+
+
+    updateStatus(
+        "📡 Solicitando tu ubicación..."
+    );
+
+
+    navigator.geolocation
+        .getCurrentPosition(
+
+            function (position) {
+
+                userLocation = {
+
+                    lat:
+                        position
+                            .coords
+                            .latitude,
+
+                    lng:
+                        position
+                            .coords
+                            .longitude
+
+                };
+
+
+                if (
+                    map &&
+                    typeof L !==
+                        "undefined"
+                ) {
+
+                    if (userMarker) {
+
+                        map.removeLayer(
+                            userMarker
+                        );
+
+                    }
+
+
+                    userMarker =
+                        L.circleMarker(
+
+                            [
+                                userLocation.lat,
+                                userLocation.lng
+                            ],
+
+                            {
+
+                                radius:
+                                    7,
+
+                                weight:
+                                    2,
+
+                                color:
+                                    "#ffffff",
+
+                                fillColor:
+                                    "#00e86d",
+
+                                fillOpacity:
+                                    1
+
+                            }
+
+                        ).addTo(
+                            map
+                        );
+
+
+                    userMarker
+                        .bindPopup(
+                            "Tu posición actual"
+                        );
+
+
+                    map.setView(
+                        [
+                            userLocation.lat,
+                            userLocation.lng
+                        ],
+                        15
+                    );
+
+
+                    drawRadius();
+
+                }
+
+
+                updateStatus(
+                    "✓ Ubicación obtenida."
+                );
+
+
+                if (callback) {
+
+                    callback(
+                        userLocation
+                    );
+
+                }
+
+            },
+
+
+            function (error) {
+
+                console.warn(
+                    "Geolocalización:",
+                    error
+                );
+
+
+                updateStatus(
+                    "⚠️ No se pudo obtener tu ubicación. Puedes seleccionar un punto manualmente en el mapa."
+                );
+
+
+                if (callback) {
+
+                    callback(null);
+
+                }
+
+            },
+
+
+            {
+
+                enableHighAccuracy:
+                    true,
+
+                timeout:
+                    12000,
+
+                maximumAge:
+                    10000
+
+            }
+
+        );
+
+}
+
+
+/* ============================================================
+   38. RADIO DE BÚSQUEDA
+============================================================ */
+
+function drawRadius() {
+
+    if (
+        !map ||
+        !userLocation ||
+        typeof L ===
+            "undefined"
+    ) {
+        return;
+    }
+
+
+    if (radiusCircle) {
+
+        map.removeLayer(
+            radiusCircle
+        );
+
+    }
+
+
+    radiusCircle =
+        L.circle(
+
+            [
+                userLocation.lat,
+                userLocation.lng
+            ],
+
+            {
+
+                radius:
+                    selectedRadius *
+                    1000,
+
+                color:
+                    "#00e86d",
+
+                weight:
+                    1,
+
+                opacity:
+                    0.35,
+
+                fillColor:
+                    "#00e86d",
+
+                fillOpacity:
+                    0.04
+
+            }
+
+        ).addTo(
+            map
+        );
+
+}
+
+
+/* ============================================================
+   39. BOTONES DE RADIO
+============================================================ */
+
+document
+    .querySelectorAll(
+        ".range-button"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    const radius =
+                        Number(
+                            this.dataset
+                                .radius
+                        );
+
+
+                    if (
+                        !Number.isFinite(
+                            radius
+                        )
+                    ) {
+                        return;
+                    }
+
+
+                    selectedRadius =
+                        radius;
+
+
+                    document
+                        .querySelectorAll(
+                            ".range-button"
+                        )
+                        .forEach(
+                            item => {
+
+                                item.classList.remove(
+                                    "active"
+                                );
+
+                            }
+                        );
+
+
+                    this.classList.add(
+                        "active"
+                    );
+
+
+                    updateReference();
+
+                    drawRadius();
+
+                }
+            );
+
+        }
+    );
+
+
+/* ============================================================
+   40. REFERENCIA DEL RADIO
+============================================================ */
+
+function updateReference() {
+
+    if (!referenceText) {
+        return;
+    }
+
+
+    let message =
+        "Una zona amplia alrededor de ti.";
+
+
+    if (
+        selectedRadius <=
+        1
+    ) {
+
+        message =
+            "Búsqueda muy cercana.";
+
+    }
+
+    else if (
+        selectedRadius <=
+        3
+    ) {
+
+        message =
+            "Tu zona y alrededores cercanos.";
+
+    }
+
+    else if (
+        selectedRadius >=
+        20
+    ) {
+
+        message =
+            "Exploración territorial extensa.";
+
+    }
+
+
+    referenceText.innerHTML =
+        "🔎 " +
+        selectedRadius +
+        " km<br>" +
+        escapeHTML(
+            message
+        );
+
+}
+
+
+/* ============================================================
+   41. ACTIVAR PUNTO
+============================================================ */
+
+if (activateButton) {
+
+    activateButton.addEventListener(
+        "click",
+        function () {
+
+            if (!sellerForm) {
+                return;
+            }
+
+
+            sellerForm.classList.remove(
+                "hidden"
+            );
+
+
+            requestUserLocation(
+                function (location) {
+
+                    if (!location) {
+
+                        updateStatus(
+                            "📍 Haz clic en el mapa para seleccionar manualmente tu punto."
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   42. CONFIRMAR PUNTO VERDE
+============================================================ */
+
+if (confirmSellerButton) {
+
+    confirmSellerButton
+        .addEventListener(
+            "click",
+            confirmSellerPoint
+        );
+
+}
+
+
+function confirmSellerPoint() {
+
+    if (!sellerProductInput) {
+        return;
+    }
+
+
+    const product =
+        sellerProductInput
+            .value
+            .trim();
+
+
+    if (!product) {
+
+        updateStatus(
+            "⚠️ Escribe qué vendes."
+        );
+
+        sellerProductInput.focus();
+
+        return;
+
+    }
+
+
+    if (!userLocation) {
+
+        updateStatus(
+            "📍 Necesitamos una posición. Permite la ubicación o haz clic en el mapa."
+        );
+
+        return;
+
+    }
+
+
+    const company =
+        getCurrentCompany();
+
+
+    const point = {
+
+        id:
+            generateId(
+                "seller"
+            ),
+
+        product,
+
+        companyId:
+            company
+                ? company.id
+                : null,
+
+        companyName:
+            company
+                ? company.name
+                : "Comerciante MAHPE",
+
+        lat:
+            userLocation.lat,
+
+        lng:
+            userLocation.lng,
+
+        active:
+            true,
+
+        createdAt:
+            new Date()
+                .toISOString()
+
+    };
+
+
+    try {
+
+        localStorage.setItem(
+            COYOTE_STORAGE_KEY,
+            JSON.stringify(
+                point
+            )
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+    }
+
+
+    commercialPoints =
+        commercialPoints.filter(
+            item =>
+                item.id !==
+                point.id
+        );
+
+
+    commercialPoints.push(
+        point
+    );
+
+
+    renderSellerPoint(
+        point
+    );
+
+
+    syncCompanyWithCoyotePoint();
+
+
+    if (sellerForm) {
+
+        sellerForm.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    sellerProductInput.value =
+        "";
+
+
+    updateStatus(
+        "🟢 Punto Verde activo · " +
+        escapeHTML(
+            product
+        )
+    );
+
+
+    updateOfferMetrics(
+        commercialPoints.length
+    );
+
+}
+
+
+/* ============================================================
+   43. RENDERIZAR PUNTO VERDE
+============================================================ */
+
+function renderSellerPoint(
+    point
+) {
+
+    if (
+        !map ||
+        !point ||
+        typeof L ===
+            "undefined"
+    ) {
+        return;
+    }
+
+
+    if (sellerMarker) {
+
+        map.removeLayer(
+            sellerMarker
+        );
+
+    }
+
+
+    const icon =
+        createGreenIcon();
+
+
+    const options =
+        icon
+            ? {
+                icon
+            }
+            : {};
+
+
+    sellerMarker =
+        L.marker(
+
+            [
+                point.lat,
+                point.lng
+            ],
+
+            options
+
+        ).addTo(
+            map
+        );
+
+
+    sellerMarker.bindPopup(
+        `
+            <strong>
+                ${escapeHTML(
+                    point.companyName ||
+                    "Punto Verde"
+                )}
+            </strong>
+
+            <br>
+
+            ${escapeHTML(
+                point.product
+            )}
+
+            <br><br>
+
+            <button
+                type="button"
+                onclick="startFollowingSeller(
+                    ${Number(
+                        point.lat
+                    )},
+                    ${Number(
+                        point.lng
+                    )}
+                )"
+                style="
+                    border:0;
+                    border-radius:8px;
+                    padding:8px 10px;
+                    background:#00e86d;
+                    color:#00210f;
+                    font-weight:900;
+                    cursor:pointer;
+                "
+            >
+                IR A ESTE PUNTO
+            </button>
+        `
+    );
+
+
+    map.setView(
+        [
+            point.lat,
+            point.lng
+        ],
+        16
+    );
+
+}
+
+
+/* ============================================================
+   44. RESTAURAR PUNTO
+============================================================ */
+
+function restoreSellerPoint() {
+
+    const saved =
+        localStorage.getItem(
+            COYOTE_STORAGE_KEY
+        );
+
+
+    if (!saved) {
+        return;
+    }
+
+
+    try {
+
+        const point =
+            JSON.parse(
+                saved
+            );
+
+
+        if (
+            !point ||
+            !point.active ||
+            !Number.isFinite(
+                Number(
+                    point.lat
+                )
+            ) ||
+            !Number.isFinite(
+                Number(
+                    point.lng
+                )
+            )
+        ) {
+            return;
+        }
+
+
+        point.lat =
+            Number(
+                point.lat
+            );
+
+
+        point.lng =
+            Number(
+                point.lng
+            );
+
+
+        commercialPoints.push(
+            point
+        );
+
+
+        renderSellerPoint(
+            point
+        );
+
+
+        updateOfferMetrics(
+            commercialPoints.length
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Punto COYOTE inválido:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   45. BUSCADOR COYOTE
+============================================================ */
+
+if (searchButton) {
+
+    searchButton.addEventListener(
+        "click",
+        searchCommercialPoints
+    );
+
+}
+
+
+if (searchInput) {
+
+    searchInput.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key ===
+                "Enter"
+            ) {
+
+                event.preventDefault();
+
+                searchCommercialPoints();
+
+            }
+
+        }
+    );
+
+}
+
+
+function searchCommercialPoints() {
+
+    if (!searchInput) {
+        return;
+    }
+
+
+    const query =
+        searchInput
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    if (!query) {
+
+        updateStatus(
+            "🔎 Escribe el producto que buscas."
+        );
+
+        return;
+
+    }
+
+
+    if (!userLocation) {
+
+        requestUserLocation(
+            function () {
+
+                executeCommercialSearch(
+                    query
+                );
+
+            }
+        );
+
+        return;
+
+    }
+
+
+    executeCommercialSearch(
+        query
+    );
+
+}
+
+
+/* ============================================================
+   46. EJECUTAR BÚSQUEDA
+============================================================ */
+
+function executeCommercialSearch(
+    query
+) {
+
+    clearSearchMarkers();
+
+
+    const matches =
+        commercialPoints
+            .map(
+                point => {
+
+                    const distance =
+                        userLocation
+                            ? calculateDistanceKm(
+
+                                userLocation.lat,
+
+                                userLocation.lng,
+
+                                point.lat,
+
+                                point.lng
+
+                            )
+                            : 0;
+
+
+                    return {
+                        ...point,
+                        distance
+                    };
+
+                }
+            )
+            .filter(
+                point => {
+
+                    const product =
+                        String(
+                            point.product ||
+                            ""
+                        )
+                            .toLowerCase();
+
+
+                    const productMatch =
+                        product.includes(
+                            query
+                        );
+
+
+                    const radiusMatch =
+                        !userLocation ||
+                        point.distance <=
+                            selectedRadius;
+
+
+                    return (
+                        productMatch &&
+                        radiusMatch
+                    );
+
+                }
+            )
+            .sort(
+                (
+                    a,
+                    b
+                ) =>
+                    a.distance -
+                    b.distance
+            );
+
+
+    matches.forEach(
+        renderSearchPoint
+    );
+
+
+    updateOfferMetrics(
+        matches.length
+    );
+
+
+    if (!matches.length) {
+
+        updateStatus(
+            "🔎 No encontramos " +
+            escapeHTML(
+                query
+            ) +
+            " dentro de " +
+            selectedRadius +
+            " km."
+        );
+
+        return;
+
+    }
+
+
+    updateStatus(
+        "✓ Encontramos " +
+        matches.length +
+        (
+            matches.length === 1
+                ? " punto"
+                : " puntos"
+        ) +
+        " para " +
+        escapeHTML(
+            query
+        ) +
+        "."
+    );
+
+
+    fitSearchResults(
+        matches
+    );
+
+}
+
+
+/* ============================================================
+   47. RENDERIZAR RESULTADO
+============================================================ */
+
+function renderSearchPoint(
+    point
+) {
+
+    if (
+        !map ||
+        typeof L ===
+            "undefined"
+    ) {
+        return;
+    }
+
+
+    const icon =
+        createCoyoteIcon();
+
+
+    const options =
+        icon
+            ? {
+                icon
+            }
+            : {};
+
+
+    const marker =
+        L.marker(
+
+            [
+                point.lat,
+                point.lng
+            ],
+
+            options
+
+        ).addTo(
+            map
+        );
+
+
+    const distanceText =
+        userLocation
+            ? point.distance
+                .toFixed(2) +
+                " km"
+            : "Distancia no disponible";
+
+
+    marker.bindPopup(
+        `
+            <strong>
+                ${escapeHTML(
+                    point.companyName ||
+                    "Comerciante"
+                )}
+            </strong>
+
+            <br>
+
+            ${escapeHTML(
+                point.product
+            )}
+
+            <br>
+
+            <small>
+                ${escapeHTML(
+                    distanceText
+                )}
+            </small>
+
+            <br><br>
+
+            <button
+                type="button"
+                onclick="startFollowingSeller(
+                    ${Number(
+                        point.lat
+                    )},
+                    ${Number(
+                        point.lng
+                    )}
+                )"
+                style="
+                    border:0;
+                    border-radius:8px;
+                    padding:8px 10px;
+                    background:#00e86d;
+                    color:#00210f;
+                    font-weight:900;
+                    cursor:pointer;
+                "
+            >
+                IR A ESTE PUNTO
+            </button>
+        `
+    );
+
+
+    searchMarkers.push(
+        marker
+    );
+
+}
+
+
+/* ============================================================
+   48. LIMPIAR RESULTADOS
+============================================================ */
+
+function clearSearchMarkers() {
+
+    if (!map) {
+
+        searchMarkers = [];
+
+        return;
+
+    }
+
+
+    searchMarkers.forEach(
+        marker => {
+
+            if (
+                map.hasLayer(
+                    marker
+                )
+            ) {
+
+                map.removeLayer(
+                    marker
+                );
+
+            }
+
+        }
+    );
+
+
+    searchMarkers = [];
+
+}
+
+
+/* ============================================================
+   49. ENCUADRAR RESULTADOS
+============================================================ */
+
+function fitSearchResults(
+    matches
+) {
+
+    if (
+        !map ||
+        !matches.length ||
+        typeof L ===
+            "undefined"
+    ) {
+        return;
+    }
+
+
+    const points =
+        matches.map(
+            point => [
+                point.lat,
+                point.lng
+            ]
+        );
+
+
+    if (userLocation) {
+
+        points.push(
+            [
+                userLocation.lat,
+                userLocation.lng
+            ]
+        );
+
+    }
+
+
+    if (
+        points.length ===
+        1
+    ) {
+
+        map.setView(
+            points[0],
+            16
+        );
+
+        return;
+
+    }
+
+
+    const bounds =
+        L.latLngBounds(
+            points
+        );
+
+
+    map.fitBounds(
+        bounds,
+        {
+            padding:
+                [70, 70],
+
+            maxZoom:
+                16
+        }
+    );
+
+}
+
+
+/* ============================================================
+   50. MÉTRICAS DE OFERTA
+============================================================ */
+
+function updateOfferMetrics(
+    count
+) {
+
+    const normalizedCount =
+        Math.max(
+            0,
+            safeNumber(
+                count
+            )
+        );
+
+
+    if (offerText) {
+
+        offerText.textContent =
+            normalizedCount +
+            (
+                normalizedCount === 1
+                    ? " punto"
+                    : " puntos"
+            );
+
+    }
+
+
+    const demand =
+        clamp(
+            normalizedCount *
+            18
+        );
+
+
+    if (demandBar) {
+
+        demandBar.style.width =
+            demand +
+            "%";
+
+    }
+
+
+    if (demandText) {
+
+        if (
+            normalizedCount ===
+            0
+        ) {
+
+            demandText.textContent =
+                "Sin datos";
+
+        }
+
+        else if (
+            normalizedCount <=
+            2
+        ) {
+
+            demandText.textContent =
+                "Actividad baja";
+
+        }
+
+        else if (
+            normalizedCount <=
+            5
+        ) {
+
+            demandText.textContent =
+                "Actividad media";
+
+        }
+
+        else {
+
+            demandText.textContent =
+                "Actividad alta";
+
+        }
+
+    }
+
+}
+
+
+/* ============================================================
+   51. SEGUIR VENDEDOR
+============================================================ */
+
+function startFollowingSeller(
+    sellerLat,
+    sellerLng
+) {
+
+    sellerLat =
+        Number(
+            sellerLat
+        );
+
+
+    sellerLng =
+        Number(
+            sellerLng
+        );
+
+
+    if (
+        !Number.isFinite(
+            sellerLat
+        ) ||
+        !Number.isFinite(
+            sellerLng
+        )
+    ) {
+
+        updateStatus(
+            "❌ Punto comercial inválido."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !navigator.geolocation
+    ) {
+
+        updateStatus(
+            "⚠️ El navegador no permite seguimiento por ubicación."
+        );
+
+        return;
+
+    }
+
+
+    stopFollowingSeller(
+        false
+    );
+
+
+    updateStatus(
+        "🧭 Seguimiento iniciado."
+    );
+
+
+    followWatchId =
+        navigator
+            .geolocation
+            .watchPosition(
+
+                function (
+                    position
+                ) {
+
+                    const buyerLat =
+                        position
+                            .coords
+                            .latitude;
+
+
+                    const buyerLng =
+                        position
+                            .coords
+                            .longitude;
+
+
+                    userLocation = {
+
+                        lat:
+                            buyerLat,
+
+                        lng:
+                            buyerLng
+
+                    };
+
+
+                    if (
+                        !map ||
+                        typeof L ===
+                            "undefined"
+                    ) {
+                        return;
+                    }
+
+
+                    if (!followUserMarker) {
+
+                        followUserMarker =
+                            L.circleMarker(
+
+                                [
+                                    buyerLat,
+                                    buyerLng
+                                ],
+
+                                {
+
+                                    radius:
+                                        7,
+
+                                    color:
+                                        "#ffffff",
+
+                                    weight:
+                                        2,
+
+                                    fillColor:
+                                        "#4d8cff",
+
+                                    fillOpacity:
+                                        1
+
+                                }
+
+                            ).addTo(
+                                map
+                            );
+
+                    }
+
+                    else {
+
+                        followUserMarker
+                            .setLatLng(
+                                [
+                                    buyerLat,
+                                    buyerLng
+                                ]
+                            );
+
+                    }
+
+
+                    if (followLine) {
+
+                        map.removeLayer(
+                            followLine
+                        );
+
+                    }
+
+
+                    followLine =
+                        L.polyline(
+
+                            [
+
+                                [
+                                    buyerLat,
+                                    buyerLng
+                                ],
+
+                                [
+                                    sellerLat,
+                                    sellerLng
+                                ]
+
+                            ],
+
+                            {
+
+                                color:
+                                    "#00e86d",
+
+                                weight:
+                                    3,
+
+                                opacity:
+                                    0.8,
+
+                                dashArray:
+                                    "7 8"
+
+                            }
+
+                        ).addTo(
+                            map
+                        );
+
+
+                    const distance =
+                        calculateDistanceKm(
+
+                            buyerLat,
+
+                            buyerLng,
+
+                            sellerLat,
+
+                            sellerLng
+
+                        );
+
+
+                    let distanceText;
+
+
+                    if (
+                        distance <
+                        1
+                    ) {
+
+                        distanceText =
+                            Math.round(
+                                distance *
+                                1000
+                            ) +
+                            " m";
+
+                    }
+
+                    else {
+
+                        distanceText =
+                            distance
+                                .toFixed(
+                                    2
+                                ) +
+                            " km";
+
+                    }
+
+
+                    updateStatus(
+                        "🧭 Distancia al punto: " +
+                        "<strong>" +
+                        escapeHTML(
+                            distanceText
+                        ) +
+                        "</strong>"
+                    );
+
+
+                    map.fitBounds(
+
+                        [
+
+                            [
+                                buyerLat,
+                                buyerLng
+                            ],
+
+                            [
+                                sellerLat,
+                                sellerLng
+                            ]
+
+                        ],
+
+                        {
+
+                            padding:
+                                [60, 60],
+
+                            maxZoom:
+                                17
+
+                        }
+
+                    );
+
+                },
+
+
+                function (error) {
+
+                    console.error(
+                        error
+                    );
+
+
+                    stopFollowingSeller(
+                        false
+                    );
+
+
+                    updateStatus(
+                        "❌ No pudimos seguir tu ubicación."
+                    );
+
+                },
+
+
+                {
+
+                    enableHighAccuracy:
+                        true,
+
+                    maximumAge:
+                        3000,
+
+                    timeout:
+                        12000
+
+                }
+
+            );
+
+}
+
+
+/* ============================================================
+   52. DETENER SEGUIMIENTO
+============================================================ */
+
+function stopFollowingSeller(
+    showMessage = true
+) {
+
+    if (
+        followWatchId !==
+        null
+    ) {
+
+        navigator
+            .geolocation
+            .clearWatch(
+                followWatchId
+            );
+
+
+        followWatchId =
+            null;
+
+    }
+
+
+    if (
+        followUserMarker &&
+        map &&
+        map.hasLayer(
+            followUserMarker
+        )
+    ) {
+
+        map.removeLayer(
+            followUserMarker
+        );
+
+    }
+
+
+    if (
+        followLine &&
+        map &&
+        map.hasLayer(
+            followLine
+        )
+    ) {
+
+        map.removeLayer(
+            followLine
+        );
+
+    }
+
+
+    followUserMarker =
+        null;
+
+
+    followLine =
+        null;
+
+
+    if (showMessage) {
+
+        updateStatus(
+            "🧭 Seguimiento detenido."
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   53. DISTANCIA HAVERSINE
+============================================================ */
+
+function calculateDistanceKm(
+
+    lat1,
+    lng1,
+    lat2,
+    lng2
+
+) {
+
+    const R =
+        6371;
+
+
+    const toRad =
+        value =>
+            value *
+            Math.PI /
+            180;
+
+
+    const dLat =
+        toRad(
+            lat2 -
+            lat1
+        );
+
+
+    const dLng =
+        toRad(
+            lng2 -
+            lng1
+        );
+
+
+    const a =
+
+        Math.sin(
+            dLat / 2
+        ) ** 2 +
+
+        Math.cos(
+            toRad(
+                lat1
+            )
+        ) *
+
+        Math.cos(
+            toRad(
+                lat2
+            )
+        ) *
+
+        Math.sin(
+            dLng / 2
+        ) ** 2;
+
+
+    return (
+
+        2 *
+        R *
+        Math.asin(
+            Math.sqrt(
+                a
+            )
+        )
+
+    );
+
+}
+
+
+/* ============================================================
+   54. ESTADO COYOTE
+============================================================ */
+
+function updateStatus(
+    message
+) {
+
+    const element =
+        document.getElementById(
+            "status"
+        );
+
+
+    if (element) {
+
+        element.innerHTML =
+            message;
+
+    }
+
+}
+
+
+/* ============================================================
+   55. CONECTAR EMPRESA CON PUNTO COYOTE
+============================================================ */
+
+function syncCompanyWithCoyotePoint() {
+
+    const company =
+        getCurrentCompany();
+
+
+    if (!company) {
+        return;
+    }
+
+
+    const saved =
+        localStorage.getItem(
+            COYOTE_STORAGE_KEY
+        );
+
+
+    if (!saved) {
+        return;
+    }
+
+
+    try {
+
+        const point =
+            JSON.parse(
+                saved
+            );
+
+
+        if (
+            point &&
+            point.active
+        ) {
+
+            migrateCompanyBusinessData(
+                company
+            );
+
+
+            company.locationStrength =
+                clamp(
+                    company.locationStrength +
+                    3
+                );
+
+
+            company.marketKnowledge =
+                clamp(
+                    company.marketKnowledge +
+                    2
+                );
+
+
+            company.value +=
+                15;
+
+
+            recalculateCompanyStage(
+                company
+            );
+
+
+            saveMahpeState();
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   56. VISIBILIDAD DEL MAPA
+============================================================ */
+
+function refreshMapSize() {
+
+    if (!map) {
+        return;
+    }
+
+
+    setTimeout(
+        () => {
+
+            map.invalidateSize();
+
+        },
+        80
+    );
+
+
+    setTimeout(
+        () => {
+
+            map.invalidateSize();
+
+        },
+        300
+    );
+
+}
+
+
+/* ============================================================
+   57. RESIZE
+============================================================ */
+
+window.addEventListener(
+    "resize",
+    function () {
+
+        if (
+            document
+                .getElementById(
+                    "mapView"
+                )
+                ?.classList
+                .contains(
+                    "active"
+                )
+        ) {
+
+            refreshMapSize();
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   58. LIMPIEZA AL SALIR
+============================================================ */
+
+window.addEventListener(
+    "beforeunload",
+    function () {
+
+        stopFollowingSeller(
+            false
+        );
+
+    }
+);
+
+
+/* ============================================================
+   59. ACTUALIZAR REFERENCIA
+============================================================ */
+
+updateReference();
+
+
+/* ============================================================
+   60. ARRANQUE MAHPE
+============================================================ */
+
+function startMahpe() {
+
+    migrateMahpeBusinessState();
+
+
+    /*
+       Leaflet puede construirse mientras
+       la vista está oculta, pero al entrar
+       al mapa openView() ejecutará
+       invalidateSize() para corregir
+       las dimensiones.
+    */
+
+    initializeMap();
+
+
+    renderFeed();
+
+
+    renderCompanyDashboard();
+
+
+    updateGlobalUI();
+
+
+    openView(
+        "feedView"
+    );
+
+
+    console.log(
+        "MAHPE iniciado."
+    );
+
+
+    console.log(
+        "COYOTE activo como motor territorial y empresarial."
+    );
+
+}
+
+
+/* ============================================================
+   61. EJECUTAR
+============================================================ */
+
+startMahpe();
+
+
+/* ============================================================
+   FIN SCRIPT.JS
+============================================================ */
