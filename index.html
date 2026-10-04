@@ -3,74 +3,50 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="theme-color"
-        content="#080a09"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080a09">
 
     <title>MAHPE — Simulador Empresarial</title>
 
-    <!-- LEAFLET -->
+    <!-- Leaflet -->
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     >
 
-    <!-- ESTILOS MAHPE -->
+    <!-- MAHPE -->
     <link
         rel="stylesheet"
-        href="./mahpe.css?v=1"
+        href="./mahpe.css?v=2"
     >
 </head>
-
 
 <body>
 
 <div id="mahpeApp">
 
-
     <!-- =====================================================
-         INICIO / FEED
+         1. INICIO
     ====================================================== -->
 
-    <main
-        id="feedView"
-        class="app-view active"
-    >
+    <main id="feedView" class="app-view active">
 
         <header class="topbar">
 
-            <div>
-                <div class="brand">
-                    MAHPE
-                </div>
-
+            <div class="brand-area">
+                <div class="brand">MAHPE</div>
                 <div class="brand-subtitle">
                     Mundo empresarial
                 </div>
             </div>
 
-
             <div class="wallet">
-
                 <span>◈</span>
 
                 <div>
-                    <strong id="walletBalance">
-                        1250
-                    </strong>
-
-                    <small>
-                        MAHPES
-                    </small>
+                    <strong id="walletBalance">1250</strong>
+                    <small>MAHPES</small>
                 </div>
-
             </div>
 
         </header>
@@ -96,6 +72,7 @@
             </section>
 
 
+            <!-- SOLO EL FEED -->
             <section
                 id="feedContainer"
                 class="feed"
@@ -106,20 +83,16 @@
     </main>
 
 
-
     <!-- =====================================================
-         MAPA / COYOTE
+         2. MAPA / COYOTE
     ====================================================== -->
 
-    <main
-        id="mapView"
-        class="app-view"
-    >
+    <main id="mapView" class="app-view">
 
         <div id="map"></div>
 
 
-        <section class="map-panel">
+        <aside class="map-panel">
 
             <div class="map-panel-header">
 
@@ -129,24 +102,26 @@
                     </div>
 
                     <small>
-                        Inteligencia territorial MAHPE
+                        Inteligencia territorial
                     </small>
                 </div>
 
             </div>
 
 
-            <!-- PUNTO VERDE -->
-
             <div class="map-section">
+
+                <span class="eyebrow">
+                    PRESENCIA COMERCIAL
+                </span>
 
                 <h3>
                     🟢 Tu Punto Verde
                 </h3>
 
                 <p>
-                    Activa tu posición comercial
-                    y prueba tu presencia en el mapa.
+                    Activa tu posición comercial y prueba
+                    tu presencia dentro del territorio.
                 </p>
 
 
@@ -187,9 +162,11 @@
             </div>
 
 
-            <!-- BUSCADOR -->
-
             <div class="map-section">
+
+                <span class="eyebrow">
+                    EXPLORAR
+                </span>
 
                 <h3>
                     🔎 Buscar producto
@@ -260,18 +237,14 @@
             </div>
 
 
-            <!-- MÉTRICAS DEL MAPA -->
-
             <div class="map-section">
 
                 <div class="metric">
-
                     Oferta encontrada
 
                     <strong id="offerText">
                         0 puntos
                     </strong>
-
                 </div>
 
 
@@ -302,20 +275,16 @@
                 🟢 COYOTE está listo.
             </div>
 
-        </section>
+        </aside>
 
     </main>
 
 
-
     <!-- =====================================================
-         CREAR EMPRESA
+         3. CREAR
     ====================================================== -->
 
-    <main
-        id="createView"
-        class="app-view"
-    >
+    <main id="createView" class="app-view">
 
         <header class="topbar">
 
@@ -325,7 +294,7 @@
                 </div>
 
                 <div class="brand-subtitle">
-                    Nueva empresa
+                    Construye una nueva empresa
                 </div>
             </div>
 
@@ -350,7 +319,7 @@
                 </p>
 
 
-                <label>
+                <label for="companyNameInput">
                     Nombre
                 </label>
 
@@ -361,7 +330,7 @@
                 >
 
 
-                <label>
+                <label for="companyCategoryInput">
                     Categoría
                 </label>
 
@@ -394,7 +363,7 @@
                 </select>
 
 
-                <label>
+                <label for="companyDescriptionInput">
                     Descripción
                 </label>
 
@@ -404,7 +373,7 @@
                 ></textarea>
 
 
-                <label>
+                <label for="companyProductInput">
                     Producto principal
                 </label>
 
@@ -415,7 +384,7 @@
                 >
 
 
-                <label>
+                <label for="companyPriceInput">
                     Precio estimado
                 </label>
 
@@ -427,7 +396,7 @@
                 >
 
 
-                <label>
+                <label for="companyAudienceInput">
                     Público objetivo
                 </label>
 
@@ -459,15 +428,11 @@
     </main>
 
 
-
     <!-- =====================================================
-         EMPRESA
+         4. EMPRESA
     ====================================================== -->
 
-    <main
-        id="companyView"
-        class="app-view"
-    >
+    <main id="companyView" class="app-view">
 
         <header class="topbar">
 
@@ -484,6 +449,16 @@
         </header>
 
 
+        <!--
+            El JS coloca aquí:
+            empresa,
+            estadísticas,
+            publicaciones,
+            Business Engine,
+            decisiones,
+            valor empresarial.
+        -->
+
         <div
             id="companyDashboard"
             class="page"
@@ -492,15 +467,11 @@
     </main>
 
 
-
     <!-- =====================================================
-         PERFIL
+         5. PERFIL
     ====================================================== -->
 
-    <main
-        id="profileView"
-        class="app-view"
-    >
+    <main id="profileView" class="app-view">
 
         <header class="topbar">
 
@@ -612,9 +583,9 @@
                 </h2>
 
                 <p>
-                    Crea una empresa, publica,
-                    consigue señales del mercado virtual
-                    y aumenta su valor.
+                    Crea una empresa, prueba decisiones,
+                    consigue señales del mercado y aumenta
+                    su valor dentro de MAHPE.
                 </p>
 
             </section>
@@ -623,13 +594,11 @@
 
     </main>
 
-
 </div>
 
 
-
 <!-- =========================================================
-     NAVEGACIÓN PRINCIPAL
+     NAVEGACIÓN
 ========================================================= -->
 
 <nav id="mahpeMainNav">
@@ -639,13 +608,8 @@
         data-view="feedView"
         type="button"
     >
-
         <span>⌂</span>
-
-        <small>
-            Inicio
-        </small>
-
+        <small>Inicio</small>
     </button>
 
 
@@ -654,13 +618,8 @@
         data-view="mapView"
         type="button"
     >
-
         <span>⌖</span>
-
-        <small>
-            Mapa
-        </small>
-
+        <small>Mapa</small>
     </button>
 
 
@@ -669,13 +628,8 @@
         data-view="createView"
         type="button"
     >
-
         <span>＋</span>
-
-        <small>
-            Crear
-        </small>
-
+        <small>Crear</small>
     </button>
 
 
@@ -684,13 +638,8 @@
         data-view="companyView"
         type="button"
     >
-
         <span>▣</span>
-
-        <small>
-            Empresa
-        </small>
-
+        <small>Empresa</small>
     </button>
 
 
@@ -699,17 +648,11 @@
         data-view="profileView"
         type="button"
     >
-
         <span>●</span>
-
-        <small>
-            Perfil
-        </small>
-
+        <small>Perfil</small>
     </button>
 
 </nav>
-
 
 
 <!-- =========================================================
