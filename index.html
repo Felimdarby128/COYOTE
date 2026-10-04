@@ -2,7 +2,6 @@
 <html lang="es">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -10,34 +9,35 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="theme-color"
+        content="#080a09"
+    >
+
     <title>MAHPE — Simulador Empresarial</title>
 
+    <!-- LEAFLET -->
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     >
 
+    <!-- ESTILOS MAHPE -->
     <link
         rel="stylesheet"
-        href="style.css"
+        href="./style.css?v=11"
     >
-
 </head>
 
 
 <body>
 
-
-<!-- =====================================================
-     APP MAHPE
-====================================================== -->
-
 <div id="mahpeApp">
 
 
-    <!-- =================================================
+    <!-- =====================================================
          INICIO / FEED
-    ================================================== -->
+    ====================================================== -->
 
     <main
         id="feedView"
@@ -47,7 +47,6 @@
         <header class="topbar">
 
             <div>
-
                 <div class="brand">
                     MAHPE
                 </div>
@@ -55,7 +54,6 @@
                 <div class="brand-subtitle">
                     Mundo empresarial
                 </div>
-
             </div>
 
 
@@ -64,7 +62,6 @@
                 <span>◈</span>
 
                 <div>
-
                     <strong id="walletBalance">
                         1250
                     </strong>
@@ -72,7 +69,6 @@
                     <small>
                         MAHPES
                     </small>
-
                 </div>
 
             </div>
@@ -111,9 +107,9 @@
 
 
 
-    <!-- =================================================
+    <!-- =====================================================
          MAPA / COYOTE
-    ================================================== -->
+    ====================================================== -->
 
     <main
         id="mapView"
@@ -128,7 +124,6 @@
             <div class="map-panel-header">
 
                 <div>
-
                     <div class="brand small">
                         COYOTE
                     </div>
@@ -136,11 +131,12 @@
                     <small>
                         Inteligencia territorial MAHPE
                     </small>
-
                 </div>
 
             </div>
 
+
+            <!-- PUNTO VERDE -->
 
             <div class="map-section">
 
@@ -157,6 +153,7 @@
                 <button
                     id="activateButton"
                     class="primary-button"
+                    type="button"
                 >
                     ACTIVAR PUNTO
                 </button>
@@ -180,6 +177,7 @@
                     <button
                         id="confirmSellerButton"
                         class="primary-button"
+                        type="button"
                     >
                         CONFIRMAR PUNTO
                     </button>
@@ -189,11 +187,14 @@
             </div>
 
 
+            <!-- BUSCADOR -->
+
             <div class="map-section">
 
                 <h3>
                     🔎 Buscar producto
                 </h3>
+
 
                 <input
                     id="searchInput"
@@ -207,6 +208,7 @@
                     <button
                         class="range-button"
                         data-radius="1"
+                        type="button"
                     >
                         1 km
                     </button>
@@ -214,6 +216,7 @@
                     <button
                         class="range-button"
                         data-radius="3"
+                        type="button"
                     >
                         3 km
                     </button>
@@ -221,6 +224,7 @@
                     <button
                         class="range-button active"
                         data-radius="10"
+                        type="button"
                     >
                         10 km
                     </button>
@@ -228,6 +232,7 @@
                     <button
                         class="range-button"
                         data-radius="20"
+                        type="button"
                     >
                         20 km
                     </button>
@@ -247,12 +252,15 @@
                 <button
                     id="searchButton"
                     class="secondary-button"
+                    type="button"
                 >
                     BUSCAR
                 </button>
 
             </div>
 
+
+            <!-- MÉTRICAS DEL MAPA -->
 
             <div class="map-section">
 
@@ -272,12 +280,10 @@
                     Actividad
 
                     <div class="bar">
-
                         <div
                             id="demandBar"
                             class="bar-fill"
                         ></div>
-
                     </div>
 
                     <strong id="demandText">
@@ -302,9 +308,9 @@
 
 
 
-    <!-- =================================================
+    <!-- =====================================================
          CREAR EMPRESA
-    ================================================== -->
+    ====================================================== -->
 
     <main
         id="createView"
@@ -314,7 +320,6 @@
         <header class="topbar">
 
             <div>
-
                 <div class="brand">
                     CREAR
                 </div>
@@ -322,7 +327,6 @@
                 <div class="brand-subtitle">
                     Nueva empresa
                 </div>
-
             </div>
 
         </header>
@@ -352,6 +356,7 @@
 
                 <input
                     id="companyNameInput"
+                    type="text"
                     placeholder="Ej. SURANO"
                 >
 
@@ -405,6 +410,7 @@
 
                 <input
                     id="companyProductInput"
+                    type="text"
                     placeholder="Ej. chaquetas urbanas"
                 >
 
@@ -427,6 +433,7 @@
 
                 <input
                     id="companyAudienceInput"
+                    type="text"
                     placeholder="Ej. jóvenes de 18 a 30 años"
                 >
 
@@ -434,6 +441,7 @@
                 <button
                     id="createCompanyButton"
                     class="primary-button big"
+                    type="button"
                 >
                     CREAR EMPRESA
                 </button>
@@ -452,9 +460,9 @@
 
 
 
-    <!-- =================================================
+    <!-- =====================================================
          EMPRESA
-    ================================================== -->
+    ====================================================== -->
 
     <main
         id="companyView"
@@ -464,7 +472,6 @@
         <header class="topbar">
 
             <div>
-
                 <div class="brand">
                     EMPRESA
                 </div>
@@ -472,7 +479,6 @@
                 <div class="brand-subtitle">
                     Centro de operaciones
                 </div>
-
             </div>
 
         </header>
@@ -487,9 +493,9 @@
 
 
 
-    <!-- =================================================
+    <!-- =====================================================
          PERFIL
-    ================================================== -->
+    ====================================================== -->
 
     <main
         id="profileView"
@@ -499,7 +505,6 @@
         <header class="topbar">
 
             <div>
-
                 <div class="brand">
                     PERFIL
                 </div>
@@ -507,7 +512,6 @@
                 <div class="brand-subtitle">
                     Tu progreso en MAHPE
                 </div>
-
             </div>
 
         </header>
@@ -537,9 +541,7 @@
 
                 <div class="stat-card">
 
-                    <span>
-                        ◈
-                    </span>
+                    <span>◈</span>
 
                     <strong id="profileMahpes">
                         1250
@@ -554,9 +556,7 @@
 
                 <div class="stat-card">
 
-                    <span>
-                        🏢
-                    </span>
+                    <span>🏢</span>
 
                     <strong id="profileCompanies">
                         0
@@ -571,9 +571,7 @@
 
                 <div class="stat-card">
 
-                    <span>
-                        🔥
-                    </span>
+                    <span>🔥</span>
 
                     <strong id="profileInterest">
                         0
@@ -588,9 +586,7 @@
 
                 <div class="stat-card">
 
-                    <span>
-                        💰
-                    </span>
+                    <span>💰</span>
 
                     <strong id="profileCommitment">
                         0
@@ -632,15 +628,16 @@
 
 
 
-<!-- =====================================================
-     NAVEGACIÓN
-====================================================== -->
+<!-- =========================================================
+     NAVEGACIÓN PRINCIPAL
+========================================================= -->
 
 <nav id="mahpeMainNav">
 
     <button
         class="nav-button active"
         data-view="feedView"
+        type="button"
     >
 
         <span>⌂</span>
@@ -655,6 +652,7 @@
     <button
         class="nav-button"
         data-view="mapView"
+        type="button"
     >
 
         <span>⌖</span>
@@ -669,6 +667,7 @@
     <button
         class="nav-button create-nav"
         data-view="createView"
+        type="button"
     >
 
         <span>＋</span>
@@ -683,6 +682,7 @@
     <button
         class="nav-button"
         data-view="companyView"
+        type="button"
     >
 
         <span>▣</span>
@@ -697,6 +697,7 @@
     <button
         class="nav-button"
         data-view="profileView"
+        type="button"
     >
 
         <span>●</span>
@@ -711,12 +712,15 @@
 
 
 
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
 <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
 ></script>
 
-<script src="script.js"></script>
+<script src="./script.js?v=11"></script>
 
 </body>
-
 </html>
