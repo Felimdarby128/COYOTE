@@ -1,11 +1,1490 @@
 /* =========================================================
-   COYOTE
-   CAPA 1 + ESTRUCTURA PARA CAPAS FUTURAS
+   MAHPE v1
+   JUEGO + SIMULADOR EMPRESARIAL
+   COYOTE = MOTOR TERRITORIAL
 ========================================================= */
 
 
 /* =========================================================
-   VARIABLES
+   ESTADO MAHPE
+========================================================= */
+
+const DEFAULT_STATE = {
+
+    mahpes: 1250,
+
+    companies: [],
+
+    posts: [],
+
+    interactions: {}
+
+};
+
+
+let mahpeState =
+    loadMahpeState();
+
+
+let currentCompanyId =
+    mahpeState.companies.length
+        ? mahpeState.companies[0].id
+        : null;
+
+
+/* =========================================================
+   EMPRESA DEMO
+========================================================= */
+
+const demoCompany = {
+
+    id: "surano-demo",
+
+    name: "SURANO",
+
+    category: "Moda",
+
+    description:
+        "Marca conceptual de moda que está probando su identidad y primera colección dentro de MAHPE.",
+
+    product:
+        "Colección urbana",
+
+    price: 180,
+
+    audience:
+        "Jóvenes interesados en moda y diseño",
+
+    stage:
+        "En desarrollo",
+
+    followers: 84,
+
+    interested: 21,
+
+    committed: 6,
+
+    value: 2850,
+
+    capital: 1000,
+
+    demo: true
+
+};
+
+
+const demoPost = {
+
+    id: "surano-post",
+
+    companyId:
+        "surano-demo",
+
+    companyName:
+        "SURANO",
+
+    category:
+        "Moda",
+
+    title:
+        "Nueva colección",
+
+    text:
+        "Estamos probando una nueva identidad visual para la primera colección de SURANO.",
+
+    views: 328,
+
+    interactions: 84,
+
+    interested: 21,
+
+    committed: 6,
+
+    demo: true
+
+};
+
+
+/* =========================================================
+   LOCAL STORAGE
+========================================================= */
+
+function loadMahpeState() {
+
+    const saved =
+        localStorage.getItem(
+            "mahpe_state_v1"
+        );
+
+
+    if (!saved) {
+
+        return JSON.parse(
+            JSON.stringify(
+                DEFAULT_STATE
+            )
+        );
+
+    }
+
+
+    try {
+
+        return JSON.parse(
+            saved
+        );
+
+    } catch (error) {
+
+        console.error(
+            "No se pudo cargar MAHPE:",
+            error
+        );
+
+
+        return JSON.parse(
+            JSON.stringify(
+                DEFAULT_STATE
+            )
+        );
+
+    }
+
+}
+
+
+function saveMahpeState() {
+
+    localStorage.setItem(
+        "mahpe_state_v1",
+        JSON.stringify(
+            mahpeState
+        )
+    );
+
+
+    updateGlobalUI();
+
+}
+
+
+/* =========================================================
+   UTILIDADES
+========================================================= */
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.textContent =
+        text ?? "";
+
+    return div.innerHTML;
+
+}
+
+
+function generateId(prefix) {
+
+    return (
+        prefix +
+        "-" +
+        Date.now() +
+        "-" +
+        Math.floor(
+            Math.random() * 100000
+        )
+    );
+
+}
+
+
+function getCurrentCompany() {
+
+    return mahpeState.companies.find(
+        company =>
+            company.id ===
+            currentCompanyId
+    ) || null;
+
+}
+
+
+/* =========================================================
+   NAVEGACIÓN
+========================================================= */
+
+const appViews =
+    document.querySelectorAll(
+        ".app-view"
+    );
+
+
+const navButtons =
+    document.querySelectorAll(
+        ".nav-button"
+    );
+
+
+function openView(viewId) {
+
+    appViews.forEach(view => {
+
+        view.classList.remove(
+            "active"
+        );
+
+    });
+
+
+    const target =
+        document.getElementById(
+            viewId
+        );
+
+
+    if (target) {
+
+        target.classList.add(
+            "active"
+        );
+
+    }
+
+
+    navButtons.forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.view ===
+                viewId
+        );
+
+    });
+
+
+    if (viewId === "mapView") {
+
+        setTimeout(() => {
+
+            if (map) {
+
+                map.invalidateSize();
+
+            }
+
+        }, 120);
+
+    }
+
+
+    if (viewId === "companyView") {
+
+        renderCompanyDashboard();
+
+    }
+
+
+    if (viewId === "profileView") {
+
+        updateProfile();
+
+    }
+
+}
+
+
+navButtons.forEach(button => {
+
+    button.addEventListener(
+        "click",
+        function() {
+
+            openView(
+                this.dataset.view
+            );
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   FEED
+========================================================= */
+
+function getAllPosts() {
+
+    return [
+        demoPost,
+        ...mahpeState.posts
+            .slice()
+            .reverse()
+    ];
+
+}
+
+
+function renderFeed() {
+
+    const container =
+        document.getElementById(
+            "feedContainer"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    container.innerHTML = "";
+
+
+    getAllPosts().forEach(post => {
+
+        const company =
+            post.demo
+                ? demoCompany
+                : mahpeState.companies
+                    .find(
+                        item =>
+                            item.id ===
+                            post.companyId
+                    );
+
+
+        if (!company) {
+            return;
+        }
+
+
+        const article =
+            document.createElement(
+                "article"
+            );
+
+
+        article.className =
+            "post";
+
+
+        article.innerHTML = `
+
+            <div class="post-header">
+
+                <div class="company-avatar">
+                    ${escapeHTML(
+                        company.name.charAt(0)
+                    )}
+                </div>
+
+                <div class="post-company">
+
+                    <strong>
+                        ${escapeHTML(
+                            company.name
+                        )}
+                    </strong>
+
+                    <span>
+                        ${escapeHTML(
+                            company.category
+                        )}
+                        ·
+                        ${escapeHTML(
+                            company.stage
+                        )}
+                    </span>
+
+                </div>
+
+                <button
+                    class="follow-button"
+                    data-company="${company.id}"
+                >
+                    Seguir
+                </button>
+
+            </div>
+
+
+            <div class="post-visual">
+
+                <div class="visual-brand">
+                    ${escapeHTML(
+                        company.name
+                    )}
+                </div>
+
+                <strong>
+                    ${escapeHTML(
+                        post.title
+                    )}
+                </strong>
+
+                <p>
+                    ${escapeHTML(
+                        post.text
+                    )}
+                </p>
+
+            </div>
+
+
+            <div class="post-body">
+
+                <p class="post-description">
+
+                    <strong>
+                        ${escapeHTML(
+                            company.name
+                        )}
+                    </strong>
+
+                    ·
+
+                    ${escapeHTML(
+                        post.text
+                    )}
+
+                </p>
+
+
+                <div class="signals">
+
+                    <button
+                        class="signal-button"
+                        data-post="${post.id}"
+                        data-signal="view"
+                    >
+
+                        <span>👁</span>
+
+                        <strong>
+                            ${post.views || 0}
+                        </strong>
+
+                        <small>
+                            Vistas
+                        </small>
+
+                    </button>
+
+
+                    <button
+                        class="signal-button"
+                        data-post="${post.id}"
+                        data-signal="interaction"
+                    >
+
+                        <span>♡</span>
+
+                        <strong>
+                            ${post.interactions || 0}
+                        </strong>
+
+                        <small>
+                            Interacción
+                        </small>
+
+                    </button>
+
+
+                    <button
+                        class="signal-button"
+                        data-post="${post.id}"
+                        data-signal="interest"
+                    >
+
+                        <span>🔥</span>
+
+                        <strong>
+                            ${post.interested || 0}
+                        </strong>
+
+                        <small>
+                            Interesado
+                        </small>
+
+                    </button>
+
+
+                    <button
+                        class="signal-button"
+                        data-post="${post.id}"
+                        data-signal="commitment"
+                    >
+
+                        <span>💰</span>
+
+                        <strong>
+                            ${post.committed || 0}
+                        </strong>
+
+                        <small>
+                            Comprometido
+                        </small>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        container.appendChild(
+            article
+        );
+
+    });
+
+
+    bindFeedEvents();
+
+}
+
+
+/* =========================================================
+   INTERACCIONES FEED
+========================================================= */
+
+function bindFeedEvents() {
+
+    document
+        .querySelectorAll(
+            ".follow-button"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    this.classList.toggle(
+                        "following"
+                    );
+
+
+                    const following =
+                        this.classList.contains(
+                            "following"
+                        );
+
+
+                    this.textContent =
+                        following
+                            ? "Siguiendo"
+                            : "Seguir";
+
+
+                    if (following) {
+
+                        mahpeState.mahpes +=
+                            2;
+
+                        saveMahpeState();
+
+                    }
+
+                }
+            );
+
+        });
+
+
+    document
+        .querySelectorAll(
+            ".signal-button"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    const postId =
+                        this.dataset.post;
+
+                    const signal =
+                        this.dataset.signal;
+
+
+                    if (
+                        signal ===
+                        "view"
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const interactionKey =
+                        postId +
+                        "-" +
+                        signal;
+
+
+                    if (
+                        mahpeState
+                            .interactions[
+                                interactionKey
+                            ]
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    mahpeState
+                        .interactions[
+                            interactionKey
+                        ] = true;
+
+
+                    this.classList.add(
+                        "selected"
+                    );
+
+
+                    applySignal(
+                        postId,
+                        signal
+                    );
+
+                }
+            );
+
+        });
+
+}
+
+
+/* =========================================================
+   MOTOR SOCIAL COYOTE
+========================================================= */
+
+function applySignal(
+    postId,
+    signal
+) {
+
+    const post =
+        mahpeState.posts.find(
+            item =>
+                item.id === postId
+        );
+
+
+    /*
+     * SURANO es demo.
+     * Permitimos interacción visual,
+     * pero no modifica una empresa
+     * real del usuario.
+     */
+
+    if (!post) {
+
+        mahpeState.mahpes += 1;
+
+        saveMahpeState();
+
+        renderFeed();
+
+        return;
+
+    }
+
+
+    const company =
+        mahpeState.companies.find(
+            item =>
+                item.id ===
+                post.companyId
+        );
+
+
+    if (!company) {
+        return;
+    }
+
+
+    if (
+        signal ===
+        "interaction"
+    ) {
+
+        post.interactions += 1;
+
+        company.interactions += 1;
+
+        company.value += 5;
+
+    }
+
+
+    if (
+        signal ===
+        "interest"
+    ) {
+
+        post.interested += 1;
+
+        company.interested += 1;
+
+        company.value += 20;
+
+    }
+
+
+    if (
+        signal ===
+        "commitment"
+    ) {
+
+        post.committed += 1;
+
+        company.committed += 1;
+
+        company.value += 50;
+
+        company.capital += 10;
+
+    }
+
+
+    recalculateCompanyStage(
+        company
+    );
+
+
+    mahpeState.mahpes += 1;
+
+
+    saveMahpeState();
+
+    renderFeed();
+
+}
+
+
+/* =========================================================
+   ETAPAS DE EMPRESA
+========================================================= */
+
+function recalculateCompanyStage(
+    company
+) {
+
+    if (
+        company.value >=
+        10000
+    ) {
+
+        company.stage =
+            "Consolidada";
+
+    }
+
+    else if (
+        company.value >=
+        5000
+    ) {
+
+        company.stage =
+            "En crecimiento";
+
+    }
+
+    else if (
+        company.value >=
+        2500
+    ) {
+
+        company.stage =
+            "Lanzada";
+
+    }
+
+    else if (
+        company.value >=
+        1000
+    ) {
+
+        company.stage =
+            "En desarrollo";
+
+    }
+
+    else {
+
+        company.stage =
+            "Idea";
+
+    }
+
+}
+
+
+/* =========================================================
+   CREAR EMPRESA
+========================================================= */
+
+document
+    .getElementById(
+        "createCompanyButton"
+    )
+    .addEventListener(
+        "click",
+        createCompany
+    );
+
+
+function createCompany() {
+
+    const name =
+        document
+            .getElementById(
+                "companyNameInput"
+            )
+            .value
+            .trim();
+
+
+    const category =
+        document
+            .getElementById(
+                "companyCategoryInput"
+            )
+            .value;
+
+
+    const description =
+        document
+            .getElementById(
+                "companyDescriptionInput"
+            )
+            .value
+            .trim();
+
+
+    const product =
+        document
+            .getElementById(
+                "companyProductInput"
+            )
+            .value
+            .trim();
+
+
+    const price =
+        Number(
+            document
+                .getElementById(
+                    "companyPriceInput"
+                )
+                .value
+        ) || 0;
+
+
+    const audience =
+        document
+            .getElementById(
+                "companyAudienceInput"
+            )
+            .value
+            .trim();
+
+
+    const status =
+        document.getElementById(
+            "createCompanyStatus"
+        );
+
+
+    if (!name) {
+
+        status.textContent =
+            "Escribe el nombre de la empresa.";
+
+        return;
+
+    }
+
+
+    const company = {
+
+        id:
+            generateId(
+                "company"
+            ),
+
+        name,
+
+        category,
+
+        description:
+            description ||
+            "Empresa creada dentro de MAHPE.",
+
+        product:
+            product ||
+            "Producto en desarrollo",
+
+        price,
+
+        audience:
+            audience ||
+            "Por definir",
+
+        stage:
+            "Idea",
+
+        followers: 0,
+
+        interactions: 0,
+
+        interested: 0,
+
+        committed: 0,
+
+        value: 500,
+
+        capital: 500,
+
+        createdAt:
+            new Date()
+                .toISOString()
+
+    };
+
+
+    mahpeState
+        .companies
+        .push(
+            company
+        );
+
+
+    currentCompanyId =
+        company.id;
+
+
+    /*
+     * Recompensa por crear
+     * una empresa.
+     */
+
+    mahpeState.mahpes +=
+        100;
+
+
+    saveMahpeState();
+
+
+    status.textContent =
+        "✓ Empresa creada. +100 Mahpes";
+
+
+    clearCompanyForm();
+
+
+    renderCompanyDashboard();
+
+    updateProfile();
+
+
+    setTimeout(
+        function() {
+
+            openView(
+                "companyView"
+            );
+
+        },
+        400
+    );
+
+}
+
+
+function clearCompanyForm() {
+
+    [
+        "companyNameInput",
+        "companyDescriptionInput",
+        "companyProductInput",
+        "companyPriceInput",
+        "companyAudienceInput"
+    ]
+    .forEach(id => {
+
+        document
+            .getElementById(id)
+            .value = "";
+
+    });
+
+}
+
+
+/* =========================================================
+   DASHBOARD EMPRESA
+========================================================= */
+
+function renderCompanyDashboard() {
+
+    const container =
+        document.getElementById(
+            "companyDashboard"
+        );
+
+
+    const company =
+        getCurrentCompany();
+
+
+    if (!company) {
+
+        container.innerHTML = `
+
+            <section class="form-card">
+
+                <span class="eyebrow">
+                    SIN EMPRESA
+                </span>
+
+                <h1>
+                    Todavía no tienes una empresa
+                </h1>
+
+                <p class="muted">
+                    Ve a Crear y construye tu
+                    primera empresa dentro de MAHPE.
+                </p>
+
+                <button
+                    class="primary-button big"
+                    onclick="openView('createView')"
+                >
+                    CREAR EMPRESA
+                </button>
+
+            </section>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML = `
+
+        <section class="company-hero">
+
+            <div class="company-hero-top">
+
+                <div class="company-big-avatar">
+
+                    ${escapeHTML(
+                        company.name.charAt(0)
+                    )}
+
+                </div>
+
+                <div>
+
+                    <h1>
+                        ${escapeHTML(
+                            company.name
+                        )}
+                    </h1>
+
+                    <div class="company-stage">
+
+                        ${escapeHTML(
+                            company.stage
+                        )}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <p class="company-description">
+
+                ${escapeHTML(
+                    company.description
+                )}
+
+            </p>
+
+        </section>
+
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <span>📈</span>
+
+                <strong>
+                    ${company.value}
+                </strong>
+
+                <small>
+                    Valor MAHPE
+                </small>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>◈</span>
+
+                <strong>
+                    ${company.capital}
+                </strong>
+
+                <small>
+                    Capital virtual
+                </small>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>🔥</span>
+
+                <strong>
+                    ${company.interested}
+                </strong>
+
+                <small>
+                    Interesados
+                </small>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>💰</span>
+
+                <strong>
+                    ${company.committed}
+                </strong>
+
+                <small>
+                    Comprometidos
+                </small>
+
+            </div>
+
+        </section>
+
+
+        <section class="company-card">
+
+            <span class="eyebrow">
+                PRODUCTO
+            </span>
+
+            <h2>
+                ${escapeHTML(
+                    company.product
+                )}
+            </h2>
+
+            <p class="muted">
+
+                Precio estimado:
+                S/
+                ${company.price}
+
+                <br><br>
+
+                Público:
+                ${escapeHTML(
+                    company.audience
+                )}
+
+            </p>
+
+        </section>
+
+
+        <section class="publisher">
+
+            <span class="eyebrow">
+                PUBLICAR
+            </span>
+
+            <h2>
+                Lanza una prueba al mercado
+            </h2>
+
+
+            <label>
+                Título
+            </label>
+
+            <input
+                id="postTitleInput"
+                placeholder="Ej. Nueva colección"
+            >
+
+
+            <label>
+                ¿Qué quieres mostrar?
+            </label>
+
+            <textarea
+                id="postTextInput"
+                placeholder="Describe el producto, diseño o avance..."
+            ></textarea>
+
+
+            <button
+                class="primary-button big"
+                onclick="publishCompanyPost()"
+            >
+                PUBLICAR
+            </button>
+
+        </section>
+
+    `;
+
+}
+
+
+/* =========================================================
+   PUBLICAR
+========================================================= */
+
+function publishCompanyPost() {
+
+    const company =
+        getCurrentCompany();
+
+
+    if (!company) {
+        return;
+    }
+
+
+    const titleInput =
+        document.getElementById(
+            "postTitleInput"
+        );
+
+
+    const textInput =
+        document.getElementById(
+            "postTextInput"
+        );
+
+
+    const title =
+        titleInput.value.trim();
+
+
+    const text =
+        textInput.value.trim();
+
+
+    if (!title || !text) {
+
+        return;
+
+    }
+
+
+    const post = {
+
+        id:
+            generateId(
+                "post"
+            ),
+
+        companyId:
+            company.id,
+
+        companyName:
+            company.name,
+
+        category:
+            company.category,
+
+        title,
+
+        text,
+
+        views:
+            Math.floor(
+                10 +
+                Math.random() * 35
+            ),
+
+        interactions: 0,
+
+        interested: 0,
+
+        committed: 0,
+
+        createdAt:
+            new Date()
+                .toISOString()
+
+    };
+
+
+    mahpeState.posts.push(
+        post
+    );
+
+
+    /*
+     * Actividad empresarial
+     * genera crecimiento inicial.
+     */
+
+    company.value += 25;
+
+    mahpeState.mahpes += 10;
+
+
+    recalculateCompanyStage(
+        company
+    );
+
+
+    saveMahpeState();
+
+
+    renderFeed();
+
+    renderCompanyDashboard();
+
+
+    openView(
+        "feedView"
+    );
+
+}
+
+
+/* =========================================================
+   PERFIL
+========================================================= */
+
+function updateProfile() {
+
+    document
+        .getElementById(
+            "profileMahpes"
+        )
+        .textContent =
+            mahpeState.mahpes;
+
+
+    document
+        .getElementById(
+            "profileCompanies"
+        )
+        .textContent =
+            mahpeState
+                .companies
+                .length;
+
+
+    const totalInterest =
+        mahpeState
+            .companies
+            .reduce(
+                (
+                    total,
+                    company
+                ) =>
+                    total +
+                    company.interested,
+                0
+            );
+
+
+    const totalCommitment =
+        mahpeState
+            .companies
+            .reduce(
+                (
+                    total,
+                    company
+                ) =>
+                    total +
+                    company.committed,
+                0
+            );
+
+
+    document
+        .getElementById(
+            "profileInterest"
+        )
+        .textContent =
+            totalInterest;
+
+
+    document
+        .getElementById(
+            "profileCommitment"
+        )
+        .textContent =
+            totalCommitment;
+
+}
+
+
+/* =========================================================
+   UI GLOBAL
+========================================================= */
+
+function updateGlobalUI() {
+
+    const wallet =
+        document.getElementById(
+            "walletBalance"
+        );
+
+
+    if (wallet) {
+
+        wallet.textContent =
+            mahpeState.mahpes;
+
+    }
+
+
+    updateProfile();
+
+}
+
+
+/* =========================================================
+   COYOTE — MAPA
 ========================================================= */
 
 let map;
@@ -16,11 +1495,6 @@ let userMarker = null;
 
 let selectedRadius = 10;
 
-
-/* =========================================================
-   SEGUIR PUNTO DENTRO DE COYOTE
-========================================================= */
-
 let followWatchId = null;
 
 let followUserMarker = null;
@@ -30,39 +1504,41 @@ let followLine = null;
 let followedSellerPoint = null;
 
 
-/*
- * Puntos comerciales.
- *
- * Por ahora se almacenan localmente.
- *
- * Más adelante:
- * Firebase / Supabase / backend.
- */
-
-let commercialPoints = [];
-
-
 /* =========================================================
    INICIALIZAR MAPA
 ========================================================= */
 
 function initializeMap() {
 
-    map = L.map("map").setView(
-        [-12.025, -76.925],
-        14
-    );
+    map =
+        L.map(
+            "map"
+        )
+        .setView(
+            [
+                -12.025,
+                -76.925
+            ],
+            14
+        );
 
 
     L.tileLayer(
+
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
         {
+
             maxZoom: 19,
 
             attribution:
                 "&copy; OpenStreetMap contributors"
+
         }
-    ).addTo(map);
+
+    ).addTo(
+        map
+    );
 
 
     loadSavedSeller();
@@ -75,7 +1551,9 @@ function initializeMap() {
 ========================================================= */
 
 document
-    .getElementById("activateButton")
+    .getElementById(
+        "activateButton"
+    )
     .addEventListener(
         "click",
         activateSeller
@@ -84,13 +1562,16 @@ document
 
 function activateSeller() {
 
-    if (!navigator.geolocation) {
+    if (
+        !navigator.geolocation
+    ) {
 
         updateStatus(
             "❌ Tu navegador no permite utilizar ubicación."
         );
 
         return;
+
     }
 
 
@@ -99,81 +1580,110 @@ function activateSeller() {
     );
 
 
-    navigator.geolocation.getCurrentPosition(
+    navigator
+        .geolocation
+        .getCurrentPosition(
 
-        function(position) {
+            function(position) {
 
-            const lat =
-                position.coords.latitude;
+                const lat =
+                    position.coords.latitude;
 
-            const lng =
-                position.coords.longitude;
-
-
-            userLocation = {
-                lat: lat,
-                lng: lng
-            };
+                const lng =
+                    position.coords.longitude;
 
 
-            map.setView(
-                [lat, lng],
-                17
-            );
+                userLocation = {
+                    lat,
+                    lng
+                };
 
 
-            document
-                .getElementById("sellerForm")
-                .classList
-                .remove("hidden");
-
-
-            document
-                .getElementById("activateButton")
-                .classList
-                .add("hidden");
-
-
-            updateStatus(
-                "📍 Ubicación encontrada.<br>" +
-                "Ahora indica qué vendes."
-            );
-
-        },
-
-        function(error) {
-
-            if (error.code === 1) {
-
-                updateStatus(
-                    "❌ Debes permitir el acceso a tu ubicación."
+                map.setView(
+                    [
+                        lat,
+                        lng
+                    ],
+                    17
                 );
 
-            } else {
+
+                document
+                    .getElementById(
+                        "sellerForm"
+                    )
+                    .classList
+                    .remove(
+                        "hidden"
+                    );
+
+
+                document
+                    .getElementById(
+                        "activateButton"
+                    )
+                    .classList
+                    .add(
+                        "hidden"
+                    );
+
 
                 updateStatus(
-                    "❌ No se pudo obtener tu ubicación."
+                    "📍 Ubicación encontrada. Ahora indica qué vendes."
                 );
+
+            },
+
+
+            function(error) {
+
+                if (
+                    error.code === 1
+                ) {
+
+                    updateStatus(
+                        "❌ Debes permitir el acceso a tu ubicación."
+                    );
+
+                }
+
+                else {
+
+                    updateStatus(
+                        "❌ No se pudo obtener tu ubicación."
+                    );
+
+                }
+
+            },
+
+
+            {
+
+                enableHighAccuracy:
+                    true,
+
+                timeout:
+                    10000,
+
+                maximumAge:
+                    0
 
             }
 
-        },
+        );
 
-        {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-        }
-    );
 }
 
 
 /* =========================================================
-   CONFIRMAR COMERCIANTE
+   CREAR PUNTO VERDE
 ========================================================= */
 
 document
-    .getElementById("confirmSellerButton")
+    .getElementById(
+        "confirmSellerButton"
+    )
     .addEventListener(
         "click",
         createSellerPoint
@@ -189,6 +1699,7 @@ function createSellerPoint() {
         );
 
         return;
+
     }
 
 
@@ -206,11 +1717,8 @@ function createSellerPoint() {
 
         input.focus();
 
-        updateStatus(
-            "⚠️ Escribe qué vendes."
-        );
-
         return;
+
     }
 
 
@@ -225,43 +1733,51 @@ function createSellerPoint() {
         lng:
             userLocation.lng,
 
-        product:
-            product,
+        product,
 
         active:
             true,
 
         createdAt:
-            new Date().toISOString()
+            new Date()
+                .toISOString()
 
     };
 
 
     localStorage.setItem(
         "coyote_seller_point",
-        JSON.stringify(point)
+        JSON.stringify(
+            point
+        )
     );
 
 
-    showGreenPoint(point);
+    showGreenPoint(
+        point
+    );
 
 
     document
-        .getElementById("sellerForm")
+        .getElementById(
+            "sellerForm"
+        )
         .classList
-        .add("hidden");
+        .add(
+            "hidden"
+        );
 
 
     updateStatus(
         "🟢 <strong>Punto activo.</strong><br>" +
-        "COYOTE sabe dónde estás y qué vendes."
+        escapeHTML(product)
     );
 
 }
 
 
 /* =========================================================
-   MOSTRAR PUNTO VERDE
+   MOSTRAR PUNTO
 ========================================================= */
 
 function showGreenPoint(point) {
@@ -271,6 +1787,7 @@ function showGreenPoint(point) {
         map.removeLayer(
             userMarker
         );
+
     }
 
 
@@ -296,83 +1813,49 @@ function showGreenPoint(point) {
 
     userMarker =
         L.marker(
+
             [
                 point.lat,
                 point.lng
             ],
+
             {
                 icon:
                     greenIcon
             }
+
         )
         .addTo(map);
-
-
-    const date =
-        new Date(
-            point.createdAt
-        );
-
-
-    const time =
-        date.toLocaleString(
-            "es-PE",
-            {
-                dateStyle: "short",
-                timeStyle: "short"
-            }
-        );
 
 
     const popup = `
 
         <div>
 
-            <div class="popup-title">
-                🟢 Punto Comercial
-            </div>
+            <strong>
+                🟢 Punto MAHPE
+            </strong>
 
-            <div class="popup-product">
-                🛒 Vende:
-                <strong>
-                    ${escapeHTML(point.product)}
-                </strong>
-            </div>
+            <br><br>
 
-            <div class="popup-distance">
-                Activo desde:
-                ${time}
-            </div>
+            Vende:
 
-            <br>
+            <strong>
+                ${escapeHTML(
+                    point.product
+                )}
+            </strong>
 
+            <br><br>
 
             <button
                 onclick="followSellerPoint()"
-                style="
-                    border:none;
-                    border-radius:8px;
-                    padding:8px;
-                    margin-right:6px;
-                    background:#2980b9;
-                    color:white;
-                    cursor:pointer;
-                "
             >
-                🧭 Seguir punto
+                🧭 Seguir
             </button>
-
 
             <button
                 onclick="deactivateSeller()"
-                style="
-                    border:none;
-                    border-radius:8px;
-                    padding:8px;
-                    background:#e74c3c;
-                    color:white;
-                    cursor:pointer;
-                "
             >
                 Desactivar
             </button>
@@ -390,44 +1873,7 @@ function showGreenPoint(point) {
 
 
 /* =========================================================
-   DESACTIVAR
-========================================================= */
-
-function deactivateSeller() {
-
-    stopFollowingSeller(false);
-
-
-    localStorage.removeItem(
-        "coyote_seller_point"
-    );
-
-
-    if (userMarker) {
-
-        map.removeLayer(
-            userMarker
-        );
-
-        userMarker = null;
-    }
-
-
-    document
-        .getElementById("activateButton")
-        .classList
-        .remove("hidden");
-
-
-    updateStatus(
-        "⚪ Punto desactivado."
-    );
-
-}
-
-
-/* =========================================================
-   CARGAR PUNTO GUARDADO
+   CARGAR PUNTO
 ========================================================= */
 
 function loadSavedSeller() {
@@ -446,7 +1892,9 @@ function loadSavedSeller() {
     try {
 
         const point =
-            JSON.parse(saved);
+            JSON.parse(
+                saved
+            );
 
 
         if (
@@ -470,29 +1918,17 @@ function loadSavedSeller() {
             );
 
 
-            map.setView(
-                [
-                    point.lat,
-                    point.lng
-                ],
-                17
-            );
-
-
             updateStatus(
-                "🟢 <strong>Tu punto está activo.</strong><br>" +
-                "Vendes: " +
-                escapeHTML(
-                    point.product
-                )
+                "🟢 Tu Punto Verde está activo."
             );
 
         }
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
-            "Error cargando punto:",
             error
         );
 
@@ -502,7 +1938,51 @@ function loadSavedSeller() {
 
 
 /* =========================================================
-   SELECCIÓN DE RADIO
+   DESACTIVAR
+========================================================= */
+
+function deactivateSeller() {
+
+    stopFollowingSeller(
+        false
+    );
+
+
+    localStorage.removeItem(
+        "coyote_seller_point"
+    );
+
+
+    if (userMarker) {
+
+        map.removeLayer(
+            userMarker
+        );
+
+        userMarker = null;
+
+    }
+
+
+    document
+        .getElementById(
+            "activateButton"
+        )
+        .classList
+        .remove(
+            "hidden"
+        );
+
+
+    updateStatus(
+        "⚪ Punto desactivado."
+    );
+
+}
+
+
+/* =========================================================
+   RADIO
 ========================================================= */
 
 const rangeButtons =
@@ -511,100 +1991,99 @@ const rangeButtons =
     );
 
 
-rangeButtons.forEach(
-    button => {
+rangeButtons.forEach(button => {
 
-        button.addEventListener(
-            "click",
-            function() {
+    button.addEventListener(
+        "click",
+        function() {
 
-                rangeButtons.forEach(
-                    b =>
-                        b.classList.remove(
-                            "active"
-                        )
-                );
+            rangeButtons
+                .forEach(item => {
 
-
-                this.classList.add(
-                    "active"
-                );
-
-
-                selectedRadius =
-                    Number(
-                        this.dataset.radius
+                    item.classList.remove(
+                        "active"
                     );
 
-
-                updateReference();
-
-            }
-        );
-
-    }
-);
+                });
 
 
-/* =========================================================
-   REFERENCIA TERRITORIAL
-========================================================= */
+            this.classList.add(
+                "active"
+            );
+
+
+            selectedRadius =
+                Number(
+                    this.dataset.radius
+                );
+
+
+            updateReference();
+
+        }
+    );
+
+});
+
 
 function updateReference() {
 
-    const reference =
-        document.getElementById(
+    let text =
+        "Una zona amplia alrededor de ti.";
+
+
+    if (
+        selectedRadius === 1
+    ) {
+
+        text =
+            "Tu zona inmediata.";
+
+    }
+
+
+    if (
+        selectedRadius === 3
+    ) {
+
+        text =
+            "Varios sectores cercanos.";
+
+    }
+
+
+    if (
+        selectedRadius === 20
+    ) {
+
+        text =
+            "Varias zonas de tu entorno.";
+
+    }
+
+
+    document
+        .getElementById(
             "referenceText"
-        );
+        )
+        .innerHTML =
 
-
-    let text = "";
-
-
-    if (selectedRadius === 1) {
-
-        text =
-            "📍 Aproximadamente tu zona inmediata.";
-
-    }
-
-    else if (selectedRadius === 3) {
-
-        text =
-            "📍 Aproximadamente varios sectores cercanos.";
-
-    }
-
-    else if (selectedRadius === 10) {
-
-        text =
-            "📍 Una zona amplia alrededor de ti.";
-
-    }
-
-    else if (selectedRadius === 20) {
-
-        text =
-            "📍 Varias zonas de tu entorno.";
-
-    }
-
-
-    reference.innerHTML =
-        "🔎 " +
-        selectedRadius +
-        " km<br>" +
-        text;
+            "🔎 " +
+            selectedRadius +
+            " km<br>" +
+            text;
 
 }
 
 
 /* =========================================================
-   BUSCADOR
+   BUSCAR
 ========================================================= */
 
 document
-    .getElementById("searchButton")
+    .getElementById(
+        "searchButton"
+    )
     .addEventListener(
         "click",
         searchProducts
@@ -630,47 +2109,36 @@ function searchProducts() {
         );
 
         return;
+
     }
 
 
-    const savedSeller =
+    const saved =
         localStorage.getItem(
             "coyote_seller_point"
         );
 
 
-    let points = [];
-
-
-    if (savedSeller) {
-
-        try {
-
-            points.push(
-                JSON.parse(
-                    savedSeller
-                )
-            );
-
-        } catch (error) {
-
-            console.error(error);
-
-        }
-
-    }
-
-
     let matches = [];
 
 
-    points.forEach(
-        point => {
+    if (saved) {
+
+        try {
+
+            const point =
+                JSON.parse(
+                    saved
+                );
+
 
             if (
+                point.active &&
                 point.product
                     .toLowerCase()
-                    .includes(search)
+                    .includes(
+                        search
+                    )
             ) {
 
                 matches.push(
@@ -680,7 +2148,16 @@ function searchProducts() {
             }
 
         }
-    );
+
+        catch (error) {
+
+            console.error(
+                error
+            );
+
+        }
+
+    }
 
 
     document
@@ -688,6 +2165,7 @@ function searchProducts() {
             "offerText"
         )
         .textContent =
+
             matches.length +
             " punto(s)";
 
@@ -696,7 +2174,8 @@ function searchProducts() {
         Math.min(
             100,
             20 +
-            matches.length * 20
+            matches.length *
+            30
         );
 
 
@@ -706,7 +2185,9 @@ function searchProducts() {
         )
         .style
         .width =
-            intensity + "%";
+
+            intensity +
+            "%";
 
 
     document
@@ -714,38 +2195,29 @@ function searchProducts() {
             "demandText"
         )
         .textContent =
-            intensity > 60
-                ? "Alta actividad"
+
+            matches.length
+                ? "Actividad detectada"
                 : "Actividad inicial";
 
 
-    if (matches.length > 0) {
-
-        updateStatus(
-            "🟢 Encontramos " +
-            matches.length +
-            " punto(s) que ofrecen " +
-            escapeHTML(search) +
-            "."
-        );
-
-
-        /*
-         * Abrimos automáticamente el punto encontrado
-         * para que el comprador pueda pulsar
-         * "SEGUIR PUNTO".
-         */
+    if (
+        matches.length
+    ) {
 
         const point =
             matches[0];
 
 
         map.setView(
+
             [
                 point.lat,
                 point.lng
             ],
+
             17
+
         );
 
 
@@ -755,12 +2227,25 @@ function searchProducts() {
 
         }
 
-    } else {
 
         updateStatus(
-            "🔎 No encontramos puntos de " +
-            escapeHTML(search) +
-            " todavía."
+            "🟢 Encontramos un punto de " +
+            escapeHTML(
+                search
+            ) +
+            "."
+        );
+
+    }
+
+    else {
+
+        updateStatus(
+            "🔎 Todavía no encontramos puntos de " +
+            escapeHTML(
+                search
+            ) +
+            "."
         );
 
     }
@@ -769,7 +2254,7 @@ function searchProducts() {
 
 
 /* =========================================================
-   SEGUIR PUNTO — NAVEGACIÓN INTERNA COYOTE
+   SEGUIR PUNTO
 ========================================================= */
 
 function followSellerPoint() {
@@ -783,288 +2268,223 @@ function followSellerPoint() {
     if (!saved) {
 
         updateStatus(
-            "⚠️ Este punto ya no está disponible."
+            "⚠️ Punto no disponible."
         );
 
         return;
+
     }
 
 
     try {
 
         followedSellerPoint =
-            JSON.parse(saved);
+            JSON.parse(
+                saved
+            );
 
-    } catch (error) {
+    }
 
-        updateStatus(
-            "⚠️ No se pudo leer la ubicación del vendedor."
-        );
+    catch {
 
         return;
+
     }
 
 
-    if (!navigator.geolocation) {
-
-        updateStatus(
-            "❌ Tu navegador no permite utilizar ubicación."
-        );
+    if (
+        !navigator.geolocation
+    ) {
 
         return;
+
     }
 
 
-    stopFollowingSeller(false);
+    stopFollowingSeller(
+        false
+    );
 
 
     updateStatus(
-        "🧭 Buscando tu ubicación..."
+        "🧭 Iniciando seguimiento..."
     );
 
 
     followWatchId =
-        navigator.geolocation.watchPosition(
+        navigator
+            .geolocation
+            .watchPosition(
 
-            function(position) {
+                function(position) {
 
-                const buyerLat =
-                    position.coords.latitude;
-
-                const buyerLng =
-                    position.coords.longitude;
-
-
-                /*
-                 * Volvemos a consultar la ubicación
-                 * almacenada del vendedor.
-                 */
-
-                const latestSaved =
-                    localStorage.getItem(
-                        "coyote_seller_point"
-                    );
+                    const buyerLat =
+                        position
+                            .coords
+                            .latitude;
 
 
-                if (latestSaved) {
+                    const buyerLng =
+                        position
+                            .coords
+                            .longitude;
 
-                    try {
 
-                        const latestPoint =
-                            JSON.parse(
-                                latestSaved
+                    const sellerLat =
+                        followedSellerPoint
+                            .lat;
+
+
+                    const sellerLng =
+                        followedSellerPoint
+                            .lng;
+
+
+                    if (
+                        !followUserMarker
+                    ) {
+
+                        followUserMarker =
+                            L.circleMarker(
+
+                                [
+                                    buyerLat,
+                                    buyerLng
+                                ],
+
+                                {
+
+                                    radius: 7,
+
+                                    weight: 3
+
+                                }
+
+                            )
+                            .addTo(
+                                map
                             );
-
-
-                        if (
-                            latestPoint &&
-                            latestPoint.active
-                        ) {
-
-                            followedSellerPoint =
-                                latestPoint;
-
-                        }
-
-                    } catch (error) {
-
-                        console.error(error);
 
                     }
 
-                }
+                    else {
+
+                        followUserMarker
+                            .setLatLng(
+                                [
+                                    buyerLat,
+                                    buyerLng
+                                ]
+                            );
+
+                    }
 
 
-                if (!followedSellerPoint) {
+                    if (!followLine) {
 
-                    stopFollowingSeller(false);
+                        followLine =
+                            L.polyline(
+
+                                [
+
+                                    [
+                                        buyerLat,
+                                        buyerLng
+                                    ],
+
+                                    [
+                                        sellerLat,
+                                        sellerLng
+                                    ]
+
+                                ],
+
+                                {
+
+                                    weight: 4,
+
+                                    dashArray:
+                                        "9 8"
+
+                                }
+
+                            )
+                            .addTo(
+                                map
+                            );
+
+                    }
+
+                    else {
+
+                        followLine
+                            .setLatLngs(
+
+                                [
+
+                                    [
+                                        buyerLat,
+                                        buyerLng
+                                    ],
+
+                                    [
+                                        sellerLat,
+                                        sellerLng
+                                    ]
+
+                                ]
+
+                            );
+
+                    }
+
+
+                    const distance =
+                        calculateDistanceKm(
+
+                            buyerLat,
+                            buyerLng,
+
+                            sellerLat,
+                            sellerLng
+
+                        );
+
+
+                    const distanceText =
+
+                        distance < 1
+
+                            ? Math.round(
+                                distance *
+                                1000
+                            ) +
+                            " m"
+
+                            : distance
+                                .toFixed(1) +
+                            " km";
+
 
                     updateStatus(
-                        "⚠️ El vendedor ya no está disponible."
-                    );
 
-                    return;
-                }
+                        "🧭 <strong>Siguiendo Punto Verde</strong>" +
 
+                        "<br>" +
 
-                const sellerLat =
-                    followedSellerPoint.lat;
+                        "Distancia: " +
 
-                const sellerLng =
-                    followedSellerPoint.lng;
-
-
-                /* =========================
-                   MARCADOR DEL COMPRADOR
-                ========================= */
-
-                if (!followUserMarker) {
-
-                    followUserMarker =
-                        L.circleMarker(
-
-                            [
-                                buyerLat,
-                                buyerLng
-                            ],
-
-                            {
-                                radius: 7,
-                                weight: 3,
-
-                                color:
-                                    "#2980b9",
-
-                                fillColor:
-                                    "#ffffff",
-
-                                fillOpacity:
-                                    1
-                            }
-
-                        )
-                        .addTo(map)
-                        .bindTooltip(
-                            "Tú",
-                            {
-                                direction:
-                                    "top"
-                            }
-                        );
-
-                } else {
-
-                    followUserMarker
-                        .setLatLng(
-                            [
-                                buyerLat,
-                                buyerLng
-                            ]
-                        );
-
-                }
-
-
-                /* =========================
-                   LÍNEA HACIA EL VENDEDOR
-                ========================= */
-
-                if (!followLine) {
-
-                    followLine =
-                        L.polyline(
-
-                            [
-                                [
-                                    buyerLat,
-                                    buyerLng
-                                ],
-
-                                [
-                                    sellerLat,
-                                    sellerLng
-                                ]
-                            ],
-
-                            {
-                                weight: 4,
-                                opacity: 0.85,
-
-                                dashArray:
-                                    "9 8"
-                            }
-
-                        )
-                        .addTo(map);
-
-                } else {
-
-                    followLine
-                        .setLatLngs(
-
-                            [
-                                [
-                                    buyerLat,
-                                    buyerLng
-                                ],
-
-                                [
-                                    sellerLat,
-                                    sellerLng
-                                ]
-                            ]
-
-                        );
-
-                }
-
-
-                /* =========================
-                   DISTANCIA
-                ========================= */
-
-                const distance =
-                    calculateDistanceKm(
-
-                        buyerLat,
-                        buyerLng,
-
-                        sellerLat,
-                        sellerLng
+                        "<strong>" +
+                        distanceText +
+                        "</strong>"
 
                     );
 
 
-                const distanceText =
-
-                    distance < 1
-
-                        ? Math.round(
-                            distance * 1000
-                        ) + " m"
-
-                        : distance.toFixed(1) +
-                          " km";
-
-
-                updateStatus(
-
-                    "🧭 <strong>Siguiendo Punto Verde</strong><br>" +
-
-                    "Distancia aproximada: " +
-
-                    "<strong>" +
-                    distanceText +
-                    "</strong>" +
-
-                    "<br><br>" +
-
-                    '<button ' +
-                    'onclick="stopFollowingSeller()" ' +
-                    'style="' +
-                    'border:none;' +
-                    'border-radius:7px;' +
-                    'padding:7px 9px;' +
-                    'background:#333;' +
-                    'color:white;' +
-                    'cursor:pointer;' +
-                    '">' +
-
-                    "⏹ DETENER SEGUIMIENTO" +
-
-                    "</button>"
-
-                );
-
-
-                /* =========================
-                   MOSTRAR AMBOS EN MAPA
-                ========================= */
-
-                const bounds =
-                    L.latLngBounds(
+                    map.fitBounds(
 
                         [
+
                             [
                                 buyerLat,
                                 buyerLng
@@ -1074,62 +2494,52 @@ function followSellerPoint() {
                                 sellerLat,
                                 sellerLng
                             ]
-                        ]
+
+                        ],
+
+                        {
+
+                            padding:
+                                [60, 60],
+
+                            maxZoom:
+                                17
+
+                        }
 
                     );
 
-
-                map.fitBounds(
-
-                    bounds,
-
-                    {
-                        padding:
-                            [60, 60],
-
-                        maxZoom:
-                            17
-                    }
-
-                );
-
-            },
+                },
 
 
-            function(error) {
+                function() {
 
-                stopFollowingSeller(false);
+                    stopFollowingSeller(
+                        false
+                    );
 
-
-                if (error.code === 1) {
 
                     updateStatus(
-                        "❌ Permite tu ubicación para seguir el punto."
+                        "❌ No pudimos seguir tu ubicación."
                     );
 
-                } else {
+                },
 
-                    updateStatus(
-                        "❌ No se pudo obtener tu ubicación."
-                    );
+
+                {
+
+                    enableHighAccuracy:
+                        true,
+
+                    maximumAge:
+                        3000,
+
+                    timeout:
+                        12000
 
                 }
 
-            },
-
-
-            {
-                enableHighAccuracy:
-                    true,
-
-                maximumAge:
-                    3000,
-
-                timeout:
-                    12000
-            }
-
-        );
+            );
 
 }
 
@@ -1143,13 +2553,16 @@ function stopFollowingSeller(
 ) {
 
     if (
-        followWatchId !== null
+        followWatchId !==
+        null
     ) {
 
-        navigator.geolocation
+        navigator
+            .geolocation
             .clearWatch(
                 followWatchId
             );
+
 
         followWatchId =
             null;
@@ -1191,9 +2604,6 @@ function stopFollowingSeller(
     followLine =
         null;
 
-    followedSellerPoint =
-        null;
-
 
     if (showMessage) {
 
@@ -1207,7 +2617,7 @@ function stopFollowingSeller(
 
 
 /* =========================================================
-   CALCULAR DISTANCIA
+   DISTANCIA
 ========================================================= */
 
 function calculateDistanceKm(
@@ -1230,13 +2640,15 @@ function calculateDistanceKm(
 
     const dLat =
         toRad(
-            lat2 - lat1
+            lat2 -
+            lat1
         );
 
 
     const dLng =
         toRad(
-            lng2 - lng1
+            lng2 -
+            lng1
         );
 
 
@@ -1247,11 +2659,15 @@ function calculateDistanceKm(
         ) ** 2 +
 
         Math.cos(
-            toRad(lat1)
+            toRad(
+                lat1
+            )
         ) *
 
         Math.cos(
-            toRad(lat2)
+            toRad(
+                lat2
+            )
         ) *
 
         Math.sin(
@@ -1264,7 +2680,9 @@ function calculateDistanceKm(
         2 *
         R *
         Math.asin(
-            Math.sqrt(a)
+            Math.sqrt(
+                a
+            )
         )
 
     );
@@ -1273,352 +2691,48 @@ function calculateDistanceKm(
 
 
 /* =========================================================
-   ESTADO
+   ESTADO COYOTE
 ========================================================= */
 
 function updateStatus(message) {
 
-    document
-        .getElementById(
+    const element =
+        document.getElementById(
             "status"
-        )
-        .innerHTML =
-            message;
-
-}
-
-
-/* =========================================================
-   SEGURIDAD DE TEXTO
-========================================================= */
-
-function escapeHTML(text) {
-
-    const div =
-        document.createElement(
-            "div"
         );
 
-    div.textContent =
-        text;
 
-    return div.innerHTML;
+    if (element) {
+
+        element.innerHTML =
+            message;
+
+    }
 
 }
 
 
 /* =========================================================
-   INICIAR COYOTE
+   ARRANQUE
 ========================================================= */
 
 initializeMap();
-/* =========================================================
-   MAHPE — NAVEGACIÓN PRINCIPAL
-   COYOTE PERMANECE BLINDADO
-========================================================= */
 
-const mahpeNavButtons =
-    document.querySelectorAll(".mahpe-nav-item");
+renderFeed();
 
-let mahpeCurrentView = "feed";
+renderCompanyDashboard();
 
+updateGlobalUI();
 
-/* =========================================================
-   CAMBIAR VISTA PRINCIPAL DE MAHPE
-========================================================= */
-
-function changeMahpeView(viewName) {
-
-    mahpeCurrentView = viewName;
-
-
-    /* =====================================================
-       ACTUALIZAR BOTÓN ACTIVO
-    ===================================================== */
-
-    mahpeNavButtons.forEach(function(button) {
-
-        button.classList.remove("active");
-
-        if (
-            button.dataset.mahpeView === viewName
-        ) {
-
-            button.classList.add("active");
-
-        }
-
-    });
-
-
-    /* =====================================================
-       LIMPIAR MODOS ANTERIORES
-    ===================================================== */
-
-    document.body.classList.remove(
-        "mahpe-map-mode",
-        "mahpe-feed-mode",
-        "mahpe-create-mode",
-        "mahpe-company-mode",
-        "mahpe-profile-mode"
-    );
-
-
-    /* =====================================================
-       MAPA / COYOTE
-    ===================================================== */
-
-    if (viewName === "map") {
-
-        document.body.classList.add(
-            "mahpe-map-mode"
-        );
-
-
-        /*
-         * Leaflet ya fue creado por initializeMap().
-         * NO creamos otro mapa.
-         *
-         * invalidateSize solamente obliga a Leaflet
-         * a recalcular el tamaño después de volver
-         * desde otra pantalla.
-         */
-
-        if (map) {
-
-            setTimeout(function() {
-
-                map.invalidateSize();
-
-            }, 120);
-
-        }
-
-
-        console.log(
-            "MAHPE → MAPA / COYOTE"
-        );
-
-        return;
-    }
-
-
-    /* =====================================================
-       INICIO / FEED
-    ===================================================== */
-
-    if (viewName === "feed") {
-
-        document.body.classList.add(
-            "mahpe-feed-mode"
-        );
-
-
-        console.log(
-            "MAHPE → INICIO / FEED"
-        );
-
-        return;
-    }
-
-
-    /* =====================================================
-       CREAR EMPRESA
-       La pantalla completa se conectará después.
-    ===================================================== */
-
-    if (viewName === "create") {
-
-        document.body.classList.add(
-            "mahpe-create-mode"
-        );
-
-
-        console.log(
-            "MAHPE → CREAR EMPRESA"
-        );
-
-        return;
-    }
-
-
-    /* =====================================================
-       EMPRESA
-    ===================================================== */
-
-    if (viewName === "company") {
-
-        document.body.classList.add(
-            "mahpe-company-mode"
-        );
-
-
-        console.log(
-            "MAHPE → EMPRESA"
-        );
-
-        return;
-    }
-
-
-    /* =====================================================
-       PERFIL
-    ===================================================== */
-
-    if (viewName === "profile") {
-
-        document.body.classList.add(
-            "mahpe-profile-mode"
-        );
-
-
-        console.log(
-            "MAHPE → PERFIL"
-        );
-
-        return;
-    }
-
-}
-
-
-/* =========================================================
-   EVENTOS DE NAVEGACIÓN
-========================================================= */
-
-mahpeNavButtons.forEach(function(button) {
-
-    button.addEventListener(
-        "click",
-        function() {
-
-            const targetView =
-                this.dataset.mahpeView;
-
-
-            if (!targetView) {
-
-                return;
-
-            }
-
-
-            changeMahpeView(
-                targetView
-            );
-
-        }
-    );
-
-});
-
-
-/* =========================================================
-   BOTÓN SEGUIR EMPRESA — PRIMERA INTERACCIÓN SOCIAL
-========================================================= */
-
-const mahpeFollowButtons =
-    document.querySelectorAll(
-        ".mahpe-follow-button"
-    );
-
-
-mahpeFollowButtons.forEach(function(button) {
-
-    button.addEventListener(
-        "click",
-        function() {
-
-            const isFollowing =
-                this.classList.contains(
-                    "following"
-                );
-
-
-            if (isFollowing) {
-
-                this.classList.remove(
-                    "following"
-                );
-
-                this.textContent =
-                    "Seguir";
-
-            } else {
-
-                this.classList.add(
-                    "following"
-                );
-
-                this.textContent =
-                    "Siguiendo";
-
-            }
-
-        }
-    );
-
-});
-
-
-/* =========================================================
-   SEÑALES DEL FEED
-   VISTAS / INTERACCIONES / INTERÉS / COMPROMISO
-========================================================= */
-
-const mahpeSignalButtons =
-    document.querySelectorAll(
-        ".mahpe-signals button"
-    );
-
-
-mahpeSignalButtons.forEach(function(button) {
-
-    button.addEventListener(
-        "click",
-        function() {
-
-            /*
-             * Por ahora registramos visualmente
-             * la interacción.
-             *
-             * Más adelante estos eventos serán
-             * enviados al motor COYOTE.
-             */
-
-            this.classList.toggle(
-                "selected"
-            );
-
-        }
-    );
-
-});
-
-
-/* =========================================================
-   INICIAR MAHPE
-========================================================= */
-
-/*
- * COYOTE ya fue inicializado anteriormente con:
- *
- * initializeMap();
- *
- * Por eso aquí NO volvemos a ejecutar initializeMap().
- *
- * MAHPE arranca mostrando el Feed.
- */
-
-changeMahpeView(
-    "feed"
+openView(
+    "feedView"
 );
 
 
 console.log(
-    "MAHPE iniciado."
+    "MAHPE v1 iniciado."
 );
 
 console.log(
-    "COYOTE permanece activo como motor del mapa."
+    "COYOTE activo como motor territorial."
 );
