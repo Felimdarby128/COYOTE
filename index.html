@@ -1,12 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#080a09">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080d0b">
 
-    <title>MAHPE — Simulador Empresarial</title>
+    <title>MAHPE — Crea. Simula. Haz crecer.</title>
 
     <!-- LEAFLET -->
     <link
@@ -14,67 +16,40 @@
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     >
 
-    <!-- MAHPE -->
-    <link
-        rel="stylesheet"
-        href="./mahpe.css"
-    >
+    <!-- ESTILOS MAHPE -->
+    <link rel="stylesheet" href="./mahpe.css">
 </head>
 
 <body>
 
 <div id="mahpeApp">
 
-    <!-- =====================================================
-         1. INICIO / FEED
-    ====================================================== -->
+    <!-- ==========================================
+         1. INICIO
+    =========================================== -->
 
-    <main
-        id="feedView"
-        class="app-view active"
-    >
+    <main id="feedView" class="app-view active">
 
         <header class="topbar">
 
             <div class="brand-area">
-
-                <div class="brand">
-                    MAHPE
-                </div>
-
+                <div class="brand">MAHPE</div>
                 <div class="brand-subtitle">
                     Crea. Simula. Haz crecer.
                 </div>
-
             </div>
 
-
             <div class="wallet">
-
                 <span>◈</span>
-
                 <div>
-
-                    <strong id="walletBalance">
-                        1250
-                    </strong>
-
-                    <small>
-                        MAHPES
-                    </small>
-
+                    <strong id="walletBalance">1250</strong>
+                    <small>MAHPES</small>
                 </div>
-
             </div>
 
         </header>
 
-
         <div class="page">
-
-            <!-- =====================================================
-                 HERO
-            ====================================================== -->
 
             <section class="hero">
 
@@ -82,21 +57,16 @@
                     MERCADO VIRTUAL
                 </span>
 
-                <h1>
-                    Empresas en crecimiento
-                </h1>
+                <h1>Empresas en crecimiento</h1>
 
                 <p>
-                    Descubre ideas, interactúa con empresas
-                    y observa cómo evolucionan dentro de MAHPE.
+                    Descubre marcas, conoce productos
+                    y participa en su evolución.
                 </p>
 
             </section>
 
-
-            <!-- =====================================================
-                 ACTIVIDAD / CONTINUIDAD
-            ====================================================== -->
+            <!-- ACTIVIDAD -->
 
             <section
                 id="activityInbox"
@@ -106,7 +76,6 @@
                 <div class="activity-inbox-header">
 
                     <div>
-
                         <span class="eyebrow">
                             TU MUNDO
                         </span>
@@ -114,53 +83,23 @@
                         <h2>
                             ¿Qué pasó mientras no estabas?
                         </h2>
-
                     </div>
-
 
                     <span
                         id="activityBadge"
                         class="activity-badge"
-                    >
-                        0
-                    </span>
+                    >0</span>
 
                 </div>
-
 
                 <div
                     id="activityList"
                     class="activity-list"
-                >
-
-                    <div class="activity-empty">
-
-                        <span>◌</span>
-
-                        <div>
-
-                            <strong>
-                                Todavía no hay novedades
-                            </strong>
-
-                            <small>
-                                Sigue empresas, descubre proyectos
-                                y observa cómo evoluciona tu mundo empresarial.
-                            </small>
-
-                        </div>
-
-                    </div>
-
-                </div>
+                ></div>
 
             </section>
 
-
-            <!-- =====================================================
-                 FEED MAHPE
-                 SIGUIENDO / DESCUBRIR / TENDENCIAS
-            ====================================================== -->
+            <!-- FILTROS DEL FEED -->
 
             <section
                 id="feedControl"
@@ -168,67 +107,40 @@
                 aria-label="Secciones del feed"
             >
 
-                <!-- SIGUIENDO -->
-
                 <button
                     id="followingFeedButton"
                     class="feed-tab"
-                    type="button"
                     data-feed-mode="following"
+                    type="button"
                 >
                     Siguiendo
-
                     <span
                         id="followingCount"
                         class="feed-tab-count"
-                    >
-                        0
-                    </span>
+                    >0</span>
                 </button>
-
-
-                <!--
-                    DESCUBRIR
-
-                    Se conserva internamente:
-                    id="exploreFeedButton"
-                    data-feed-mode="explore"
-
-                    Esto evita romper referencias existentes
-                    dentro de script.js.
-                -->
 
                 <button
                     id="exploreFeedButton"
                     class="feed-tab active"
-                    type="button"
                     data-feed-mode="explore"
+                    type="button"
                 >
                     Descubrir
                 </button>
 
-
-                <!-- TENDENCIAS -->
-
                 <button
                     id="trendingFeedButton"
                     class="feed-tab"
-                    type="button"
                     data-feed-mode="trending"
+                    type="button"
                 >
                     Tendencias
                 </button>
 
             </section>
 
-
-            <!-- =====================================================
-                 FEED DINÁMICO
-
-                 IMPORTANTE:
-                 NO cambiar feedContainer.
-                 script.js genera aquí las publicaciones.
-            ====================================================== -->
+            <!-- PUBLICACIONES DINÁMICAS -->
 
             <section
                 id="feedContainer"
@@ -240,47 +152,31 @@
     </main>
 
 
+    <!-- ==========================================
+         2. COYOTE
+    =========================================== -->
 
-    <!-- =====================================================
-         2. MAPA / COYOTE
-    ====================================================== -->
-
-    <main
-        id="mapView"
-        class="app-view"
-    >
-
-        <!-- MAPA LEAFLET -->
+    <main id="mapView" class="app-view">
 
         <div id="map"></div>
-
-
-        <!-- =====================================================
-             PANEL COYOTE
-        ====================================================== -->
 
         <aside class="map-panel">
 
             <div class="map-panel-header">
 
                 <div>
-
                     <div class="brand small">
                         COYOTE
                     </div>
 
                     <small>
-                        Inteligencia territorial
+                        Inteligencia comercial de campo
                     </small>
-
                 </div>
 
             </div>
 
-
-            <!-- ===============================
-                 PUNTO VERDE
-            ================================ -->
+            <!-- PUNTO VERDE -->
 
             <section class="map-section">
 
@@ -288,22 +184,12 @@
                     PRESENCIA COMERCIAL
                 </span>
 
-                <h3>
-                    🟢 Tu Punto Verde
-                </h3>
+                <h3>🟢 Tu Punto Verde</h3>
 
                 <p>
-                    Activa tu presencia comercial
-                    y prueba tu posición dentro del territorio.
+                    Activa voluntariamente tu
+                    presencia comercial en el mapa.
                 </p>
-
-
-                <!--
-                    IMPORTANTE:
-                    Este ID se mantiene.
-                    script.js controlará posteriormente
-                    ACTIVO / INACTIVO.
-                -->
 
                 <button
                     id="activateButton"
@@ -312,7 +198,6 @@
                 >
                     ACTIVAR PUNTO
                 </button>
-
 
                 <div
                     id="sellerForm"
@@ -326,10 +211,9 @@
                     <input
                         id="productInput"
                         type="text"
+                        placeholder="Ej. ropa, bebidas, audífonos"
                         autocomplete="off"
-                        placeholder="Ej. ropa, bebidas, audífonos..."
                     >
-
 
                     <button
                         id="confirmSellerButton"
@@ -343,11 +227,7 @@
 
             </section>
 
-
-
-            <!-- ===============================
-                 BUSCADOR COYOTE
-            ================================ -->
+            <!-- BÚSQUEDA -->
 
             <section class="map-section">
 
@@ -355,20 +235,14 @@
                     EXPLORAR
                 </span>
 
-                <h3>
-                    🔎 Buscar producto
-                </h3>
-
+                <h3>🔎 Buscar producto</h3>
 
                 <input
                     id="searchInput"
                     type="search"
-                    autocomplete="off"
                     placeholder="¿Qué estás buscando?"
+                    autocomplete="off"
                 >
-
-
-                <!-- DISTANCIAS -->
 
                 <div class="range-options">
 
@@ -376,51 +250,34 @@
                         class="range-button"
                         data-radius="1"
                         type="button"
-                    >
-                        1 km
-                    </button>
-
+                    >1 km</button>
 
                     <button
                         class="range-button"
                         data-radius="3"
                         type="button"
-                    >
-                        3 km
-                    </button>
-
+                    >3 km</button>
 
                     <button
                         class="range-button active"
                         data-radius="10"
                         type="button"
-                    >
-                        10 km
-                    </button>
-
+                    >10 km</button>
 
                     <button
                         class="range-button"
                         data-radius="20"
                         type="button"
-                    >
-                        20 km
-                    </button>
+                    >20 km</button>
 
                 </div>
-
-
-                <!-- REFERENCIA DE DISTANCIA -->
 
                 <div
                     id="referenceText"
                     class="reference"
                 >
-                    🔎 10 km
-                    <br>
-                    Una zona amplia alrededor de ti.
+                    10 km
                 </div>
-
 
                 <button
                     id="searchButton"
@@ -432,40 +289,26 @@
 
             </section>
 
-
-
-            <!-- ===============================
-                 RESULTADOS COYOTE
-            ================================ -->
+            <!-- RESULTADOS -->
 
             <section class="map-section">
 
-                <!-- OFERTA -->
-
                 <div class="metric">
-
-                    Oferta encontrada
-
+                    <span>Oferta encontrada</span>
                     <strong id="offerText">
-                        0 puntos
+                        0 comercios
                     </strong>
-
                 </div>
 
-
-                <!-- ACTIVIDAD -->
-
                 <div class="metric">
 
-                    Actividad
+                    <span>Actividad registrada</span>
 
                     <div class="bar">
-
                         <div
                             id="demandBar"
                             class="bar-fill"
                         ></div>
-
                     </div>
 
                     <strong id="demandText">
@@ -476,15 +319,12 @@
 
             </section>
 
-
-            <!-- ESTADO COYOTE -->
-
             <div
                 id="status"
                 class="status"
                 aria-live="polite"
             >
-                🟢 COYOTE está listo.
+                COYOTE está listo.
             </div>
 
         </aside>
@@ -492,32 +332,23 @@
     </main>
 
 
-
-    <!-- =====================================================
+    <!-- ==========================================
          3. CREAR EMPRESA
-    ====================================================== -->
+    =========================================== -->
 
-    <main
-        id="createView"
-        class="app-view"
-    >
+    <main id="createView" class="app-view">
 
         <header class="topbar">
 
             <div>
-
-                <div class="brand">
-                    CREAR
-                </div>
+                <div class="brand">CREAR</div>
 
                 <div class="brand-subtitle">
                     Construye una nueva empresa
                 </div>
-
             </div>
 
         </header>
-
 
         <div class="page narrow">
 
@@ -527,80 +358,38 @@
                     NUEVO PROYECTO
                 </span>
 
-                <h1>
-                    Crea tu empresa
-                </h1>
+                <h1>Crea tu empresa</h1>
 
                 <p class="muted">
-                    No necesita existir todavía.
-                    MAHPE será su campo de pruebas.
+                    Convierte una idea en una empresa
+                    dentro del simulador MAHPE.
                 </p>
 
-
-                <!-- ===============================
-                     NOMBRE
-                ================================ -->
-
                 <label for="companyNameInput">
-                    Nombre
+                    Nombre de la empresa
                 </label>
 
                 <input
                     id="companyNameInput"
                     type="text"
-                    autocomplete="off"
+                    maxlength="80"
                     placeholder="Ej. SURANO"
                 >
-
-
-                <!-- ===============================
-                     CATEGORÍA
-                ================================ -->
 
                 <label for="companyCategoryInput">
                     Categoría
                 </label>
 
                 <select id="companyCategoryInput">
-
-                    <option value="Moda">
-                        Moda
-                    </option>
-
-                    <option value="Tecnología">
-                        Tecnología
-                    </option>
-
-                    <option value="Alimentos">
-                        Alimentos
-                    </option>
-
-                    <option value="Servicios">
-                        Servicios
-                    </option>
-
-                    <option value="Movilidad">
-                        Movilidad
-                    </option>
-
-                    <option value="Educación">
-                        Educación
-                    </option>
-
-                    <option value="Entretenimiento">
-                        Entretenimiento
-                    </option>
-
-                    <option value="Otro">
-                        Otro
-                    </option>
-
+                    <option value="Moda">Moda</option>
+                    <option value="Tecnología">Tecnología</option>
+                    <option value="Alimentos">Alimentos</option>
+                    <option value="Servicios">Servicios</option>
+                    <option value="Movilidad">Movilidad</option>
+                    <option value="Educación">Educación</option>
+                    <option value="Entretenimiento">Entretenimiento</option>
+                    <option value="Otro">Otro</option>
                 </select>
-
-
-                <!-- ===============================
-                     DESCRIPCIÓN
-                ================================ -->
 
                 <label for="companyDescriptionInput">
                     Descripción
@@ -608,13 +397,10 @@
 
                 <textarea
                     id="companyDescriptionInput"
-                    placeholder="¿Qué quiere hacer esta empresa?"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="¿Qué problema resuelve tu empresa?"
                 ></textarea>
-
-
-                <!-- ===============================
-                     PRODUCTO
-                ================================ -->
 
                 <label for="companyProductInput">
                     Producto principal
@@ -623,17 +409,11 @@
                 <input
                     id="companyProductInput"
                     type="text"
-                    autocomplete="off"
-                    placeholder="Ej. chaquetas urbanas"
+                    placeholder="Ej. Chaquetas urbanas"
                 >
 
-
-                <!-- ===============================
-                     PRECIO
-                ================================ -->
-
                 <label for="companyPriceInput">
-                    Precio estimado
+                    Precio estimado (S/)
                 </label>
 
                 <input
@@ -641,14 +421,8 @@
                     type="number"
                     min="0"
                     step="0.01"
-                    inputmode="decimal"
                     placeholder="Ej. 150"
                 >
-
-
-                <!-- ===============================
-                     PÚBLICO
-                ================================ -->
 
                 <label for="companyAudienceInput">
                     Público objetivo
@@ -657,14 +431,8 @@
                 <input
                     id="companyAudienceInput"
                     type="text"
-                    autocomplete="off"
-                    placeholder="Ej. jóvenes de 18 a 30 años"
+                    placeholder="Ej. Jóvenes de 18 a 30 años"
                 >
-
-
-                <!-- ===============================
-                     CREAR
-                ================================ -->
 
                 <button
                     id="createCompanyButton"
@@ -673,7 +441,6 @@
                 >
                     CREAR EMPRESA
                 </button>
-
 
                 <div
                     id="createCompanyStatus"
@@ -688,48 +455,32 @@
     </main>
 
 
+    <!-- ==========================================
+         4. MI EMPRESA
+    =========================================== -->
 
-    <!-- =====================================================
-         4. EMPRESA
-    ====================================================== -->
-
-    <main
-        id="companyView"
-        class="app-view"
-    >
+    <main id="companyView" class="app-view">
 
         <header class="topbar">
 
             <div>
-
-                <div class="brand">
-                    EMPRESA
-                </div>
+                <div class="brand">MI EMPRESA</div>
 
                 <div class="brand-subtitle">
                     Centro de operaciones
                 </div>
-
             </div>
 
         </header>
 
-
         <!--
-            El JavaScript renderiza aquí:
-
-            - empresa seleccionada
-            - etapa
-            - valor
-            - capital
-            - estadísticas
-            - publicaciones
-            - Business Engine
-            - decisiones COYOTE
-            - historial
-
-            IMPORTANTE:
-            NO cambiar companyDashboard.
+            Aquí JavaScript dibuja:
+            - Portada de empresa
+            - Logo
+            - Productos
+            - Estadísticas
+            - Decisiones
+            - Historial
         -->
 
         <div
@@ -740,301 +491,237 @@
     </main>
 
 
-
-    <!-- =====================================================
+    <!-- ==========================================
          5. PERFIL
-    ====================================================== -->
+    =========================================== -->
+
+    <!--
+        El Bloque 3 renderiza el perfil
+        completo dentro de profileView.
+    -->
 
     <main
         id="profileView"
         class="app-view"
-    >
-
-        <header class="topbar">
-
-            <div>
-
-                <div class="brand">
-                    PERFIL
-                </div>
-
-                <div class="brand-subtitle">
-                    Tu progreso en MAHPE
-                </div>
-
-            </div>
-
-        </header>
-
-
-        <div class="page narrow">
-
-            <!-- ===============================
-                 TARJETA DE PERFIL
-            ================================ -->
-
-            <section class="profile-card">
-
-                <div class="profile-avatar">
-                    M
-                </div>
-
-                <h2>
-                    Emprendedor MAHPE
-                </h2>
-
-                <p>
-                    Construye, prueba y mejora empresas
-                    dentro del simulador.
-                </p>
-
-            </section>
-
-
-
-            <!-- ===============================
-                 ESTADÍSTICAS
-            ================================ -->
-
-            <section class="stats-grid">
-
-                <!-- MAHPES -->
-
-                <div class="stat-card">
-
-                    <span>◈</span>
-
-                    <strong id="profileMahpes">
-                        1250
-                    </strong>
-
-                    <small>
-                        Mahpes
-                    </small>
-
-                </div>
-
-
-                <!-- EMPRESAS -->
-
-                <div class="stat-card">
-
-                    <span>🏢</span>
-
-                    <strong id="profileCompanies">
-                        0
-                    </strong>
-
-                    <small>
-                        Empresas
-                    </small>
-
-                </div>
-
-
-                <!-- INTERÉS -->
-
-                <div class="stat-card">
-
-                    <span>🔥</span>
-
-                    <strong id="profileInterest">
-                        0
-                    </strong>
-
-                    <small>
-                        Interesados
-                    </small>
-
-                </div>
-
-
-                <!-- COMPROMISO -->
-
-                <div class="stat-card">
-
-                    <span>💰</span>
-
-                    <strong id="profileCommitment">
-                        0
-                    </strong>
-
-                    <small>
-                        Comprometidos
-                    </small>
-
-                </div>
-
-            </section>
-
-
-
-            <!-- ===============================
-                 OBJETIVO
-            ================================ -->
-
-            <section class="info-card">
-
-                <span class="eyebrow">
-                    OBJETIVO
-                </span>
-
-                <h2>
-                    Lleva una idea desde cero
-                </h2>
-
-                <p>
-                    Crea una empresa, toma decisiones,
-                    prueba el mercado, consigue señales
-                    de usuarios y aumenta su valor
-                    dentro de MAHPE.
-                </p>
-
-            </section>
-
-        </div>
-
-    </main>
+    ></main>
 
 </div>
 
 
+<!-- ==========================================
+     6. EDITOR DE PRODUCTOS
+=========================================== -->
 
-<!-- =========================================================
-     NAVEGACIÓN PRINCIPAL
+<section
+    id="productEditor"
+    class="product-editor hidden"
+    aria-label="Editor de productos"
+>
 
-     IMPORTANTE:
-     Se mantienen exactamente los data-view utilizados
-     por script.js.
-========================================================= -->
+    <div class="product-editor-panel">
+
+        <div class="product-editor-header">
+
+            <div>
+                <span class="eyebrow">
+                    VITRINA EMPRESARIAL
+                </span>
+
+                <h2 id="productEditorTitle">
+                    Nuevo producto
+                </h2>
+            </div>
+
+            <button
+                id="cancelProductButton"
+                class="secondary-button"
+                type="button"
+            >
+                CERRAR
+            </button>
+
+        </div>
+
+        <div class="product-editor-body">
+
+            <label for="productNameInput">
+                Nombre del producto
+            </label>
+
+            <input
+                id="productNameInput"
+                type="text"
+                maxlength="100"
+                placeholder="Ej. Chaqueta SURANO"
+            >
+
+            <label for="productCategoryInput">
+                Categoría
+            </label>
+
+            <input
+                id="productCategoryInput"
+                type="text"
+                maxlength="80"
+                placeholder="Ej. Moda urbana"
+            >
+
+            <label for="productPriceInput">
+                Precio estimado (S/)
+            </label>
+
+            <input
+                id="productPriceInput"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Ej. 180"
+            >
+
+            <label for="productDescriptionInput">
+                Descripción
+            </label>
+
+            <textarea
+                id="productDescriptionInput"
+                rows="4"
+                maxlength="800"
+                placeholder="Describe tu producto"
+            ></textarea>
+
+            <div class="product-images-section">
+
+                <h3>Imágenes del producto</h3>
+
+                <p class="muted">
+                    Sube hasta cinco imágenes.
+                    Puedes seleccionar cuál será
+                    la portada de tu producto.
+                </p>
+
+                <label
+                    for="productImagesInput"
+                    class="secondary-button"
+                >
+                    + AGREGAR IMÁGENES
+                </label>
+
+                <input
+                    id="productImagesInput"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    hidden
+                >
+
+                <div
+                    id="productImagePreview"
+                    class="product-image-preview"
+                ></div>
+
+            </div>
+
+            <div
+                id="productEditorStatus"
+                class="form-message"
+                aria-live="polite"
+            ></div>
+
+            <button
+                id="saveProductButton"
+                class="primary-button big"
+                type="button"
+            >
+                GUARDAR PRODUCTO
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==========================================
+     7. ESPACIO DE PRODUCTOS
+=========================================== -->
+
+<section
+    id="companyProductsWorkspace"
+    class="company-products-workspace hidden"
+>
+
+    <div
+        id="companyProductsContainer"
+    ></div>
+
+</section>
+
+
+<!-- ==========================================
+     8. NAVEGACIÓN INFERIOR
+=========================================== -->
 
 <nav
     id="mahpeMainNav"
     aria-label="Navegación principal"
 >
 
-    <!-- ===============================
-         INICIO
-    ================================ -->
-
     <button
         class="nav-button active"
         data-view="feedView"
         type="button"
-        aria-label="Inicio"
     >
-
         <span>⌂</span>
-
-        <small>
-            Inicio
-        </small>
-
+        <small>Inicio</small>
     </button>
-
-
-    <!-- ===============================
-         MAPA
-    ================================ -->
 
     <button
         class="nav-button"
         data-view="mapView"
         type="button"
-        aria-label="Mapa"
     >
-
         <span>⌖</span>
-
-        <small>
-            Mapa
-        </small>
-
+        <small>Mapa</small>
     </button>
-
-
-    <!-- ===============================
-         CREAR
-    ================================ -->
 
     <button
         class="nav-button create-nav"
         data-view="createView"
         type="button"
-        aria-label="Crear empresa"
     >
-
         <span>＋</span>
-
-        <small>
-            Crear
-        </small>
-
+        <small>Crear</small>
     </button>
-
-
-    <!-- ===============================
-         EMPRESA
-    ================================ -->
 
     <button
         class="nav-button"
         data-view="companyView"
         type="button"
-        aria-label="Empresa"
     >
-
         <span>▣</span>
-
-        <small>
-            Empresa
-        </small>
-
+        <small>Empresa</small>
     </button>
-
-
-    <!-- ===============================
-         PERFIL
-    ================================ -->
 
     <button
         class="nav-button"
         data-view="profileView"
         type="button"
-        aria-label="Perfil"
     >
-
         <span>●</span>
-
-        <small>
-            Perfil
-        </small>
-
+        <small>Perfil</small>
     </button>
 
 </nav>
 
 
+<!-- ==========================================
+     9. SCRIPTS
+=========================================== -->
 
-<!-- =========================================================
-     JAVASCRIPT
-
-     IMPORTANTE:
-     No se introduce lógica MAHPE dentro de index.html.
-     Toda la lógica permanece en script.js.
-========================================================= -->
-
-<!-- LEAFLET -->
-
-<script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-></script>
-
-
-<!-- MAHPE -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script src="./script.js"></script>
 
 </body>
-
 </html>
