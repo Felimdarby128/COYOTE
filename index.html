@@ -4,9 +4,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#080d0b">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <meta name="theme-color" content="#050706">
 
     <title>MAHPE — Crea. Simula. Haz crecer.</title>
 
@@ -16,8 +18,9 @@
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     >
 
-    <!-- ESTILOS MAHPE -->
+    <!-- ESTILOS -->
     <link rel="stylesheet" href="./mahpe.css">
+
 </head>
 
 <body>
@@ -25,7 +28,7 @@
 <div id="mahpeApp">
 
     <!-- ==========================================
-         1. INICIO
+         1. INICIO / FEED
     =========================================== -->
 
     <main id="feedView" class="app-view active">
@@ -33,18 +36,29 @@
         <header class="topbar">
 
             <div class="brand-area">
-                <div class="brand">MAHPE</div>
+
+                <div class="brand">
+                    MAHPE
+                </div>
+
                 <div class="brand-subtitle">
                     Crea. Simula. Haz crecer.
                 </div>
+
             </div>
 
             <div class="wallet">
+
                 <span>◈</span>
+
                 <div>
-                    <strong id="walletBalance">1250</strong>
+                    <strong id="walletBalance">
+                        1250
+                    </strong>
+
                     <small>MAHPES</small>
                 </div>
+
             </div>
 
         </header>
@@ -57,7 +71,9 @@
                     MERCADO VIRTUAL
                 </span>
 
-                <h1>Empresas en crecimiento</h1>
+                <h1>
+                    Empresas en crecimiento
+                </h1>
 
                 <p>
                     Descubre marcas, conoce productos
@@ -76,6 +92,7 @@
                 <div class="activity-inbox-header">
 
                     <div>
+
                         <span class="eyebrow">
                             TU MUNDO
                         </span>
@@ -83,12 +100,15 @@
                         <h2>
                             ¿Qué pasó mientras no estabas?
                         </h2>
+
                     </div>
 
                     <span
                         id="activityBadge"
                         class="activity-badge"
-                    >0</span>
+                    >
+                        0
+                    </span>
 
                 </div>
 
@@ -99,7 +119,7 @@
 
             </section>
 
-            <!-- FILTROS DEL FEED -->
+            <!-- FILTROS -->
 
             <section
                 id="feedControl"
@@ -114,10 +134,14 @@
                     type="button"
                 >
                     Siguiendo
+
                     <span
                         id="followingCount"
                         class="feed-tab-count"
-                    >0</span>
+                    >
+                        0
+                    </span>
+
                 </button>
 
                 <button
@@ -140,7 +164,7 @@
 
             </section>
 
-            <!-- PUBLICACIONES DINÁMICAS -->
+            <!-- PUBLICACIONES -->
 
             <section
                 id="feedContainer"
@@ -153,7 +177,7 @@
 
 
     <!-- ==========================================
-         2. COYOTE
+         2. COYOTE / MAPA
     =========================================== -->
 
     <main id="mapView" class="app-view">
@@ -165,6 +189,7 @@
             <div class="map-panel-header">
 
                 <div>
+
                     <div class="brand small">
                         COYOTE
                     </div>
@@ -172,6 +197,7 @@
                     <small>
                         Inteligencia comercial de campo
                     </small>
+
                 </div>
 
             </div>
@@ -184,11 +210,13 @@
                     PRESENCIA COMERCIAL
                 </span>
 
-                <h3>🟢 Tu Punto Verde</h3>
+                <h3>
+                    🟢 Tu Punto Verde
+                </h3>
 
                 <p>
-                    Activa voluntariamente tu
-                    presencia comercial en el mapa.
+                    Activa voluntariamente tu presencia
+                    comercial dentro del mapa.
                 </p>
 
                 <button
@@ -211,8 +239,8 @@
                     <input
                         id="productInput"
                         type="text"
-                        placeholder="Ej. ropa, bebidas, audífonos"
                         autocomplete="off"
+                        placeholder="Ej. ropa, bebidas, audífonos"
                     >
 
                     <button
@@ -227,7 +255,7 @@
 
             </section>
 
-            <!-- BÚSQUEDA -->
+            <!-- BUSCADOR SIMPLE -->
 
             <section class="map-section">
 
@@ -235,56 +263,28 @@
                     EXPLORAR
                 </span>
 
-                <h3>🔎 Buscar producto</h3>
+                <h3>
+                    🔎 Buscar producto
+                </h3>
+
+                <p>
+                    Explora los comercios registrados
+                    y encuentra lo que necesitas.
+                </p>
 
                 <input
                     id="searchInput"
                     type="search"
-                    placeholder="¿Qué estás buscando?"
                     autocomplete="off"
+                    placeholder="¿Qué estás buscando?"
                 >
-
-                <div class="range-options">
-
-                    <button
-                        class="range-button"
-                        data-radius="1"
-                        type="button"
-                    >1 km</button>
-
-                    <button
-                        class="range-button"
-                        data-radius="3"
-                        type="button"
-                    >3 km</button>
-
-                    <button
-                        class="range-button active"
-                        data-radius="10"
-                        type="button"
-                    >10 km</button>
-
-                    <button
-                        class="range-button"
-                        data-radius="20"
-                        type="button"
-                    >20 km</button>
-
-                </div>
-
-                <div
-                    id="referenceText"
-                    class="reference"
-                >
-                    10 km
-                </div>
 
                 <button
                     id="searchButton"
                     class="secondary-button"
                     type="button"
                 >
-                    BUSCAR
+                    BUSCAR PRODUCTO
                 </button>
 
             </section>
@@ -294,21 +294,30 @@
             <section class="map-section">
 
                 <div class="metric">
-                    <span>Oferta encontrada</span>
+
+                    <span>
+                        Oferta encontrada
+                    </span>
+
                     <strong id="offerText">
                         0 comercios
                     </strong>
+
                 </div>
 
                 <div class="metric">
 
-                    <span>Actividad registrada</span>
+                    <span>
+                        Actividad registrada
+                    </span>
 
                     <div class="bar">
+
                         <div
                             id="demandBar"
                             class="bar-fill"
                         ></div>
+
                     </div>
 
                     <strong id="demandText">
@@ -318,6 +327,8 @@
                 </div>
 
             </section>
+
+            <!-- ESTADO -->
 
             <div
                 id="status"
@@ -341,11 +352,15 @@
         <header class="topbar">
 
             <div>
-                <div class="brand">CREAR</div>
+
+                <div class="brand">
+                    CREAR
+                </div>
 
                 <div class="brand-subtitle">
                     Construye una nueva empresa
                 </div>
+
             </div>
 
         </header>
@@ -358,7 +373,9 @@
                     NUEVO PROYECTO
                 </span>
 
-                <h1>Crea tu empresa</h1>
+                <h1>
+                    Crea tu empresa
+                </h1>
 
                 <p class="muted">
                     Convierte una idea en una empresa
@@ -381,14 +398,39 @@
                 </label>
 
                 <select id="companyCategoryInput">
-                    <option value="Moda">Moda</option>
-                    <option value="Tecnología">Tecnología</option>
-                    <option value="Alimentos">Alimentos</option>
-                    <option value="Servicios">Servicios</option>
-                    <option value="Movilidad">Movilidad</option>
-                    <option value="Educación">Educación</option>
-                    <option value="Entretenimiento">Entretenimiento</option>
-                    <option value="Otro">Otro</option>
+
+                    <option value="Moda">
+                        Moda
+                    </option>
+
+                    <option value="Tecnología">
+                        Tecnología
+                    </option>
+
+                    <option value="Alimentos">
+                        Alimentos
+                    </option>
+
+                    <option value="Servicios">
+                        Servicios
+                    </option>
+
+                    <option value="Movilidad">
+                        Movilidad
+                    </option>
+
+                    <option value="Educación">
+                        Educación
+                    </option>
+
+                    <option value="Entretenimiento">
+                        Entretenimiento
+                    </option>
+
+                    <option value="Otro">
+                        Otro
+                    </option>
+
                 </select>
 
                 <label for="companyDescriptionInput">
@@ -464,24 +506,20 @@
         <header class="topbar">
 
             <div>
-                <div class="brand">MI EMPRESA</div>
+
+                <div class="brand">
+                    MI EMPRESA
+                </div>
 
                 <div class="brand-subtitle">
                     Centro de operaciones
                 </div>
+
             </div>
 
         </header>
 
-        <!--
-            Aquí JavaScript dibuja:
-            - Portada de empresa
-            - Logo
-            - Productos
-            - Estadísticas
-            - Decisiones
-            - Historial
-        -->
+        <!-- CONTENIDO GENERADO POR SCRIPT.JS -->
 
         <div
             id="companyDashboard"
@@ -492,12 +530,23 @@
 
 
     <!-- ==========================================
-         5. PERFIL
+         5. PERFIL DINÁMICO
     =========================================== -->
 
     <!--
-        El Bloque 3 renderiza el perfil
-        completo dentro de profileView.
+        IMPORTANTE:
+
+        No colocar tarjetas estáticas aquí.
+
+        El Bloque 3 del script.js genera:
+        - Avatar
+        - Datos personales
+        - Estadísticas
+        - Empresas
+        - Productos
+        - Recomendaciones
+        - Actividad
+        - Configuración
     -->
 
     <main
@@ -523,6 +572,7 @@
         <div class="product-editor-header">
 
             <div>
+
                 <span class="eyebrow">
                     VITRINA EMPRESARIAL
                 </span>
@@ -530,6 +580,7 @@
                 <h2 id="productEditorTitle">
                     Nuevo producto
                 </h2>
+
             </div>
 
             <button
@@ -589,14 +640,17 @@
                 placeholder="Describe tu producto"
             ></textarea>
 
+            <!-- GALERÍA -->
+
             <div class="product-images-section">
 
-                <h3>Imágenes del producto</h3>
+                <h3>
+                    Imágenes del producto
+                </h3>
 
                 <p class="muted">
-                    Sube hasta cinco imágenes.
-                    Puedes seleccionar cuál será
-                    la portada de tu producto.
+                    Agrega imágenes y selecciona
+                    la portada principal.
                 </p>
 
                 <label
@@ -643,23 +697,7 @@
 
 
 <!-- ==========================================
-     7. ESPACIO DE PRODUCTOS
-=========================================== -->
-
-<section
-    id="companyProductsWorkspace"
-    class="company-products-workspace hidden"
->
-
-    <div
-        id="companyProductsContainer"
-    ></div>
-
-</section>
-
-
-<!-- ==========================================
-     8. NAVEGACIÓN INFERIOR
+     7. NAVEGACIÓN INFERIOR
 =========================================== -->
 
 <nav
@@ -716,10 +754,12 @@
 
 
 <!-- ==========================================
-     9. SCRIPTS
+     8. JAVASCRIPT
 =========================================== -->
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+></script>
 
 <script src="./script.js"></script>
 
