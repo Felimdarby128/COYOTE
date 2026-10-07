@@ -142,23 +142,29 @@ function loadMahpeState() {
             parsed.companies = [];
         }
 
+
         if (!Array.isArray(parsed.posts)) {
             parsed.posts = [];
         }
+
 
         if (!parsed.interactions) {
             parsed.interactions = {};
         }
 
+
         if (!Array.isArray(parsed.decisionHistory)) {
             parsed.decisionHistory = [];
         }
+
 
         if (
             typeof parsed.mahpes !==
             "number"
         ) {
+
             parsed.mahpes = 1250;
+
         }
 
 
@@ -3155,3042 +3161,50 @@ function updateGlobalUI() {
 
 
 /* =========================================================
-   FIN DE PARTE 1/2
-   NO CIERRES EL ARCHIVO.
-   LA PARTE 2 EMPIEZA CON LOS ESTILOS DEL BUSINESS ENGINE
-   Y CONTINÚA CON TODO EL MAPA COYOTE.
+   FIN PARTE 1/2
+
+   NO DECLARES "map" NI NINGUNA VARIABLE COYOTE AQUÍ.
+
+   LA PARTE 2/2 SE PEGA DIRECTAMENTE DEBAJO.
 ========================================================= */
 /* =========================================================
-   ESTILOS COYOTE BUSINESS ENGINE
-========================================================= */
-
-function injectCoyoteBusinessStyles() {
-
-    if (
-        document.getElementById(
-            "coyoteBusinessStyles"
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    const style =
-        document.createElement(
-            "style"
-        );
-
-
-    style.id =
-        "coyoteBusinessStyles";
-
-
-    style.textContent = `
-
-        .coyote-business-engine {
-
-            margin-top: 18px;
-
-            padding: 22px;
-
-            border:
-                1px solid
-                rgba(255,255,255,.08);
-
-            border-radius: 22px;
-
-            background:
-                #111315;
-
-        }
-
-
-        .coyote-engine-heading {
-
-            display: flex;
-
-            justify-content:
-                space-between;
-
-            gap: 18px;
-
-            align-items:
-                flex-start;
-
-        }
-
-
-        .coyote-engine-heading h2 {
-
-            margin:
-                7px 0 5px;
-
-        }
-
-
-        .coyote-score {
-
-            min-width: 94px;
-
-            padding: 13px;
-
-            text-align:
-                center;
-
-            border:
-                1px solid
-                rgba(0,233,101,.25);
-
-            border-radius:
-                16px;
-
-            background:
-                rgba(0,233,101,.07);
-
-        }
-
-
-        .coyote-score strong {
-
-            font-size:
-                27px;
-
-            color:
-                #00e965;
-
-        }
-
-
-        .coyote-score small {
-
-            color:
-                #6f7772;
-
-        }
-
-
-        .coyote-score span {
-
-            display:
-                block;
-
-            margin-top:
-                4px;
-
-            font-size:
-                7px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                1px;
-
-            color:
-                #00e965;
-
-        }
-
-
-        .coyote-business-metrics {
-
-            display:
-                grid;
-
-            grid-template-columns:
-                repeat(2, 1fr);
-
-            gap:
-                9px;
-
-            margin-top:
-                18px;
-
-        }
-
-
-        .coyote-business-metric {
-
-            padding:
-                11px;
-
-            border:
-                1px solid
-                rgba(255,255,255,.06);
-
-            border-radius:
-                12px;
-
-            background:
-                #181a1d;
-
-        }
-
-
-        .coyote-business-metric
-        > div:first-child {
-
-            display:
-                flex;
-
-            justify-content:
-                space-between;
-
-            gap:
-                8px;
-
-            font-size:
-                9px;
-
-            color:
-                #8a9094;
-
-        }
-
-
-        .coyote-business-metric strong {
-
-            color:
-                white;
-
-        }
-
-
-        .coyote-business-bar {
-
-            height:
-                5px;
-
-            margin-top:
-                8px;
-
-            overflow:
-                hidden;
-
-            border-radius:
-                20px;
-
-            background:
-                #292d30;
-
-        }
-
-
-        .coyote-business-bar div {
-
-            height:
-                100%;
-
-            border-radius:
-                20px;
-
-            background:
-                #00e965;
-
-        }
-
-
-        .coyote-risk-line {
-
-            display:
-                flex;
-
-            justify-content:
-                space-between;
-
-            margin:
-                11px 0 17px;
-
-            padding:
-                10px 12px;
-
-            border-radius:
-                11px;
-
-            background:
-                rgba(255,255,255,.035);
-
-            color:
-                #8b9094;
-
-            font-size:
-                10px;
-
-        }
-
-
-        .coyote-risk-line strong {
-
-            color:
-                #f2f2f2;
-
-        }
-
-
-        .coyote-decision-grid {
-
-            display:
-                grid;
-
-            grid-template-columns:
-                repeat(2, 1fr);
-
-            gap:
-                9px;
-
-        }
-
-
-        .coyote-decision-button {
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                10px;
-
-            min-height:
-                76px;
-
-            padding:
-                11px;
-
-            border:
-                1px solid
-                rgba(255,255,255,.07);
-
-            border-radius:
-                14px;
-
-            background:
-                #181a1d;
-
-            color:
-                white;
-
-            text-align:
-                left;
-
-            cursor:
-                pointer;
-
-            transition:
-                .18s ease;
-
-        }
-
-
-        .coyote-decision-button:hover {
-
-            border-color:
-                rgba(0,233,101,.4);
-
-            background:
-                rgba(0,233,101,.06);
-
-            transform:
-                translateY(-1px);
-
-        }
-
-
-        .coyote-decision-icon {
-
-            font-size:
-                20px;
-
-        }
-
-
-        .coyote-decision-copy {
-
-            flex:
-                1;
-
-        }
-
-
-        .coyote-decision-copy strong,
-        .coyote-decision-copy small {
-
-            display:
-                block;
-
-        }
-
-
-        .coyote-decision-copy strong {
-
-            font-size:
-                10px;
-
-        }
-
-
-        .coyote-decision-copy small {
-
-            margin-top:
-                4px;
-
-            color:
-                #777d82;
-
-            font-size:
-                8px;
-
-            line-height:
-                1.35;
-
-        }
-
-
-        .coyote-decision-cost {
-
-            white-space:
-                nowrap;
-
-            color:
-                #00e965;
-
-            font-size:
-                9px;
-
-            font-weight:
-                900;
-
-        }
-
-
-        .coyote-business-result {
-
-            display:
-                none;
-
-            margin-top:
-                13px;
-
-            padding:
-                12px;
-
-            border-radius:
-                12px;
-
-            font-size:
-                10px;
-
-            line-height:
-                1.5;
-
-        }
-
-
-        .coyote-business-result.success {
-
-            display:
-                block;
-
-            border:
-                1px solid
-                rgba(0,233,101,.2);
-
-            background:
-                rgba(0,233,101,.07);
-
-            color:
-                #bdf8d1;
-
-        }
-
-
-        .coyote-business-result.warning {
-
-            display:
-                block;
-
-            border:
-                1px solid
-                rgba(255,190,60,.25);
-
-            background:
-                rgba(255,190,60,.08);
-
-            color:
-                #ffd68b;
-
-        }
-
-
-        .coyote-history {
-
-            margin-top:
-                20px;
-
-            padding-top:
-                15px;
-
-            border-top:
-                1px solid
-                rgba(255,255,255,.07);
-
-        }
-
-
-        .coyote-history h3 {
-
-            margin:
-                0 0 10px;
-
-            font-size:
-                12px;
-
-        }
-
-
-        .coyote-history-item {
-
-            display:
-                flex;
-
-            justify-content:
-                space-between;
-
-            gap:
-                10px;
-
-            padding:
-                9px 0;
-
-            border-bottom:
-                1px solid
-                rgba(255,255,255,.05);
-
-        }
-
-
-        .coyote-history-item strong,
-        .coyote-history-item small {
-
-            display:
-                block;
-
-        }
-
-
-        .coyote-history-item strong {
-
-            font-size:
-                9px;
-
-        }
-
-
-        .coyote-history-item small {
-
-            margin-top:
-                3px;
-
-            color:
-                #6f7478;
-
-            font-size:
-                7px;
-
-        }
-
-
-        .coyote-history-item > span {
-
-            color:
-                #00e965;
-
-            font-size:
-                10px;
-
-            font-weight:
-                900;
-
-        }
-
-
-        .coyote-history-empty {
-
-            color:
-                #686e72;
-
-            font-size:
-                9px;
-
-        }
-
-
-        @media (
-            max-width: 600px
-        ) {
-
-            .coyote-engine-heading {
-
-                flex-direction:
-                    column;
-
-            }
-
-
-            .coyote-score {
-
-                width:
-                    100%;
-
-            }
-
-
-            .coyote-decision-grid {
-
-                grid-template-columns:
-                    1fr;
-
-            }
-
-
-            .coyote-business-metrics {
-
-                grid-template-columns:
-                    1fr;
-
-            }
-
-        }
-
-    `;
-
-
-    document.head.appendChild(
-        style
-    );
-
-}
-
-
-/* =========================================================
-   COYOTE — MAPA
-========================================================= */
-
-let map;
-
-let userLocation =
-    null;
-
-let userMarker =
-    null;
-
-let selectedRadius =
-    10;
-
-let followWatchId =
-    null;
-
-let followUserMarker =
-    null;
-
-let followLine =
-    null;
-
-let followedSellerPoint =
-    null;
-
-
-/* =========================================================
-   INICIALIZAR MAPA
-========================================================= */
-
-function initializeMap() {
-
-    if (map) {
-
-        return;
-
-    }
-
-
-    const mapElement =
-        document.getElementById(
-            "map"
-        );
-
-
-    if (!mapElement) {
-
-        console.error(
-            "No existe #map."
-        );
-
-        return;
-
-    }
-
-
-    map =
-        L.map(
-            "map"
-        )
-        .setView(
-
-            [
-                -12.025,
-                -76.925
-            ],
-
-            14
-
-        );
-
-
-    L.tileLayer(
-
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-
-        {
-
-            maxZoom:
-                19,
-
-            attribution:
-                "&copy; OpenStreetMap contributors"
-
-        }
-
-    )
-    .addTo(
-        map
-    );
-
-
-    loadSavedSeller();
-
-}
-
-
-/* =========================================================
-   ACTIVAR PUNTO VERDE
-========================================================= */
-
-const activateButton =
-    document.getElementById(
-        "activateButton"
-    );
-
-
-if (activateButton) {
-
-    activateButton
-        .addEventListener(
-            "click",
-            activateSeller
-        );
-
-}
-
-
-function activateSeller() {
-
-    if (
-        !navigator.geolocation
-    ) {
-
-        updateStatus(
-            "❌ Tu navegador no permite utilizar ubicación."
-        );
-
-        return;
-
-    }
-
-
-    updateStatus(
-        "📍 Buscando tu ubicación..."
-    );
-
-
-    navigator
-        .geolocation
-        .getCurrentPosition(
-
-            function(position) {
-
-                const lat =
-                    position
-                        .coords
-                        .latitude;
-
-
-                const lng =
-                    position
-                        .coords
-                        .longitude;
-
-
-                userLocation = {
-
-                    lat,
-
-                    lng
-
-                };
-
-
-                map.setView(
-
-                    [
-                        lat,
-                        lng
-                    ],
-
-                    17
-
-                );
-
-
-                const sellerForm =
-                    document
-                        .getElementById(
-                            "sellerForm"
-                        );
-
-
-                if (sellerForm) {
-
-                    sellerForm
-                        .classList
-                        .remove(
-                            "hidden"
-                        );
-
-                }
-
-
-                if (activateButton) {
-
-                    activateButton
-                        .classList
-                        .add(
-                            "hidden"
-                        );
-
-                }
-
-
-                updateStatus(
-
-                    "📍 Ubicación encontrada. " +
-                    "Ahora indica qué vendes."
-
-                );
-
-            },
-
-
-            function(error) {
-
-                if (
-                    error.code ===
-                    1
-                ) {
-
-                    updateStatus(
-                        "❌ Debes permitir el acceso a tu ubicación."
-                    );
-
-                }
-
-                else {
-
-                    updateStatus(
-                        "❌ No se pudo obtener tu ubicación."
-                    );
-
-                }
-
-            },
-
-
-            {
-
-                enableHighAccuracy:
-                    true,
-
-                timeout:
-                    10000,
-
-                maximumAge:
-                    0
-
-            }
-
-        );
-
-}
-
-
-/* =========================================================
-   CREAR PUNTO VERDE
-========================================================= */
-
-const confirmSellerButton =
-    document.getElementById(
-        "confirmSellerButton"
-    );
-
-
-if (confirmSellerButton) {
-
-    confirmSellerButton
-        .addEventListener(
-            "click",
-            createSellerPoint
-        );
-
-}
-
-
-function createSellerPoint() {
-
-    if (!userLocation) {
-
-        updateStatus(
-            "❌ Primero necesitamos tu ubicación."
-        );
-
-        return;
-
-    }
-
-
-    const input =
-        document.getElementById(
-            "productInput"
-        );
-
-
-    if (!input) {
-
-        return;
-
-    }
-
-
-    const product =
-        input
-            .value
-            .trim();
-
-
-    if (!product) {
-
-        input.focus();
-
-        return;
-
-    }
-
-
-    const point = {
-
-        id:
-            Date.now(),
-
-        lat:
-            userLocation.lat,
-
-        lng:
-            userLocation.lng,
-
-        product,
-
-        active:
-            true,
-
-        createdAt:
-            new Date()
-                .toISOString()
-
-    };
-
-
-    localStorage.setItem(
-
-        "coyote_seller_point",
-
-        JSON.stringify(
-            point
-        )
-
-    );
-
-
-    showGreenPoint(
-        point
-    );
-
-
-    const sellerForm =
-        document.getElementById(
-            "sellerForm"
-        );
-
-
-    if (sellerForm) {
-
-        sellerForm
-            .classList
-            .add(
-                "hidden"
-            );
-
-    }
-
-
-    updateStatus(
-
-        "🟢 <strong>Punto activo.</strong><br>" +
-
-        escapeHTML(
-            product
-        )
-
-    );
-
-}
-
-
-/* =========================================================
-   MOSTRAR PUNTO VERDE
-========================================================= */
-
-function showGreenPoint(
-    point
-) {
-
-    if (!map) {
-
-        return;
-
-    }
-
-
-    if (userMarker) {
-
-        map.removeLayer(
-            userMarker
-        );
-
-    }
-
-
-    const greenIcon =
-        L.divIcon({
-
-            className:
-                "",
-
-            html:
-                '<div class="green-marker"></div>',
-
-            iconSize:
-                [22, 22],
-
-            iconAnchor:
-                [11, 11],
-
-            popupAnchor:
-                [0, -12]
-
-        });
-
-
-    userMarker =
-        L.marker(
-
-            [
-                point.lat,
-                point.lng
-            ],
-
-            {
-                icon:
-                    greenIcon
-            }
-
-        )
-        .addTo(
-            map
-        );
-
-
-    const popup = `
-
-        <div>
-
-            <strong>
-
-                🟢 Punto MAHPE
-
-            </strong>
-
-            <br><br>
-
-            Vende:
-
-            <strong>
-
-                ${escapeHTML(
-                    point.product
-                )}
-
-            </strong>
-
-            <br><br>
-
-
-            <button
-                onclick="followSellerPoint()"
-            >
-
-                🧭 Seguir
-
-            </button>
-
-
-            <button
-                onclick="deactivateSeller()"
-            >
-
-                Desactivar
-
-            </button>
-
-        </div>
-
-    `;
-
-
-    userMarker.bindPopup(
-        popup
-    );
-
-}
-
-
-/* =========================================================
-   CARGAR PUNTO GUARDADO
-========================================================= */
-
-function loadSavedSeller() {
-
-    const saved =
-        localStorage.getItem(
-            "coyote_seller_point"
-        );
-
-
-    if (!saved) {
-
-        return;
-
-    }
-
-
-    try {
-
-        const point =
-            JSON.parse(
-                saved
-            );
-
-
-        if (
-            point &&
-            point.active
-        ) {
-
-            userLocation = {
-
-                lat:
-                    point.lat,
-
-                lng:
-                    point.lng
-
-            };
-
-
-            showGreenPoint(
-                point
-            );
-
-
-            updateStatus(
-                "🟢 Tu Punto Verde está activo."
-            );
-
-        }
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Error cargando Punto Verde:",
-            error
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   DESACTIVAR PUNTO
-========================================================= */
-
-function deactivateSeller() {
-
-    stopFollowingSeller(
-        false
-    );
-
-
-    localStorage.removeItem(
-        "coyote_seller_point"
-    );
-
-
-    if (
-        userMarker &&
-        map
-    ) {
-
-        map.removeLayer(
-            userMarker
-        );
-
-
-        userMarker =
-            null;
-
-    }
-
-
-    if (activateButton) {
-
-        activateButton
-            .classList
-            .remove(
-                "hidden"
-            );
-
-    }
-
-
-    updateStatus(
-        "⚪ Punto desactivado."
-    );
-
-}
-
-
-/* =========================================================
-   RADIO DE BÚSQUEDA
-========================================================= */
-
-const rangeButtons =
-    document.querySelectorAll(
-        ".range-button"
-    );
-
-
-rangeButtons.forEach(
-    button => {
-
-        button.addEventListener(
-
-            "click",
-
-            function() {
-
-                rangeButtons
-                    .forEach(
-                        item => {
-
-                            item
-                                .classList
-                                .remove(
-                                    "active"
-                                );
-
-                        }
-                    );
-
-
-                this
-                    .classList
-                    .add(
-                        "active"
-                    );
-
-
-                selectedRadius =
-                    Number(
-                        this.dataset.radius
-                    );
-
-
-                updateReference();
-
-            }
-
-        );
-
-    }
-);
-
-
-function updateReference() {
-
-    let text =
-        "Una zona amplia alrededor de ti.";
-
-
-    if (
-        selectedRadius ===
-        1
-    ) {
-
-        text =
-            "Tu zona inmediata.";
-
-    }
-
-
-    if (
-        selectedRadius ===
-        3
-    ) {
-
-        text =
-            "Varios sectores cercanos.";
-
-    }
-
-
-    if (
-        selectedRadius ===
-        10
-    ) {
-
-        text =
-            "Una zona amplia alrededor de ti.";
-
-    }
-
-
-    if (
-        selectedRadius ===
-        20
-    ) {
-
-        text =
-            "Varias zonas de tu entorno.";
-
-    }
-
-
-    const reference =
-        document.getElementById(
-            "referenceText"
-        );
-
-
-    if (reference) {
-
-        reference.innerHTML =
-
-            "🔎 " +
-
-            selectedRadius +
-
-            " km<br>" +
-
-            text;
-
-    }
-
-}
-
-
-/* =========================================================
-   BUSCAR PRODUCTOS
-========================================================= */
-
-const searchButton =
-    document.getElementById(
-        "searchButton"
-    );
-
-
-if (searchButton) {
-
-    searchButton
-        .addEventListener(
-            "click",
-            searchProducts
-        );
-
-}
-
-
-function searchProducts() {
-
-    const searchInput =
-        document.getElementById(
-            "searchInput"
-        );
-
-
-    if (!searchInput) {
-
-        return;
-
-    }
-
-
-    const search =
-        searchInput
-            .value
-            .trim()
-            .toLowerCase();
-
-
-    if (!search) {
-
-        updateStatus(
-            "⚠️ Escribe qué estás buscando."
-        );
-
-        return;
-
-    }
-
-
-    const saved =
-        localStorage.getItem(
-            "coyote_seller_point"
-        );
-
-
-    let matches = [];
-
-
-    if (saved) {
-
-        try {
-
-            const point =
-                JSON.parse(
-                    saved
-                );
-
-
-            if (
-
-                point.active &&
-
-                point.product &&
-
-                point.product
-                    .toLowerCase()
-                    .includes(
-                        search
-                    )
-
-            ) {
-
-                matches.push(
-                    point
-                );
-
-            }
-
-        }
-
-        catch (error) {
-
-            console.error(
-                error
-            );
-
-        }
-
-    }
-
-
-    const offerText =
-        document.getElementById(
-            "offerText"
-        );
-
-
-    if (offerText) {
-
-        offerText.textContent =
-
-            matches.length +
-
-            " punto(s)";
-
-    }
-
-
-    const intensity =
-        Math.min(
-
-            100,
-
-            20 +
-
-            matches.length *
-            30
-
-        );
-
-
-    const demandBar =
-        document.getElementById(
-            "demandBar"
-        );
-
-
-    if (demandBar) {
-
-        demandBar.style.width =
-
-            intensity +
-
-            "%";
-
-    }
-
-
-    const demandText =
-        document.getElementById(
-            "demandText"
-        );
-
-
-    if (demandText) {
-
-        demandText.textContent =
-
-            matches.length
-
-                ? "Actividad detectada"
-
-                : "Actividad inicial";
-
-    }
-
-
-    if (
-        matches.length
-    ) {
-
-        const point =
-            matches[0];
-
-
-        map.setView(
-
-            [
-                point.lat,
-                point.lng
-            ],
-
-            17
-
-        );
-
-
-        if (userMarker) {
-
-            userMarker.openPopup();
-
-        }
-
-
-        updateStatus(
-
-            "🟢 Encontramos un punto de " +
-
-            escapeHTML(
-                search
-            ) +
-
-            "."
-
-        );
-
-    }
-
-    else {
-
-        updateStatus(
-
-            "🔎 Todavía no encontramos puntos de " +
-
-            escapeHTML(
-                search
-            ) +
-
-            "."
-
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   SEGUIR PUNTO
-========================================================= */
-
-function followSellerPoint() {
-
-    const saved =
-        localStorage.getItem(
-            "coyote_seller_point"
-        );
-
-
-    if (!saved) {
-
-        updateStatus(
-            "⚠️ Punto no disponible."
-        );
-
-        return;
-
-    }
-
-
-    try {
-
-        followedSellerPoint =
-            JSON.parse(
-                saved
-            );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-        return;
-
-    }
-
-
-    if (
-        !navigator.geolocation
-    ) {
-
-        updateStatus(
-            "❌ Tu navegador no permite seguimiento."
-        );
-
-        return;
-
-    }
-
-
-    stopFollowingSeller(
-        false
-    );
-
-
-    updateStatus(
-        "🧭 Iniciando seguimiento..."
-    );
-
-
-    followWatchId =
-        navigator
-            .geolocation
-            .watchPosition(
-
-                function(position) {
-
-                    const buyerLat =
-                        position
-                            .coords
-                            .latitude;
-
-
-                    const buyerLng =
-                        position
-                            .coords
-                            .longitude;
-
-
-                    const sellerLat =
-                        followedSellerPoint
-                            .lat;
-
-
-                    const sellerLng =
-                        followedSellerPoint
-                            .lng;
-
-
-                    if (
-                        !followUserMarker
-                    ) {
-
-                        followUserMarker =
-                            L.circleMarker(
-
-                                [
-                                    buyerLat,
-                                    buyerLng
-                                ],
-
-                                {
-
-                                    radius:
-                                        7,
-
-                                    weight:
-                                        3
-
-                                }
-
-                            )
-                            .addTo(
-                                map
-                            );
-
-                    }
-
-                    else {
-
-                        followUserMarker
-                            .setLatLng(
-
-                                [
-                                    buyerLat,
-                                    buyerLng
-                                ]
-
-                            );
-
-                    }
-
-
-                    if (
-                        !followLine
-                    ) {
-
-                        followLine =
-                            L.polyline(
-
-                                [
-
-                                    [
-                                        buyerLat,
-                                        buyerLng
-                                    ],
-
-                                    [
-                                        sellerLat,
-                                        sellerLng
-                                    ]
-
-                                ],
-
-                                {
-
-                                    weight:
-                                        4,
-
-                                    dashArray:
-                                        "9 8"
-
-                                }
-
-                            )
-                            .addTo(
-                                map
-                            );
-
-                    }
-
-                    else {
-
-                        followLine
-                            .setLatLngs(
-
-                                [
-
-                                    [
-                                        buyerLat,
-                                        buyerLng
-                                    ],
-
-                                    [
-                                        sellerLat,
-                                        sellerLng
-                                    ]
-
-                                ]
-
-                            );
-
-                    }
-
-
-                    const distance =
-                        calculateDistanceKm(
-
-                            buyerLat,
-                            buyerLng,
-
-                            sellerLat,
-                            sellerLng
-
-                        );
-
-
-                    const distanceText =
-
-                        distance < 1
-
-                            ? Math.round(
-                                distance *
-                                1000
-                            ) +
-                            " m"
-
-                            : distance
-                                .toFixed(1) +
-                            " km";
-
-
-                    updateStatus(
-
-                        "🧭 <strong>Siguiendo Punto Verde</strong>" +
-
-                        "<br>" +
-
-                        "Distancia: " +
-
-                        "<strong>" +
-
-                        distanceText +
-
-                        "</strong>"
-
-                    );
-
-
-                    map.fitBounds(
-
-                        [
-
-                            [
-                                buyerLat,
-                                buyerLng
-                            ],
-
-                            [
-                                sellerLat,
-                                sellerLng
-                            ]
-
-                        ],
-
-                        {
-
-                            padding:
-                                [60, 60],
-
-                            maxZoom:
-                                17
-
-                        }
-
-                    );
-
-                },
-
-
-                function(error) {
-
-                    console.error(
-                        error
-                    );
-
-
-                    stopFollowingSeller(
-                        false
-                    );
-
-
-                    updateStatus(
-                        "❌ No pudimos seguir tu ubicación."
-                    );
-
-                },
-
-
-                {
-
-                    enableHighAccuracy:
-                        true,
-
-                    maximumAge:
-                        3000,
-
-                    timeout:
-                        12000
-
-                }
-
-            );
-
-}
-
-
-/* =========================================================
-   DETENER SEGUIMIENTO
-========================================================= */
-
-function stopFollowingSeller(
-    showMessage = true
-) {
-
-    if (
-        followWatchId !==
-        null
-    ) {
-
-        navigator
-            .geolocation
-            .clearWatch(
-                followWatchId
-            );
-
-
-        followWatchId =
-            null;
-
-    }
-
-
-    if (
-
-        followUserMarker &&
-
-        map &&
-
-        map.hasLayer(
-            followUserMarker
-        )
-
-    ) {
-
-        map.removeLayer(
-            followUserMarker
-        );
-
-    }
-
-
-    if (
-
-        followLine &&
-
-        map &&
-
-        map.hasLayer(
-            followLine
-        )
-
-    ) {
-
-        map.removeLayer(
-            followLine
-        );
-
-    }
-
-
-    followUserMarker =
-        null;
-
-
-    followLine =
-        null;
-
-
-    if (showMessage) {
-
-        updateStatus(
-            "🧭 Seguimiento detenido."
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   CALCULAR DISTANCIA
-========================================================= */
-
-function calculateDistanceKm(
-
-    lat1,
-
-    lng1,
-
-    lat2,
-
-    lng2
-
-) {
-
-    const R =
-        6371;
-
-
-    const toRad =
-        value =>
-
-            value *
-
-            Math.PI /
-
-            180;
-
-
-    const dLat =
-        toRad(
-            lat2 -
-            lat1
-        );
-
-
-    const dLng =
-        toRad(
-            lng2 -
-            lng1
-        );
-
-
-    const a =
-
-        Math.sin(
-            dLat / 2
-        ) ** 2 +
-
-        Math.cos(
-            toRad(
-                lat1
-            )
-        ) *
-
-        Math.cos(
-            toRad(
-                lat2
-            )
-        ) *
-
-        Math.sin(
-            dLng / 2
-        ) ** 2;
-
-
-    return (
-
-        2 *
-
-        R *
-
-        Math.asin(
-            Math.sqrt(
-                a
-            )
-        )
-
-    );
-
-}
-
-
-/* =========================================================
-   ESTADO COYOTE
-========================================================= */
-
-function updateStatus(
-    message
-) {
-
-    const element =
-        document.getElementById(
-            "status"
-        );
-
-
-    if (element) {
-
-        element.innerHTML =
-            message;
-
-    }
-
-}
-
-
-/* =========================================================
-   CONECTAR EMPRESA CON COYOTE
-========================================================= */
-
-function syncCompanyWithCoyotePoint() {
-
-    const company =
-        getCurrentCompany();
-
-
-    if (!company) {
-
-        return;
-
-    }
-
-
-    const saved =
-        localStorage.getItem(
-            "coyote_seller_point"
-        );
-
-
-    if (!saved) {
-
-        return;
-
-    }
-
-
-    try {
-
-        const point =
-            JSON.parse(
-                saved
-            );
-
-
-        if (
-            point &&
-            point.active
-        ) {
-
-            migrateCompanyBusinessData(
-                company
-            );
-
-
-            company.locationStrength =
-                clamp(
-                    company.locationStrength +
-                    3
-                );
-
-
-            company.marketKnowledge =
-                clamp(
-                    company.marketKnowledge +
-                    2
-                );
-
-
-            saveMahpeState();
-
-        }
-
-    }
-
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   ACTUALIZAR REFERENCIA INICIAL
-========================================================= */
-
-updateReference();
-
-
-/* =========================================================
-   ARRANQUE MAHPE v1.1
-========================================================= */
-
-migrateMahpeBusinessState();
-
-
-injectCoyoteBusinessStyles();
-
-
-initializeMap();
-
-
-renderFeed();
-
-
-renderCompanyDashboard();
-
-
-updateGlobalUI();
-
-
-openView(
-    "feedView"
-);
-
-
-console.log(
-    "MAHPE v1.1 iniciado."
-);
-
-
-console.log(
-    "COYOTE activo como motor territorial + empresarial."
-);
-
-
-/* =========================================================
-   FIN MAHPE v1.1
-========================================================= */
-/* ============================================================
-   MAHPE
-   SCRIPT.JS DEFINITIVO
-
-   PARTE 2 DE 2
-
-   PEGAR INMEDIATAMENTE DEBAJO DE LA PARTE 1
-
-   - Dashboard de empresa
-   - Publicador
-   - Business Engine
-   - COYOTE
-   - Leaflet
+   MAHPE v1.1
+   SCRIPT.JS — PARTE 2/2
+
+   COYOTE
+   - Mapa Leaflet
    - Punto Verde
+   - Ubicación
+   - Radios de búsqueda
    - Buscador
-   - Distancias
    - Seguimiento
+   - Distancias
+   - Sincronización con empresa
    - Arranque final
-============================================================ */
+========================================================= */
 
 
-/* ============================================================
-   31. DASHBOARD DE EMPRESA
-============================================================ */
+/* =========================================================
+   VARIABLES COYOTE
+   IMPORTANTE:
+   ESTA ES LA ÚNICA DECLARACIÓN DE ESTAS VARIABLES
+========================================================= */
 
-function renderCompanyDashboard() {
-
-    const container =
-        document.getElementById(
-            "companyDashboard"
-        );
-
-    if (!container) {
-        return;
-    }
-
-
-    if (!mahpeState.companies.length) {
-
-        container.innerHTML = `
-            <section class="empty-state">
-
-                <strong>
-                    Todavía no tienes una empresa
-                </strong>
-
-                <p>
-                    Crea tu primera empresa para
-                    empezar a probar productos,
-                    mercado, diseño y ubicación.
-                </p>
-
-                <button
-                    id="emptyCreateCompanyButton"
-                    class="primary-button"
-                    type="button"
-                    style="
-                        margin-top:16px;
-                        max-width:260px;
-                    "
-                >
-                    CREAR EMPRESA
-                </button>
-
-            </section>
-        `;
-
-
-        const createButton =
-            document.getElementById(
-                "emptyCreateCompanyButton"
-            );
-
-
-        if (createButton) {
-
-            createButton.addEventListener(
-                "click",
-                function () {
-
-                    openView(
-                        "createView"
-                    );
-
-                }
-            );
-
-        }
-
-
-        return;
-
-    }
-
-
-    let company =
-        getCurrentCompany();
-
-
-    if (!company) {
-
-        currentCompanyId =
-            mahpeState
-                .companies[0]
-                .id;
-
-
-        company =
-            getCurrentCompany();
-
-    }
-
-
-    if (!company) {
-        return;
-    }
-
-
-    migrateCompanyBusinessData(
-        company
-    );
-
-
-    recalculateCompanyStage(
-        company
-    );
-
-
-    const score =
-        calculateBusinessScore(
-            company
-        );
-
-
-    const scoreInfo =
-        getBusinessScoreLabel(
-            score
-        );
-
-
-    const companyOptions =
-        mahpeState
-            .companies
-            .map(
-                item => `
-                    <option
-                        value="${escapeHTML(
-                            item.id
-                        )}"
-                        ${
-                            item.id ===
-                            company.id
-                                ? "selected"
-                                : ""
-                        }
-                    >
-                        ${escapeHTML(
-                            item.name
-                        )}
-                    </option>
-                `
-            )
-            .join("");
-
-
-    container.innerHTML = `
-
-        <section
-            style="
-                margin-top:18px;
-            "
-        >
-
-            <label
-                for="companySelector"
-                style="
-                    margin-top:0;
-                "
-            >
-                EMPRESA ACTIVA
-            </label>
-
-            <select id="companySelector">
-                ${companyOptions}
-            </select>
-
-        </section>
-
-
-        <section class="company-hero">
-
-            <div class="company-hero-top">
-
-                <div class="company-big-avatar">
-                    ${escapeHTML(
-                        getInitials(
-                            company.name
-                        )
-                    )}
-                </div>
-
-
-                <div
-                    style="
-                        min-width:0;
-                        flex:1;
-                    "
-                >
-
-                    <h1>
-                        ${escapeHTML(
-                            company.name
-                        )}
-                    </h1>
-
-
-                    <div class="company-stage">
-                        ${escapeHTML(
-                            company.stage
-                        )}
-                    </div>
-
-
-                    <div
-                        style="
-                            margin-top:6px;
-                            color:#727b76;
-                            font-size:8px;
-                        "
-                    >
-                        ${escapeHTML(
-                            company.category
-                        )}
-                    </div>
-
-                </div>
-
-
-                <div
-                    style="
-                        flex-shrink:0;
-                        text-align:right;
-                    "
-                >
-
-                    <strong
-                        style="
-                            display:block;
-                            color:#00e86d;
-                            font-size:23px;
-                        "
-                    >
-                        ${score}
-                    </strong>
-
-                    <small
-                        style="
-                            color:#727b76;
-                            font-size:7px;
-                        "
-                    >
-                        SCORE
-                    </small>
-
-                </div>
-
-            </div>
-
-
-            <p class="company-description">
-                ${escapeHTML(
-                    company.description
-                )}
-            </p>
-
-
-            <div
-                style="
-                    display:flex;
-                    flex-wrap:wrap;
-                    gap:6px;
-                    margin-top:12px;
-                "
-            >
-
-                <span class="badge green">
-                    ${escapeHTML(
-                        scoreInfo.label
-                    )}
-                </span>
-
-                <span class="badge">
-                    ${escapeHTML(
-                        company.product
-                    )}
-                </span>
-
-                <span class="badge">
-                    ${formatMoney(
-                        company.price
-                    )}
-                </span>
-
-            </div>
-
-        </section>
-
-
-        <section class="stats-grid">
-
-            <div class="stat-card">
-
-                <span>◈</span>
-
-                <strong>
-                    ${formatNumber(
-                        company.value
-                    )}
-                </strong>
-
-                <small>
-                    Valor virtual
-                </small>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <span>💼</span>
-
-                <strong>
-                    ${formatNumber(
-                        company.capital
-                    )}
-                </strong>
-
-                <small>
-                    Capital
-                </small>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <span>♡</span>
-
-                <strong>
-                    ${formatNumber(
-                        company.interactions
-                    )}
-                </strong>
-
-                <small>
-                    Interacciones
-                </small>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <span>🔥</span>
-
-                <strong>
-                    ${formatNumber(
-                        company.interested
-                    )}
-                </strong>
-
-                <small>
-                    Interesados
-                </small>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <span>💰</span>
-
-                <strong>
-                    ${formatNumber(
-                        company.committed
-                    )}
-                </strong>
-
-                <small>
-                    Comprometidos
-                </small>
-
-            </div>
-
-
-            <div class="stat-card">
-
-                <span>👥</span>
-
-                <strong>
-                    ${formatNumber(
-                        company.followers
-                    )}
-                </strong>
-
-                <small>
-                    Seguidores
-                </small>
-
-            </div>
-
-        </section>
-
-
-        <section class="publisher">
-
-            <span class="eyebrow">
-                PUBLICAR
-            </span>
-
-            <h3>
-                Prueba una idea en el mercado
-            </h3>
-
-            <p>
-                Publica un producto, concepto o
-                propuesta para recibir señales.
-            </p>
-
-
-            <label for="companyPostTitle">
-                Título
-            </label>
-
-            <input
-                id="companyPostTitle"
-                type="text"
-                autocomplete="off"
-                placeholder="Ej. Nueva colección"
-            >
-
-
-            <label for="companyPostText">
-                Publicación
-            </label>
-
-            <textarea
-                id="companyPostText"
-                placeholder="Cuenta qué estás probando..."
-            ></textarea>
-
-
-            <button
-                id="publishCompanyPostButton"
-                class="primary-button"
-                type="button"
-                style="
-                    margin-top:12px;
-                "
-            >
-                PUBLICAR EN MAHPE
-            </button>
-
-
-            <div
-                id="publisherStatus"
-                class="form-message"
-            ></div>
-
-        </section>
-
-
-        ${renderBusinessEngine(
-            company
-        )}
-
-
-        <section
-            class="info-card"
-            style="
-                margin-bottom:25px;
-            "
-        >
-
-            <span class="eyebrow">
-                EMPRESA
-            </span>
-
-            <h2>
-                ${escapeHTML(
-                    company.product
-                )}
-            </h2>
-
-            <p>
-                Público:
-                ${escapeHTML(
-                    company.audience
-                )}
-            </p>
-
-            <p>
-                Precio estimado:
-                ${formatMoney(
-                    company.price
-                )}
-            </p>
-
-
-            <button
-                id="openCompanyMapButton"
-                class="secondary-button"
-                type="button"
-                style="
-                    margin-top:8px;
-                "
-            >
-                📍 ABRIR EN COYOTE
-            </button>
-
-
-            <button
-                id="deleteCompanyButton"
-                class="secondary-button"
-                type="button"
-                style="
-                    margin-top:8px;
-                    color:#ff6478;
-                "
-            >
-                ELIMINAR EMPRESA
-            </button>
-
-        </section>
-
-    `;
-
-
-    bindCompanyDashboardEvents();
-
-}
-
-
-/* ============================================================
-   32. EVENTOS DEL DASHBOARD
-============================================================ */
-
-function bindCompanyDashboardEvents() {
-
-    const selector =
-        document.getElementById(
-            "companySelector"
-        );
-
-
-    if (selector) {
-
-        selector.addEventListener(
-            "change",
-            function () {
-
-                selectCompany(
-                    this.value
-                );
-
-            }
-        );
-
-    }
-
-
-    const publishButton =
-        document.getElementById(
-            "publishCompanyPostButton"
-        );
-
-
-    if (publishButton) {
-
-        publishButton.addEventListener(
-            "click",
-            function () {
-
-                const title =
-                    document.getElementById(
-                        "companyPostTitle"
-                    );
-
-
-                const text =
-                    document.getElementById(
-                        "companyPostText"
-                    );
-
-
-                const status =
-                    document.getElementById(
-                        "publisherStatus"
-                    );
-
-
-                const company =
-                    getCurrentCompany();
-
-
-                if (
-                    !company ||
-                    !title ||
-                    !text
-                ) {
-                    return;
-                }
-
-
-                if (
-                    !title.value.trim() ||
-                    !text.value.trim()
-                ) {
-
-                    if (status) {
-
-                        status.textContent =
-                            "⚠️ Completa el título y la publicación.";
-
-                    }
-
-                    return;
-
-                }
-
-
-                const success =
-                    createCompanyPost(
-
-                        company.id,
-
-                        title.value,
-
-                        text.value
-
-                    );
-
-
-                if (success) {
-
-                    title.value = "";
-                    text.value = "";
-
-
-                    if (status) {
-
-                        status.textContent =
-                            "✓ Publicación enviada al mercado.";
-
-                    }
-
-
-                    renderCompanyDashboard();
-
-                }
-
-            }
-        );
-
-    }
-
-
-    document
-        .querySelectorAll(
-            "[data-business-decision]"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "click",
-                    function () {
-
-                        executeBusinessDecision(
-                            this.dataset
-                                .businessDecision
-                        );
-
-                    }
-                );
-
-            }
-        );
-
-
-    const mapButton =
-        document.getElementById(
-            "openCompanyMapButton"
-        );
-
-
-    if (mapButton) {
-
-        mapButton.addEventListener(
-            "click",
-            function () {
-
-                openView(
-                    "mapView"
-                );
-
-
-                setTimeout(
-                    () => {
-
-                        const company =
-                            getCurrentCompany();
-
-
-                        if (company) {
-
-                            updateStatus(
-                                "📍 COYOTE listo para analizar a " +
-                                escapeHTML(
-                                    company.name
-                                ) +
-                                "."
-                            );
-
-                        }
-
-                    },
-                    200
-                );
-
-            }
-        );
-
-    }
-
-
-    const deleteButton =
-        document.getElementById(
-            "deleteCompanyButton"
-        );
-
-
-    if (deleteButton) {
-
-        deleteButton.addEventListener(
-            "click",
-            function () {
-
-                const company =
-                    getCurrentCompany();
-
-
-                if (!company) {
-                    return;
-                }
-
-
-                const confirmed =
-                    window.confirm(
-                        "¿Eliminar " +
-                        company.name +
-                        "? Sus publicaciones también serán eliminadas."
-                    );
-
-
-                if (confirmed) {
-
-                    deleteCompany(
-                        company.id
-                    );
-
-                }
-
-            }
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   33. VARIABLES COYOTE
-============================================================ */
+let map = null;
 
 let userLocation = null;
 
 let userMarker = null;
 
-let radiusCircle = null;
-
 let selectedRadius = 10;
+
+let radiusCircle = null;
 
 let sellerMarker = null;
 
-let searchMarkers = [];
-
 let commercialPoints = [];
+
+let searchMarkers = [];
 
 let followWatchId = null;
 
@@ -6198,10 +3212,12 @@ let followUserMarker = null;
 
 let followLine = null;
 
+let followedSellerPoint = null;
 
-/* ============================================================
-   34. ELEMENTOS COYOTE
-============================================================ */
+
+/* =========================================================
+   ELEMENTOS DEL PANEL COYOTE
+========================================================= */
 
 const activateButton =
     document.getElementById(
@@ -6263,23 +3279,202 @@ const demandText =
     );
 
 
-/* ============================================================
-   35. ICONOS LEAFLET
-============================================================ */
+/* =========================================================
+   INICIALIZAR MAPA
+========================================================= */
 
-function createGreenIcon() {
+function initializeMap() {
+
+    if (map) {
+
+        return;
+
+    }
+
+
+    const mapElement =
+        document.getElementById(
+            "map"
+        );
+
+
+    if (!mapElement) {
+
+        console.warn(
+            "MAHPE: no se encontró #map."
+        );
+
+        return;
+
+    }
+
 
     if (
         typeof L ===
         "undefined"
     ) {
+
+        console.error(
+            "MAHPE: Leaflet no está cargado."
+        );
+
+
+        updateStatus(
+            "⚠️ No se pudo cargar el motor del mapa."
+        );
+
+
+        return;
+
+    }
+
+
+    map =
+        L.map(
+            "map",
+            {
+
+                zoomControl: true,
+
+                attributionControl: true
+
+            }
+        );
+
+
+    /*
+       Vista inicial general.
+       La ubicación real solamente se solicita
+       cuando el usuario activa su punto.
+    */
+
+    map.setView(
+        [
+            -12.0464,
+            -77.0428
+        ],
+        11
+    );
+
+
+    L.tileLayer(
+
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+        {
+
+            maxZoom: 19,
+
+            attribution:
+                "&copy; OpenStreetMap contributors"
+
+        }
+
+    ).addTo(
+        map
+    );
+
+
+    /*
+       Permite elegir manualmente una ubicación
+       cuando el formulario de vendedor está abierto.
+    */
+
+    map.on(
+        "click",
+
+        function(event) {
+
+            if (!sellerForm) {
+
+                return;
+
+            }
+
+
+            if (
+                sellerForm.classList.contains(
+                    "hidden"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            userLocation = {
+
+                lat:
+                    event.latlng.lat,
+
+                lng:
+                    event.latlng.lng
+
+            };
+
+
+            showTemporaryUserMarker(
+                userLocation.lat,
+                userLocation.lng
+            );
+
+
+            drawSearchRadius();
+
+
+            updateStatus(
+
+                "📍 Punto seleccionado en el mapa.<br>" +
+
+                "Ahora escribe qué vendes y pulsa <strong>Confirmar punto</strong>."
+
+            );
+
+        }
+
+    );
+
+
+    loadSavedSeller();
+
+
+    setTimeout(
+        function() {
+
+            if (map) {
+
+                map.invalidateSize();
+
+            }
+
+        },
+        250
+    );
+
+}
+
+
+/* =========================================================
+   ICONO PUNTO VERDE
+========================================================= */
+
+function createGreenSellerIcon() {
+
+    if (
+        typeof L ===
+        "undefined"
+    ) {
+
         return null;
+
     }
 
 
     return L.divIcon({
 
-        className: "",
+        className:
+            "coyote-div-icon",
 
         html:
             '<div class="green-marker"></div>',
@@ -6298,19 +3493,26 @@ function createGreenIcon() {
 }
 
 
-function createCoyoteIcon() {
+/* =========================================================
+   ICONO RESULTADO COYOTE
+========================================================= */
+
+function createSearchResultIcon() {
 
     if (
         typeof L ===
         "undefined"
     ) {
+
         return null;
+
     }
 
 
     return L.divIcon({
 
-        className: "",
+        className:
+            "coyote-div-icon",
 
         html:
             '<div class="coyote-marker">●</div>',
@@ -6329,150 +3531,124 @@ function createCoyoteIcon() {
 }
 
 
-/* ============================================================
-   36. INICIALIZAR MAPA
-============================================================ */
+/* =========================================================
+   MOSTRAR POSICIÓN TEMPORAL
+========================================================= */
 
-function initializeMap() {
+function showTemporaryUserMarker(
+    lat,
+    lng
+) {
 
     if (
+        !map ||
         typeof L ===
         "undefined"
     ) {
 
-        console.error(
-            "Leaflet no está disponible."
-        );
-
         return;
 
     }
 
 
-    const mapElement =
-        document.getElementById(
-            "map"
-        );
+    if (userMarker) {
 
+        try {
 
-    if (!mapElement) {
-        return;
-    }
+            map.removeLayer(
+                userMarker
+            );
 
+        }
 
-    if (map) {
+        catch (error) {
 
-        setTimeout(
-            () => {
-                map.invalidateSize();
-            },
-            100
-        );
+            console.warn(error);
 
-        return;
+        }
 
     }
 
 
-    /*
-       Vista inicial general de Lima.
-       No se interpreta como ubicación
-       exacta del usuario.
-    */
+    userMarker =
+        L.circleMarker(
 
-    map =
-        L.map(
-            "map",
+            [lat, lng],
+
             {
-                zoomControl: true
+
+                radius: 7,
+
+                weight: 2,
+
+                color:
+                    "#ffffff",
+
+                fillColor:
+                    "#00e86d",
+
+                fillOpacity: 1
+
             }
+
+        ).addTo(
+            map
         );
 
 
-    map.setView(
-        [-12.0464, -77.0428],
-        11
-    );
-
-
-    L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-
-            maxZoom:
-                19,
-
-            attribution:
-                "&copy; OpenStreetMap"
-
-        }
-    ).addTo(
-        map
-    );
-
-
-    map.on(
-        "click",
-        function (event) {
-
-            if (
-                sellerForm &&
-                !sellerForm.classList.contains(
-                    "hidden"
-                )
-            ) {
-
-                userLocation = {
-                    lat:
-                        event.latlng.lat,
-
-                    lng:
-                        event.latlng.lng
-                };
-
-
-                updateStatus(
-                    "📍 Punto seleccionado. Escribe qué vendes y confirma."
-                );
-
-            }
-
-        }
-    );
-
-
-    restoreSellerPoint();
-
-
-    setTimeout(
-        () => {
-            map.invalidateSize();
-        },
-        250
+    userMarker.bindPopup(
+        "Ubicación seleccionada"
     );
 
 }
 
 
-/* ============================================================
-   37. OBTENER UBICACIÓN CON CONSENTIMIENTO
-============================================================ */
+/* =========================================================
+   ACTIVAR PUNTO VERDE
+========================================================= */
 
-function requestUserLocation(
-    callback
-) {
+function activateSeller() {
+
+    if (!sellerForm) {
+
+        return;
+
+    }
+
+
+    sellerForm.classList.remove(
+        "hidden"
+    );
+
+
+    if (activateButton) {
+
+        activateButton.disabled =
+            true;
+
+    }
+
 
     if (
         !navigator.geolocation
     ) {
 
         updateStatus(
-            "⚠️ Tu navegador no permite geolocalización."
+
+            "⚠️ Tu navegador no permite geolocalización.<br>" +
+
+            "Puedes hacer clic directamente sobre el mapa para seleccionar tu punto."
+
         );
 
-        if (callback) {
-            callback(null);
+
+        if (activateButton) {
+
+            activateButton.disabled =
+                false;
+
         }
+
 
         return;
 
@@ -6480,14 +3656,14 @@ function requestUserLocation(
 
 
     updateStatus(
-        "📡 Solicitando tu ubicación..."
+        "📍 Buscando tu ubicación..."
     );
 
 
     navigator.geolocation
         .getCurrentPosition(
 
-            function (position) {
+            function(position) {
 
                 userLocation = {
 
@@ -6504,105 +3680,93 @@ function requestUserLocation(
                 };
 
 
-                if (
-                    map &&
-                    typeof L !==
-                        "undefined"
-                ) {
+                showTemporaryUserMarker(
 
-                    if (userMarker) {
+                    userLocation.lat,
 
-                        map.removeLayer(
-                            userMarker
-                        );
+                    userLocation.lng
 
-                    }
+                );
 
 
-                    userMarker =
-                        L.circleMarker(
-
-                            [
-                                userLocation.lat,
-                                userLocation.lng
-                            ],
-
-                            {
-
-                                radius:
-                                    7,
-
-                                weight:
-                                    2,
-
-                                color:
-                                    "#ffffff",
-
-                                fillColor:
-                                    "#00e86d",
-
-                                fillOpacity:
-                                    1
-
-                            }
-
-                        ).addTo(
-                            map
-                        );
+                drawSearchRadius();
 
 
-                    userMarker
-                        .bindPopup(
-                            "Tu posición actual"
-                        );
-
+                if (map) {
 
                     map.setView(
+
                         [
                             userLocation.lat,
                             userLocation.lng
                         ],
-                        15
+
+                        17
+
                     );
-
-
-                    drawRadius();
 
                 }
 
 
                 updateStatus(
-                    "✓ Ubicación obtenida."
+
+                    "✓ Ubicación encontrada.<br>" +
+
+                    "Escribe qué vendes y confirma tu Punto Verde."
+
                 );
 
 
-                if (callback) {
+                if (activateButton) {
 
-                    callback(
-                        userLocation
-                    );
+                    activateButton.disabled =
+                        false;
 
                 }
 
             },
 
 
-            function (error) {
+            function(error) {
 
                 console.warn(
-                    "Geolocalización:",
+                    "COYOTE geolocation:",
                     error
                 );
 
 
-                updateStatus(
-                    "⚠️ No se pudo obtener tu ubicación. Puedes seleccionar un punto manualmente en el mapa."
-                );
+                if (
+                    error &&
+                    error.code === 1
+                ) {
+
+                    updateStatus(
+
+                        "⚠️ No se concedió acceso a tu ubicación.<br>" +
+
+                        "Puedes seleccionar el punto manualmente tocando el mapa."
+
+                    );
+
+                }
+
+                else {
+
+                    updateStatus(
+
+                        "⚠️ No pudimos obtener tu ubicación.<br>" +
+
+                        "Selecciona manualmente un punto sobre el mapa."
+
+                    );
+
+                }
 
 
-                if (callback) {
+                if (activateButton) {
 
-                    callback(null);
+                    activateButton.disabled =
+                        false;
 
                 }
 
@@ -6615,10 +3779,10 @@ function requestUserLocation(
                     true,
 
                 timeout:
-                    12000,
+                    10000,
 
                 maximumAge:
-                    10000
+                    0
 
             }
 
@@ -6627,27 +3791,656 @@ function requestUserLocation(
 }
 
 
-/* ============================================================
-   38. RADIO DE BÚSQUEDA
-============================================================ */
+/* =========================================================
+   EVENTO ACTIVAR
+========================================================= */
 
-function drawRadius() {
+if (activateButton) {
+
+    activateButton.addEventListener(
+
+        "click",
+
+        activateSeller
+
+    );
+
+}
+
+
+/* =========================================================
+   CONFIRMAR PUNTO VERDE
+========================================================= */
+
+function createSellerPoint() {
+
+    if (!userLocation) {
+
+        updateStatus(
+
+            "⚠️ Primero permite tu ubicación o selecciona un punto en el mapa."
+
+        );
+
+
+        return;
+
+    }
+
+
+    if (!sellerProductInput) {
+
+        return;
+
+    }
+
+
+    const product =
+        sellerProductInput
+            .value
+            .trim();
+
+
+    if (!product) {
+
+        updateStatus(
+            "⚠️ Escribe qué producto vendes."
+        );
+
+
+        sellerProductInput.focus();
+
+
+        return;
+
+    }
+
+
+    const company =
+        getCurrentCompany();
+
+
+    const point = {
+
+        id:
+            generateId(
+                "coyote-point"
+            ),
+
+        lat:
+            Number(
+                userLocation.lat
+            ),
+
+        lng:
+            Number(
+                userLocation.lng
+            ),
+
+        product,
+
+        companyId:
+            company
+                ? company.id
+                : null,
+
+        companyName:
+            company
+                ? company.name
+                : "Comerciante MAHPE",
+
+        active: true,
+
+        createdAt:
+            new Date()
+                .toISOString()
+
+    };
+
+
+    try {
+
+        localStorage.setItem(
+
+            "coyote_seller_point",
+
+            JSON.stringify(
+                point
+            )
+
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "No se pudo guardar Punto Verde:",
+            error
+        );
+
+    }
+
+
+    commercialPoints =
+        commercialPoints.filter(
+
+            item =>
+                item.id !==
+                point.id
+
+        );
+
+
+    commercialPoints.push(
+        point
+    );
+
+
+    showGreenPoint(
+        point
+    );
+
+
+    if (sellerForm) {
+
+        sellerForm.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    if (activateButton) {
+
+        activateButton.style.display =
+            "none";
+
+    }
+
+
+    sellerProductInput.value =
+        "";
+
+
+    syncCompanyWithCoyotePoint();
+
+
+    updateOfferMetrics(
+        commercialPoints.length
+    );
+
+
+    updateStatus(
+
+        "🟢 <strong>Punto Verde activo.</strong><br>" +
+
+        escapeHTML(
+            product
+        ) +
+
+        " ya está visible dentro de COYOTE."
+
+    );
+
+}
+
+
+/* =========================================================
+   EVENTO CONFIRMAR
+========================================================= */
+
+if (confirmSellerButton) {
+
+    confirmSellerButton.addEventListener(
+
+        "click",
+
+        createSellerPoint
+
+    );
+
+}
+
+
+/* =========================================================
+   MOSTRAR PUNTO VERDE
+========================================================= */
+
+function showGreenPoint(point) {
+
+    if (
+        !map ||
+        !point ||
+        typeof L ===
+        "undefined"
+    ) {
+
+        return;
+
+    }
+
+
+    if (sellerMarker) {
+
+        try {
+
+            map.removeLayer(
+                sellerMarker
+            );
+
+        }
+
+        catch (error) {
+
+            console.warn(error);
+
+        }
+
+    }
+
+
+    const icon =
+        createGreenSellerIcon();
+
+
+    const markerOptions =
+        icon
+            ? { icon }
+            : {};
+
+
+    sellerMarker =
+        L.marker(
+
+            [
+                Number(point.lat),
+                Number(point.lng)
+            ],
+
+            markerOptions
+
+        ).addTo(
+            map
+        );
+
+
+    const companyName =
+        point.companyName ||
+        "Comerciante MAHPE";
+
+
+    sellerMarker.bindPopup(`
+
+        <div
+            style="
+                min-width:170px;
+                line-height:1.45;
+            "
+        >
+
+            <strong>
+
+                ${escapeHTML(
+                    companyName
+                )}
+
+            </strong>
+
+            <br>
+
+            <span>
+
+                ${escapeHTML(
+                    point.product
+                )}
+
+            </span>
+
+            <br><br>
+
+
+            <button
+
+                type="button"
+
+                onclick="followSellerPoint()"
+
+                style="
+                    width:100%;
+                    border:0;
+                    border-radius:8px;
+                    padding:9px 10px;
+                    background:#00e86d;
+                    color:#001b0c;
+                    font-weight:900;
+                    cursor:pointer;
+                "
+
+            >
+
+                IR A ESTE PUNTO
+
+            </button>
+
+
+            <button
+
+                type="button"
+
+                onclick="deactivateSeller()"
+
+                style="
+                    width:100%;
+                    margin-top:6px;
+                    border:1px solid rgba(0,0,0,.15);
+                    border-radius:8px;
+                    padding:8px 10px;
+                    background:white;
+                    color:#333;
+                    font-weight:700;
+                    cursor:pointer;
+                "
+
+            >
+
+                Desactivar
+
+            </button>
+
+        </div>
+
+    `);
+
+
+    map.setView(
+
+        [
+            Number(point.lat),
+            Number(point.lng)
+        ],
+
+        Math.max(
+            map.getZoom(),
+            15
+        )
+
+    );
+
+}
+
+
+/* =========================================================
+   CARGAR PUNTO GUARDADO
+========================================================= */
+
+function loadSavedSeller() {
+
+    let saved = null;
+
+
+    try {
+
+        saved =
+            localStorage.getItem(
+                "coyote_seller_point"
+            );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+
+    if (!saved) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const point =
+            JSON.parse(saved);
+
+
+        if (
+            !point ||
+            !point.active
+        ) {
+
+            return;
+
+        }
+
+
+        const lat =
+            Number(
+                point.lat
+            );
+
+
+        const lng =
+            Number(
+                point.lng
+            );
+
+
+        if (
+            !Number.isFinite(lat) ||
+            !Number.isFinite(lng)
+        ) {
+
+            return;
+
+        }
+
+
+        point.lat = lat;
+
+        point.lng = lng;
+
+
+        userLocation = {
+
+            lat,
+
+            lng
+
+        };
+
+
+        commercialPoints =
+            commercialPoints.filter(
+
+                item =>
+                    item.id !==
+                    point.id
+
+            );
+
+
+        commercialPoints.push(
+            point
+        );
+
+
+        showGreenPoint(
+            point
+        );
+
+
+        updateOfferMetrics(
+            commercialPoints.length
+        );
+
+
+        if (activateButton) {
+
+            activateButton.style.display =
+                "none";
+
+        }
+
+
+        if (sellerForm) {
+
+            sellerForm.classList.add(
+                "hidden"
+            );
+
+        }
+
+
+        updateStatus(
+
+            "🟢 Tienes un Punto Verde activo: <strong>" +
+
+            escapeHTML(
+                point.product
+            ) +
+
+            "</strong>."
+
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Punto COYOTE guardado inválido:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   DESACTIVAR PUNTO VERDE
+========================================================= */
+
+function deactivateSeller() {
+
+    stopFollowingSeller(
+        false
+    );
+
+
+    try {
+
+        localStorage.removeItem(
+            "coyote_seller_point"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+
+    if (
+        sellerMarker &&
+        map
+    ) {
+
+        try {
+
+            map.removeLayer(
+                sellerMarker
+            );
+
+        }
+
+        catch (error) {
+
+            console.warn(error);
+
+        }
+
+    }
+
+
+    sellerMarker = null;
+
+
+    commercialPoints = [];
+
+
+    if (activateButton) {
+
+        activateButton.style.display =
+            "";
+
+        activateButton.disabled =
+            false;
+
+    }
+
+
+    if (sellerForm) {
+
+        sellerForm.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    updateOfferMetrics(0);
+
+
+    updateStatus(
+
+        "Punto Verde desactivado."
+
+    );
+
+}
+
+
+/* =========================================================
+   RADIO DE BÚSQUEDA
+========================================================= */
+
+function drawSearchRadius() {
 
     if (
         !map ||
         !userLocation ||
         typeof L ===
-            "undefined"
+        "undefined"
     ) {
+
         return;
+
     }
 
 
     if (radiusCircle) {
 
-        map.removeLayer(
-            radiusCircle
-        );
+        try {
+
+            map.removeLayer(
+                radiusCircle
+            );
+
+        }
+
+        catch (error) {
+
+            console.warn(error);
+
+        }
 
     }
 
@@ -6669,17 +4462,15 @@ function drawRadius() {
                 color:
                     "#00e86d",
 
-                weight:
-                    1,
+                weight: 1,
 
-                opacity:
-                    0.35,
+                opacity: 0.32,
 
                 fillColor:
                     "#00e86d",
 
                 fillOpacity:
-                    0.04
+                    0.035
 
             }
 
@@ -6690,561 +4481,155 @@ function drawRadius() {
 }
 
 
-/* ============================================================
-   39. BOTONES DE RADIO
-============================================================ */
+/* =========================================================
+   BOTONES DE RANGO
+========================================================= */
 
 document
     .querySelectorAll(
         ".range-button"
     )
-    .forEach(
-        button => {
+    .forEach(button => {
 
-            button.addEventListener(
-                "click",
-                function () {
+        button.addEventListener(
 
-                    const radius =
-                        Number(
-                            this.dataset
-                                .radius
-                        );
+            "click",
 
+            function() {
 
-                    if (
-                        !Number.isFinite(
-                            radius
-                        )
-                    ) {
-                        return;
-                    }
-
-
-                    selectedRadius =
-                        radius;
-
-
-                    document
-                        .querySelectorAll(
-                            ".range-button"
-                        )
-                        .forEach(
-                            item => {
-
-                                item.classList.remove(
-                                    "active"
-                                );
-
-                            }
-                        );
-
-
-                    this.classList.add(
-                        "active"
+                const radius =
+                    Number(
+                        this.dataset.radius
                     );
 
 
-                    updateReference();
+                if (
+                    !Number.isFinite(
+                        radius
+                    )
+                ) {
 
-                    drawRadius();
+                    return;
 
                 }
-            );
-
-        }
-    );
 
 
-/* ============================================================
-   40. REFERENCIA DEL RADIO
-============================================================ */
+                selectedRadius =
+                    radius;
+
+
+                document
+                    .querySelectorAll(
+                        ".range-button"
+                    )
+                    .forEach(item => {
+
+                        item.classList.remove(
+                            "active"
+                        );
+
+                    });
+
+
+                this.classList.add(
+                    "active"
+                );
+
+
+                updateReference();
+
+
+                drawSearchRadius();
+
+            }
+
+        );
+
+    });
+
+
+/* =========================================================
+   TEXTO DE REFERENCIA
+========================================================= */
 
 function updateReference() {
 
     if (!referenceText) {
+
         return;
+
     }
 
 
-    let message =
+    let description =
         "Una zona amplia alrededor de ti.";
 
 
     if (
-        selectedRadius <=
-        1
+        selectedRadius === 1
     ) {
 
-        message =
-            "Búsqueda muy cercana.";
+        description =
+            "Tu zona inmediata.";
 
     }
 
+
     else if (
-        selectedRadius <=
-        3
+        selectedRadius === 3
     ) {
 
-        message =
-            "Tu zona y alrededores cercanos.";
+        description =
+            "Varios sectores cercanos.";
 
     }
 
+
     else if (
-        selectedRadius >=
-        20
+        selectedRadius === 10
     ) {
 
-        message =
-            "Exploración territorial extensa.";
+        description =
+            "Una zona amplia alrededor de ti.";
+
+    }
+
+
+    else if (
+        selectedRadius >= 20
+    ) {
+
+        description =
+            "Varias zonas de tu entorno.";
 
     }
 
 
     referenceText.innerHTML =
+
         "🔎 " +
+
         selectedRadius +
+
         " km<br>" +
+
         escapeHTML(
-            message
+            description
         );
 
 }
 
 
-/* ============================================================
-   41. ACTIVAR PUNTO
-============================================================ */
-
-if (activateButton) {
-
-    activateButton.addEventListener(
-        "click",
-        function () {
-
-            if (!sellerForm) {
-                return;
-            }
-
-
-            sellerForm.classList.remove(
-                "hidden"
-            );
-
-
-            requestUserLocation(
-                function (location) {
-
-                    if (!location) {
-
-                        updateStatus(
-                            "📍 Haz clic en el mapa para seleccionar manualmente tu punto."
-                        );
-
-                    }
-
-                }
-            );
-
-        }
-    );
-
-}
-
-
-/* ============================================================
-   42. CONFIRMAR PUNTO VERDE
-============================================================ */
-
-if (confirmSellerButton) {
-
-    confirmSellerButton
-        .addEventListener(
-            "click",
-            confirmSellerPoint
-        );
-
-}
-
-
-function confirmSellerPoint() {
-
-    if (!sellerProductInput) {
-        return;
-    }
-
-
-    const product =
-        sellerProductInput
-            .value
-            .trim();
-
-
-    if (!product) {
-
-        updateStatus(
-            "⚠️ Escribe qué vendes."
-        );
-
-        sellerProductInput.focus();
-
-        return;
-
-    }
-
-
-    if (!userLocation) {
-
-        updateStatus(
-            "📍 Necesitamos una posición. Permite la ubicación o haz clic en el mapa."
-        );
-
-        return;
-
-    }
-
-
-    const company =
-        getCurrentCompany();
-
-
-    const point = {
-
-        id:
-            generateId(
-                "seller"
-            ),
-
-        product,
-
-        companyId:
-            company
-                ? company.id
-                : null,
-
-        companyName:
-            company
-                ? company.name
-                : "Comerciante MAHPE",
-
-        lat:
-            userLocation.lat,
-
-        lng:
-            userLocation.lng,
-
-        active:
-            true,
-
-        createdAt:
-            new Date()
-                .toISOString()
-
-    };
-
-
-    try {
-
-        localStorage.setItem(
-            COYOTE_STORAGE_KEY,
-            JSON.stringify(
-                point
-            )
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-    }
-
-
-    commercialPoints =
-        commercialPoints.filter(
-            item =>
-                item.id !==
-                point.id
-        );
-
-
-    commercialPoints.push(
-        point
-    );
-
-
-    renderSellerPoint(
-        point
-    );
-
-
-    syncCompanyWithCoyotePoint();
-
-
-    if (sellerForm) {
-
-        sellerForm.classList.add(
-            "hidden"
-        );
-
-    }
-
-
-    sellerProductInput.value =
-        "";
-
-
-    updateStatus(
-        "🟢 Punto Verde activo · " +
-        escapeHTML(
-            product
-        )
-    );
-
-
-    updateOfferMetrics(
-        commercialPoints.length
-    );
-
-}
-
-
-/* ============================================================
-   43. RENDERIZAR PUNTO VERDE
-============================================================ */
-
-function renderSellerPoint(
-    point
-) {
-
-    if (
-        !map ||
-        !point ||
-        typeof L ===
-            "undefined"
-    ) {
-        return;
-    }
-
-
-    if (sellerMarker) {
-
-        map.removeLayer(
-            sellerMarker
-        );
-
-    }
-
-
-    const icon =
-        createGreenIcon();
-
-
-    const options =
-        icon
-            ? {
-                icon
-            }
-            : {};
-
-
-    sellerMarker =
-        L.marker(
-
-            [
-                point.lat,
-                point.lng
-            ],
-
-            options
-
-        ).addTo(
-            map
-        );
-
-
-    sellerMarker.bindPopup(
-        `
-            <strong>
-                ${escapeHTML(
-                    point.companyName ||
-                    "Punto Verde"
-                )}
-            </strong>
-
-            <br>
-
-            ${escapeHTML(
-                point.product
-            )}
-
-            <br><br>
-
-            <button
-                type="button"
-                onclick="startFollowingSeller(
-                    ${Number(
-                        point.lat
-                    )},
-                    ${Number(
-                        point.lng
-                    )}
-                )"
-                style="
-                    border:0;
-                    border-radius:8px;
-                    padding:8px 10px;
-                    background:#00e86d;
-                    color:#00210f;
-                    font-weight:900;
-                    cursor:pointer;
-                "
-            >
-                IR A ESTE PUNTO
-            </button>
-        `
-    );
-
-
-    map.setView(
-        [
-            point.lat,
-            point.lng
-        ],
-        16
-    );
-
-}
-
-
-/* ============================================================
-   44. RESTAURAR PUNTO
-============================================================ */
-
-function restoreSellerPoint() {
-
-    const saved =
-        localStorage.getItem(
-            COYOTE_STORAGE_KEY
-        );
-
-
-    if (!saved) {
-        return;
-    }
-
-
-    try {
-
-        const point =
-            JSON.parse(
-                saved
-            );
-
-
-        if (
-            !point ||
-            !point.active ||
-            !Number.isFinite(
-                Number(
-                    point.lat
-                )
-            ) ||
-            !Number.isFinite(
-                Number(
-                    point.lng
-                )
-            )
-        ) {
-            return;
-        }
-
-
-        point.lat =
-            Number(
-                point.lat
-            );
-
-
-        point.lng =
-            Number(
-                point.lng
-            );
-
-
-        commercialPoints.push(
-            point
-        );
-
-
-        renderSellerPoint(
-            point
-        );
-
-
-        updateOfferMetrics(
-            commercialPoints.length
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Punto COYOTE inválido:",
-            error
-        );
-
-    }
-
-}
-
-
-/* ============================================================
-   45. BUSCADOR COYOTE
-============================================================ */
-
-if (searchButton) {
-
-    searchButton.addEventListener(
-        "click",
-        searchCommercialPoints
-    );
-
-}
-
-
-if (searchInput) {
-
-    searchInput.addEventListener(
-        "keydown",
-        function (event) {
-
-            if (
-                event.key ===
-                "Enter"
-            ) {
-
-                event.preventDefault();
-
-                searchCommercialPoints();
-
-            }
-
-        }
-    );
-
-}
-
-
-function searchCommercialPoints() {
+/* =========================================================
+   BUSCADOR DE PRODUCTOS
+========================================================= */
+
+function searchCoyoteProducts() {
 
     if (!searchInput) {
+
         return;
+
     }
 
 
@@ -7258,120 +4643,91 @@ function searchCommercialPoints() {
     if (!query) {
 
         updateStatus(
+
             "🔎 Escribe el producto que buscas."
+
         );
+
 
         return;
 
     }
 
 
-    if (!userLocation) {
+    /*
+       En esta versión local, COYOTE consulta
+       los puntos almacenados en el navegador.
 
-        requestUserLocation(
-            function () {
-
-                executeCommercialSearch(
-                    query
-                );
-
-            }
-        );
-
-        return;
-
-    }
-
-
-    executeCommercialSearch(
-        query
-    );
-
-}
-
-
-/* ============================================================
-   46. EJECUTAR BÚSQUEDA
-============================================================ */
-
-function executeCommercialSearch(
-    query
-) {
-
-    clearSearchMarkers();
+       Cuando conectemos Supabase, esta misma
+       función podrá consultar puntos reales
+       de múltiples usuarios.
+    */
 
 
     const matches =
         commercialPoints
-            .map(
-                point => {
+            .map(point => {
 
-                    const distance =
-                        userLocation
-                            ? calculateDistanceKm(
-
-                                userLocation.lat,
-
-                                userLocation.lng,
-
-                                point.lat,
-
-                                point.lng
-
-                            )
-                            : 0;
+                let distance = null;
 
 
-                    return {
-                        ...point,
-                        distance
-                    };
+                if (userLocation) {
 
-                }
-            )
-            .filter(
-                point => {
+                    distance =
+                        calculateDistanceKm(
 
-                    const product =
-                        String(
-                            point.product ||
-                            ""
-                        )
-                            .toLowerCase();
+                            userLocation.lat,
 
+                            userLocation.lng,
 
-                    const productMatch =
-                        product.includes(
-                            query
+                            Number(point.lat),
+
+                            Number(point.lng)
+
                         );
 
-
-                    const radiusMatch =
-                        !userLocation ||
-                        point.distance <=
-                            selectedRadius;
+                }
 
 
-                    return (
-                        productMatch &&
-                        radiusMatch
+                return {
+
+                    ...point,
+
+                    distance
+
+                };
+
+            })
+            .filter(point => {
+
+                const product =
+                    String(
+                        point.product || ""
+                    )
+                    .toLowerCase();
+
+
+                const productMatches =
+                    product.includes(
+                        query
                     );
 
-                }
-            )
-            .sort(
-                (
-                    a,
-                    b
-                ) =>
-                    a.distance -
-                    b.distance
-            );
+
+                const radiusMatches =
+                    point.distance === null ||
+                    point.distance <=
+                        selectedRadius;
 
 
-    matches.forEach(
-        renderSearchPoint
-    );
+                return (
+                    productMatches &&
+                    radiusMatches
+                );
+
+            });
+
+
+    clearSearchMarkers();
 
 
     updateOfferMetrics(
@@ -7379,36 +4735,30 @@ function executeCommercialSearch(
     );
 
 
-    if (!matches.length) {
+    if (
+        matches.length === 0
+    ) {
 
         updateStatus(
-            "🔎 No encontramos " +
+
+            "🔎 No encontramos <strong>" +
+
             escapeHTML(
                 query
             ) +
-            " dentro de " +
-            selectedRadius +
-            " km."
+
+            "</strong> dentro del radio seleccionado."
+
         );
+
 
         return;
 
     }
 
 
-    updateStatus(
-        "✓ Encontramos " +
-        matches.length +
-        (
-            matches.length === 1
-                ? " punto"
-                : " puntos"
-        ) +
-        " para " +
-        escapeHTML(
-            query
-        ) +
-        "."
+    matches.forEach(
+        renderSearchResult
     );
 
 
@@ -7416,35 +4766,102 @@ function executeCommercialSearch(
         matches
     );
 
+
+    updateStatus(
+
+        "✓ COYOTE encontró <strong>" +
+
+        matches.length +
+
+        "</strong> " +
+
+        (
+            matches.length === 1
+                ? "resultado"
+                : "resultados"
+        ) +
+
+        " para <strong>" +
+
+        escapeHTML(
+            query
+        ) +
+
+        "</strong>."
+
+    );
+
 }
 
 
-/* ============================================================
-   47. RENDERIZAR RESULTADO
-============================================================ */
+/* =========================================================
+   EVENTO BUSCAR
+========================================================= */
 
-function renderSearchPoint(
-    point
-) {
+if (searchButton) {
+
+    searchButton.addEventListener(
+
+        "click",
+
+        searchCoyoteProducts
+
+    );
+
+}
+
+
+if (searchInput) {
+
+    searchInput.addEventListener(
+
+        "keydown",
+
+        function(event) {
+
+            if (
+                event.key ===
+                "Enter"
+            ) {
+
+                event.preventDefault();
+
+
+                searchCoyoteProducts();
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* =========================================================
+   RENDER RESULTADO DE BÚSQUEDA
+========================================================= */
+
+function renderSearchResult(point) {
 
     if (
         !map ||
         typeof L ===
-            "undefined"
+        "undefined"
     ) {
+
         return;
+
     }
 
 
     const icon =
-        createCoyoteIcon();
+        createSearchResultIcon();
 
 
     const options =
         icon
-            ? {
-                icon
-            }
+            ? { icon }
             : {};
 
 
@@ -7452,8 +4869,8 @@ function renderSearchPoint(
         L.marker(
 
             [
-                point.lat,
-                point.lng
+                Number(point.lat),
+                Number(point.lng)
             ],
 
             options
@@ -7463,63 +4880,98 @@ function renderSearchPoint(
         );
 
 
-    const distanceText =
-        userLocation
-            ? point.distance
-                .toFixed(2) +
-                " km"
-            : "Distancia no disponible";
+    let distanceText =
+        "Distancia no disponible";
 
 
-    marker.bindPopup(
-        `
-            <strong>
-                ${escapeHTML(
-                    point.companyName ||
-                    "Comerciante"
-                )}
-            </strong>
+    if (
+        point.distance !== null &&
+        Number.isFinite(
+            point.distance
+        )
+    ) {
 
-            <br>
+        if (
+            point.distance < 1
+        ) {
+
+            distanceText =
+                Math.round(
+                    point.distance *
+                    1000
+                ) +
+                " m";
+
+        }
+
+        else {
+
+            distanceText =
+                point.distance
+                    .toFixed(2) +
+                " km";
+
+        }
+
+    }
+
+
+    marker.bindPopup(`
+
+        <strong>
 
             ${escapeHTML(
-                point.product
+                point.companyName ||
+                "Comerciante"
             )}
 
-            <br>
+        </strong>
 
-            <small>
-                ${escapeHTML(
-                    distanceText
-                )}
-            </small>
+        <br>
 
-            <br><br>
+        ${escapeHTML(
+            point.product
+        )}
 
-            <button
-                type="button"
-                onclick="startFollowingSeller(
-                    ${Number(
-                        point.lat
-                    )},
-                    ${Number(
-                        point.lng
-                    )}
-                )"
-                style="
-                    border:0;
-                    border-radius:8px;
-                    padding:8px 10px;
-                    background:#00e86d;
-                    color:#00210f;
-                    font-weight:900;
-                    cursor:pointer;
-                "
-            >
-                IR A ESTE PUNTO
-            </button>
-        `
-    );
+        <br>
+
+        <small>
+
+            ${escapeHTML(
+                distanceText
+            )}
+
+        </small>
+
+        <br><br>
+
+
+        <button
+
+            type="button"
+
+            onclick="startFollowingSeller(
+                ${Number(point.lat)},
+                ${Number(point.lng)}
+            )"
+
+            style="
+                border:0;
+                border-radius:8px;
+                padding:8px 10px;
+                background:#00e86d;
+                color:#001b0c;
+                font-weight:900;
+                cursor:pointer;
+            "
+
+        >
+
+            IR A ESTE PUNTO
+
+        </button>
+
+    `);
 
 
     searchMarkers.push(
@@ -7529,9 +4981,9 @@ function renderSearchPoint(
 }
 
 
-/* ============================================================
-   48. LIMPIAR RESULTADOS
-============================================================ */
+/* =========================================================
+   LIMPIAR RESULTADOS
+========================================================= */
 
 function clearSearchMarkers() {
 
@@ -7544,8 +4996,9 @@ function clearSearchMarkers() {
     }
 
 
-    searchMarkers.forEach(
-        marker => {
+    searchMarkers.forEach(marker => {
+
+        try {
 
             if (
                 map.hasLayer(
@@ -7560,7 +5013,14 @@ function clearSearchMarkers() {
             }
 
         }
-    );
+
+        catch (error) {
+
+            console.warn(error);
+
+        }
+
+    });
 
 
     searchMarkers = [];
@@ -7568,9 +5028,9 @@ function clearSearchMarkers() {
 }
 
 
-/* ============================================================
-   49. ENCUADRAR RESULTADOS
-============================================================ */
+/* =========================================================
+   ENCUADRAR RESULTADOS
+========================================================= */
 
 function fitSearchResults(
     matches
@@ -7580,42 +5040,50 @@ function fitSearchResults(
         !map ||
         !matches.length ||
         typeof L ===
-            "undefined"
+        "undefined"
     ) {
+
         return;
+
     }
 
 
-    const points =
-        matches.map(
-            point => [
-                point.lat,
-                point.lng
-            ]
-        );
+    const positions =
+        matches.map(point => [
+
+            Number(point.lat),
+
+            Number(point.lng)
+
+        ]);
 
 
     if (userLocation) {
 
-        points.push(
-            [
-                userLocation.lat,
+        positions.push([
+
+            Number(
+                userLocation.lat
+            ),
+
+            Number(
                 userLocation.lng
-            ]
-        );
+            )
+
+        ]);
 
     }
 
 
     if (
-        points.length ===
-        1
+        positions.length === 1
     ) {
 
         map.setView(
-            points[0],
+            positions[0],
             16
         );
+
 
         return;
 
@@ -7624,65 +5092,77 @@ function fitSearchResults(
 
     const bounds =
         L.latLngBounds(
-            points
+            positions
         );
 
 
     map.fitBounds(
-        bounds,
-        {
-            padding:
-                [70, 70],
 
-            maxZoom:
-                16
+        bounds,
+
+        {
+
+            padding:
+                [60, 60],
+
+            maxZoom: 16
+
         }
+
     );
 
 }
 
 
-/* ============================================================
-   50. MÉTRICAS DE OFERTA
-============================================================ */
+/* =========================================================
+   MÉTRICAS DEL PANEL
+========================================================= */
 
 function updateOfferMetrics(
-    count
+    matches
 ) {
 
-    const normalizedCount =
+    const count =
         Math.max(
             0,
-            safeNumber(
-                count
-            )
+            Number(matches) || 0
         );
 
 
     if (offerText) {
 
         offerText.textContent =
-            normalizedCount +
-            (
-                normalizedCount === 1
-                    ? " punto"
-                    : " puntos"
-            );
+            count === 1
+
+                ? "1 punto"
+
+                : count +
+                  " puntos";
 
     }
 
 
-    const demand =
-        clamp(
-            normalizedCount *
-            18
-        );
+    /*
+       Por ahora representa intensidad
+       de actividad dentro del prototipo.
+    */
+
+    const intensity =
+        count === 0
+
+            ? 0
+
+            : Math.min(
+                100,
+                20 +
+                count * 30
+            );
 
 
     if (demandBar) {
 
         demandBar.style.width =
-            demand +
+            intensity +
             "%";
 
     }
@@ -7691,34 +5171,34 @@ function updateOfferMetrics(
     if (demandText) {
 
         if (
-            normalizedCount ===
-            0
+            count === 0
         ) {
 
             demandText.textContent =
-                "Sin datos";
+                "Sin actividad detectada";
 
         }
 
+
         else if (
-            normalizedCount <=
-            2
+            intensity < 50
         ) {
 
             demandText.textContent =
-                "Actividad baja";
+                "Actividad inicial";
 
         }
 
+
         else if (
-            normalizedCount <=
-            5
+            intensity < 80
         ) {
 
             demandText.textContent =
                 "Actividad media";
 
         }
+
 
         else {
 
@@ -7732,13 +5212,104 @@ function updateOfferMetrics(
 }
 
 
-/* ============================================================
-   51. SEGUIR VENDEDOR
-============================================================ */
+/* =========================================================
+   SEGUIR EL PUNTO VERDE GUARDADO
+========================================================= */
+
+function followSellerPoint() {
+
+    let saved = null;
+
+
+    try {
+
+        saved =
+            localStorage.getItem(
+                "coyote_seller_point"
+            );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
+
+
+    if (!saved) {
+
+        updateStatus(
+
+            "⚠️ No existe un Punto Verde activo."
+
+        );
+
+
+        return;
+
+    }
+
+
+    try {
+
+        const point =
+            JSON.parse(saved);
+
+
+        if (
+            !point ||
+            !point.active
+        ) {
+
+            updateStatus(
+
+                "⚠️ El Punto Verde ya no está activo."
+
+            );
+
+
+            return;
+
+        }
+
+
+        startFollowingSeller(
+
+            Number(point.lat),
+
+            Number(point.lng),
+
+            point
+
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+
+        updateStatus(
+
+            "⚠️ No se pudo abrir el punto."
+
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   INICIAR SEGUIMIENTO
+========================================================= */
 
 function startFollowingSeller(
     sellerLat,
-    sellerLng
+    sellerLng,
+    sellerPoint = null
 ) {
 
     sellerLat =
@@ -7763,8 +5334,11 @@ function startFollowingSeller(
     ) {
 
         updateStatus(
-            "❌ Punto comercial inválido."
+
+            "⚠️ La ubicación comercial no es válida."
+
         );
+
 
         return;
 
@@ -7776,8 +5350,11 @@ function startFollowingSeller(
     ) {
 
         updateStatus(
-            "⚠️ El navegador no permite seguimiento por ubicación."
+
+            "⚠️ Tu navegador no permite seguimiento por ubicación."
+
         );
+
 
         return;
 
@@ -7789,19 +5366,30 @@ function startFollowingSeller(
     );
 
 
+    followedSellerPoint =
+        sellerPoint || {
+
+            lat:
+                sellerLat,
+
+            lng:
+                sellerLng
+
+        };
+
+
     updateStatus(
-        "🧭 Seguimiento iniciado."
+
+        "🧭 Iniciando seguimiento hacia el punto..."
+
     );
 
 
     followWatchId =
-        navigator
-            .geolocation
+        navigator.geolocation
             .watchPosition(
 
-                function (
-                    position
-                ) {
+                function(position) {
 
                     const buyerLat =
                         position
@@ -7826,197 +5414,25 @@ function startFollowingSeller(
                     };
 
 
-                    if (
-                        !map ||
-                        typeof L ===
-                            "undefined"
-                    ) {
-                        return;
-                    }
+                    updateFollowMap(
 
+                        buyerLat,
 
-                    if (!followUserMarker) {
+                        buyerLng,
 
-                        followUserMarker =
-                            L.circleMarker(
+                        sellerLat,
 
-                                [
-                                    buyerLat,
-                                    buyerLng
-                                ],
-
-                                {
-
-                                    radius:
-                                        7,
-
-                                    color:
-                                        "#ffffff",
-
-                                    weight:
-                                        2,
-
-                                    fillColor:
-                                        "#4d8cff",
-
-                                    fillOpacity:
-                                        1
-
-                                }
-
-                            ).addTo(
-                                map
-                            );
-
-                    }
-
-                    else {
-
-                        followUserMarker
-                            .setLatLng(
-                                [
-                                    buyerLat,
-                                    buyerLng
-                                ]
-                            );
-
-                    }
-
-
-                    if (followLine) {
-
-                        map.removeLayer(
-                            followLine
-                        );
-
-                    }
-
-
-                    followLine =
-                        L.polyline(
-
-                            [
-
-                                [
-                                    buyerLat,
-                                    buyerLng
-                                ],
-
-                                [
-                                    sellerLat,
-                                    sellerLng
-                                ]
-
-                            ],
-
-                            {
-
-                                color:
-                                    "#00e86d",
-
-                                weight:
-                                    3,
-
-                                opacity:
-                                    0.8,
-
-                                dashArray:
-                                    "7 8"
-
-                            }
-
-                        ).addTo(
-                            map
-                        );
-
-
-                    const distance =
-                        calculateDistanceKm(
-
-                            buyerLat,
-
-                            buyerLng,
-
-                            sellerLat,
-
-                            sellerLng
-
-                        );
-
-
-                    let distanceText;
-
-
-                    if (
-                        distance <
-                        1
-                    ) {
-
-                        distanceText =
-                            Math.round(
-                                distance *
-                                1000
-                            ) +
-                            " m";
-
-                    }
-
-                    else {
-
-                        distanceText =
-                            distance
-                                .toFixed(
-                                    2
-                                ) +
-                            " km";
-
-                    }
-
-
-                    updateStatus(
-                        "🧭 Distancia al punto: " +
-                        "<strong>" +
-                        escapeHTML(
-                            distanceText
-                        ) +
-                        "</strong>"
-                    );
-
-
-                    map.fitBounds(
-
-                        [
-
-                            [
-                                buyerLat,
-                                buyerLng
-                            ],
-
-                            [
-                                sellerLat,
-                                sellerLng
-                            ]
-
-                        ],
-
-                        {
-
-                            padding:
-                                [60, 60],
-
-                            maxZoom:
-                                17
-
-                        }
+                        sellerLng
 
                     );
 
                 },
 
 
-                function (error) {
+                function(error) {
 
                     console.error(
+                        "Seguimiento COYOTE:",
                         error
                     );
 
@@ -8026,9 +5442,28 @@ function startFollowingSeller(
                     );
 
 
-                    updateStatus(
-                        "❌ No pudimos seguir tu ubicación."
-                    );
+                    if (
+                        error &&
+                        error.code === 1
+                    ) {
+
+                        updateStatus(
+
+                            "⚠️ Necesitas permitir ubicación para usar IR A ESTE PUNTO."
+
+                        );
+
+                    }
+
+                    else {
+
+                        updateStatus(
+
+                            "⚠️ No pudimos actualizar tu ubicación."
+
+                        );
+
+                    }
 
                 },
 
@@ -8051,17 +5486,228 @@ function startFollowingSeller(
 }
 
 
-/* ============================================================
-   52. DETENER SEGUIMIENTO
-============================================================ */
+/* =========================================================
+   ACTUALIZAR MAPA DE SEGUIMIENTO
+========================================================= */
+
+function updateFollowMap(
+    buyerLat,
+    buyerLng,
+    sellerLat,
+    sellerLng
+) {
+
+    if (
+        !map ||
+        typeof L ===
+        "undefined"
+    ) {
+
+        return;
+
+    }
+
+
+    if (!followUserMarker) {
+
+        followUserMarker =
+            L.circleMarker(
+
+                [
+                    buyerLat,
+                    buyerLng
+                ],
+
+                {
+
+                    radius: 7,
+
+                    weight: 2,
+
+                    color:
+                        "#ffffff",
+
+                    fillColor:
+                        "#4f8cff",
+
+                    fillOpacity: 1
+
+                }
+
+            ).addTo(
+                map
+            );
+
+
+        followUserMarker.bindPopup(
+            "Tu posición"
+        );
+
+    }
+
+    else {
+
+        followUserMarker.setLatLng(
+
+            [
+                buyerLat,
+                buyerLng
+            ]
+
+        );
+
+    }
+
+
+    if (followLine) {
+
+        try {
+
+            map.removeLayer(
+                followLine
+            );
+
+        }
+
+        catch (error) {
+
+            console.warn(error);
+
+        }
+
+    }
+
+
+    followLine =
+        L.polyline(
+
+            [
+
+                [
+                    buyerLat,
+                    buyerLng
+                ],
+
+                [
+                    sellerLat,
+                    sellerLng
+                ]
+
+            ],
+
+            {
+
+                color:
+                    "#00e86d",
+
+                weight: 3,
+
+                opacity: 0.85,
+
+                dashArray:
+                    "8 8"
+
+            }
+
+        ).addTo(
+            map
+        );
+
+
+    const distance =
+        calculateDistanceKm(
+
+            buyerLat,
+
+            buyerLng,
+
+            sellerLat,
+
+            sellerLng
+
+        );
+
+
+    let distanceText;
+
+
+    if (
+        distance < 1
+    ) {
+
+        distanceText =
+            Math.round(
+                distance *
+                1000
+            ) +
+            " m";
+
+    }
+
+    else {
+
+        distanceText =
+            distance
+                .toFixed(2) +
+            " km";
+
+    }
+
+
+    updateStatus(
+
+        "🧭 Distancia al Punto Verde: <strong>" +
+
+        escapeHTML(
+            distanceText
+        ) +
+
+        "</strong>."
+
+    );
+
+
+    map.fitBounds(
+
+        [
+
+            [
+                buyerLat,
+                buyerLng
+            ],
+
+            [
+                sellerLat,
+                sellerLng
+            ]
+
+        ],
+
+        {
+
+            padding:
+                [60, 60],
+
+            maxZoom: 17
+
+        }
+
+    );
+
+}
+
+
+/* =========================================================
+   DETENER SEGUIMIENTO
+========================================================= */
 
 function stopFollowingSeller(
     showMessage = true
 ) {
 
     if (
-        followWatchId !==
-        null
+        followWatchId !== null &&
+        navigator.geolocation
     ) {
 
         navigator
@@ -8071,54 +5717,84 @@ function stopFollowingSeller(
             );
 
 
-        followWatchId =
-            null;
+        followWatchId = null;
 
     }
 
 
     if (
         followUserMarker &&
-        map &&
-        map.hasLayer(
-            followUserMarker
-        )
+        map
     ) {
 
-        map.removeLayer(
-            followUserMarker
-        );
+        try {
+
+            if (
+                map.hasLayer(
+                    followUserMarker
+                )
+            ) {
+
+                map.removeLayer(
+                    followUserMarker
+                );
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.warn(error);
+
+        }
 
     }
 
 
     if (
         followLine &&
-        map &&
-        map.hasLayer(
-            followLine
-        )
+        map
     ) {
 
-        map.removeLayer(
-            followLine
-        );
+        try {
+
+            if (
+                map.hasLayer(
+                    followLine
+                )
+            ) {
+
+                map.removeLayer(
+                    followLine
+                );
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.warn(error);
+
+        }
 
     }
 
 
-    followUserMarker =
-        null;
+    followUserMarker = null;
 
+    followLine = null;
 
-    followLine =
-        null;
+    followedSellerPoint = null;
 
 
     if (showMessage) {
 
         updateStatus(
+
             "🧭 Seguimiento detenido."
+
         );
 
     }
@@ -8126,39 +5802,37 @@ function stopFollowingSeller(
 }
 
 
-/* ============================================================
-   53. DISTANCIA HAVERSINE
-============================================================ */
+/* =========================================================
+   DISTANCIA HAVERSINE
+========================================================= */
 
 function calculateDistanceKm(
-
     lat1,
     lng1,
     lat2,
     lng2
-
 ) {
 
-    const R =
+    const earthRadiusKm =
         6371;
 
 
-    const toRad =
-        value =>
-            value *
+    const toRadians =
+        degrees =>
+            degrees *
             Math.PI /
             180;
 
 
     const dLat =
-        toRad(
+        toRadians(
             lat2 -
             lat1
         );
 
 
     const dLng =
-        toRad(
+        toRadians(
             lng2 -
             lng1
         );
@@ -8171,13 +5845,13 @@ function calculateDistanceKm(
         ) ** 2 +
 
         Math.cos(
-            toRad(
+            toRadians(
                 lat1
             )
         ) *
 
         Math.cos(
-            toRad(
+            toRadians(
                 lat2
             )
         ) *
@@ -8187,48 +5861,30 @@ function calculateDistanceKm(
         ) ** 2;
 
 
-    return (
-
+    const c =
         2 *
-        R *
-        Math.asin(
-            Math.sqrt(
-                a
-            )
-        )
+        Math.atan2(
 
+            Math.sqrt(a),
+
+            Math.sqrt(
+                1 - a
+            )
+
+        );
+
+
+    return (
+        earthRadiusKm *
+        c
     );
 
 }
 
 
-/* ============================================================
-   54. ESTADO COYOTE
-============================================================ */
-
-function updateStatus(
-    message
-) {
-
-    const element =
-        document.getElementById(
-            "status"
-        );
-
-
-    if (element) {
-
-        element.innerHTML =
-            message;
-
-    }
-
-}
-
-
-/* ============================================================
-   55. CONECTAR EMPRESA CON PUNTO COYOTE
-============================================================ */
+/* =========================================================
+   SINCRONIZAR COYOTE CON EMPRESA
+========================================================= */
 
 function syncCompanyWithCoyotePoint() {
 
@@ -8237,71 +5893,97 @@ function syncCompanyWithCoyotePoint() {
 
 
     if (!company) {
+
         return;
+
     }
 
 
-    const saved =
-        localStorage.getItem(
-            COYOTE_STORAGE_KEY
-        );
+    let saved = null;
+
+
+    try {
+
+        saved =
+            localStorage.getItem(
+                "coyote_seller_point"
+            );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+    }
 
 
     if (!saved) {
+
         return;
+
     }
 
 
     try {
 
         const point =
-            JSON.parse(
-                saved
-            );
+            JSON.parse(saved);
 
 
         if (
-            point &&
-            point.active
+            !point ||
+            !point.active
         ) {
 
-            migrateCompanyBusinessData(
-                company
-            );
-
-
-            company.locationStrength =
-                clamp(
-                    company.locationStrength +
-                    3
-                );
-
-
-            company.marketKnowledge =
-                clamp(
-                    company.marketKnowledge +
-                    2
-                );
-
-
-            company.value +=
-                15;
-
-
-            recalculateCompanyStage(
-                company
-            );
-
-
-            saveMahpeState();
+            return;
 
         }
+
+
+        migrateCompanyBusinessData(
+            company
+        );
+
+
+        company.locationStrength =
+            clamp(
+
+                company.locationStrength +
+                3
+
+            );
+
+
+        company.marketKnowledge =
+            clamp(
+
+                company.marketKnowledge +
+                2
+
+            );
+
+
+        company.value +=
+            15;
+
+
+        recalculateCompanyStage(
+            company
+        );
+
+
+        saveMahpeState();
+
+
+        renderCompanyDashboard();
 
     }
 
     catch (error) {
 
         console.error(
+            "No se pudo sincronizar COYOTE:",
             error
         );
 
@@ -8310,19 +5992,46 @@ function syncCompanyWithCoyotePoint() {
 }
 
 
-/* ============================================================
-   56. VISIBILIDAD DEL MAPA
-============================================================ */
+/* =========================================================
+   STATUS COYOTE
+========================================================= */
 
-function refreshMapSize() {
+function updateStatus(message) {
+
+    const status =
+        document.getElementById(
+            "status"
+        );
+
+
+    if (!status) {
+
+        return;
+
+    }
+
+
+    status.innerHTML =
+        message;
+
+}
+
+
+/* =========================================================
+   REFRESCAR MAPA
+========================================================= */
+
+function refreshCoyoteMap() {
 
     if (!map) {
+
         return;
+
     }
 
 
     setTimeout(
-        () => {
+        function() {
 
             map.invalidateSize();
 
@@ -8332,7 +6041,7 @@ function refreshMapSize() {
 
 
     setTimeout(
-        () => {
+        function() {
 
             map.invalidateSize();
 
@@ -8343,75 +6052,187 @@ function refreshMapSize() {
 }
 
 
-/* ============================================================
-   57. RESIZE
-============================================================ */
+/* =========================================================
+   RESIZE
+========================================================= */
 
 window.addEventListener(
+
     "resize",
-    function () {
+
+    function() {
+
+        const mapView =
+            document.getElementById(
+                "mapView"
+            );
+
 
         if (
-            document
-                .getElementById(
-                    "mapView"
-                )
-                ?.classList
-                .contains(
-                    "active"
-                )
+            mapView &&
+            mapView.classList.contains(
+                "active"
+            )
         ) {
 
-            refreshMapSize();
+            refreshCoyoteMap();
 
         }
 
     }
+
 );
 
 
-/* ============================================================
-   58. LIMPIEZA AL SALIR
-============================================================ */
+/* =========================================================
+   LIMPIEZA AL CERRAR
+========================================================= */
 
 window.addEventListener(
+
     "beforeunload",
-    function () {
+
+    function() {
 
         stopFollowingSeller(
             false
         );
 
     }
+
 );
 
 
-/* ============================================================
-   59. ACTUALIZAR REFERENCIA
-============================================================ */
+/* =========================================================
+   COMPATIBILIDAD DE FUNCIONES DE POPUP
+========================================================= */
 
-updateReference();
+/*
+   Las exponemos explícitamente porque los botones
+   dentro de los popups Leaflet usan onclick.
+*/
+
+window.followSellerPoint =
+    followSellerPoint;
 
 
-/* ============================================================
-   60. ARRANQUE MAHPE
-============================================================ */
+window.startFollowingSeller =
+    startFollowingSeller;
 
-function startMahpe() {
+
+window.deactivateSeller =
+    deactivateSeller;
+
+
+window.executeBusinessDecision =
+    executeBusinessDecision;
+
+
+window.openView =
+    openView;
+
+
+window.publishCompanyPost =
+    publishCompanyPost;
+
+
+/* =========================================================
+   COMPROBACIÓN BÁSICA
+========================================================= */
+
+function validateMahpeDOM() {
+
+    const importantElements = [
+
+        "feedView",
+
+        "feedContainer",
+
+        "mapView",
+
+        "map",
+
+        "createView",
+
+        "companyView",
+
+        "companyDashboard",
+
+        "profileView",
+
+        "walletBalance"
+
+    ];
+
+
+    const missing =
+        importantElements.filter(
+            id =>
+                !document.getElementById(
+                    id
+                )
+        );
+
+
+    if (
+        missing.length
+    ) {
+
+        console.warn(
+
+            "MAHPE: faltan elementos HTML:",
+
+            missing
+
+        );
+
+    }
+
+
+    return missing;
+
+}
+
+
+/* =========================================================
+   ARRANQUE
+========================================================= */
+
+function initializeMahpe() {
+
+    console.log(
+        "MAHPE: iniciando..."
+    );
+
+
+    validateMahpeDOM();
+
+
+    /*
+       Actualiza empresas antiguas almacenadas
+       antes de la incorporación del Business Engine.
+    */
 
     migrateMahpeBusinessState();
 
 
     /*
-       Leaflet puede construirse mientras
-       la vista está oculta, pero al entrar
-       al mapa openView() ejecutará
-       invalidateSize() para corregir
-       las dimensiones.
+       Prepara el texto inicial del radio.
+    */
+
+    updateReference();
+
+
+    /*
+       Inicializa Leaflet una sola vez.
     */
 
     initializeMap();
 
+
+    /*
+       Render principal.
+    */
 
     renderFeed();
 
@@ -8422,30 +6243,62 @@ function startMahpe() {
     updateGlobalUI();
 
 
+    /*
+       MAHPE siempre abre inicialmente
+       en el Feed.
+    */
+
     openView(
         "feedView"
     );
 
 
     console.log(
-        "MAHPE iniciado."
-    );
-
-
-    console.log(
-        "COYOTE activo como motor territorial y empresarial."
+        "MAHPE: listo."
     );
 
 }
 
 
-/* ============================================================
-   61. EJECUTAR
-============================================================ */
+/* =========================================================
+   EJECUCIÓN SEGURA
+========================================================= */
 
-startMahpe();
+/*
+   El script está colocado al final del BODY en nuestro
+   index.html, por lo que normalmente el DOM ya existe.
+
+   Aun así dejamos esta comprobación para evitar problemas
+   si después movemos script.js al HEAD.
+*/
+
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+
+        "DOMContentLoaded",
+
+        initializeMahpe,
+
+        {
+            once: true
+        }
+
+    );
+
+}
+
+else {
+
+    initializeMahpe();
+
+}
 
 
-/* ============================================================
+/* =========================================================
+   FIN MAHPE v1.1
    FIN SCRIPT.JS
-============================================================ */
+========================================================= */
