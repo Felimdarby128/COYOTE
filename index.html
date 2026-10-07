@@ -72,6 +72,10 @@
 
         <div class="page">
 
+            <!-- =====================================================
+                 HERO
+            ====================================================== -->
+
             <section class="hero">
 
                 <span class="eyebrow">
@@ -90,104 +94,146 @@
             </section>
 
 
-        <!-- =====================================================
-     ACTIVIDAD / CONTINUIDAD MAHPE
-====================================================== -->
+            <!-- =====================================================
+                 ACTIVIDAD / CONTINUIDAD
+            ====================================================== -->
 
-<section
-    id="activityInbox"
-    class="activity-inbox"
->
+            <section
+                id="activityInbox"
+                class="activity-inbox"
+            >
 
-    <div class="activity-inbox-header">
+                <div class="activity-inbox-header">
 
-        <div>
-            <span class="eyebrow">
-                TU MUNDO
-            </span>
+                    <div>
 
-            <h2>
-                ¿Qué pasó mientras no estabas?
-            </h2>
-        </div>
+                        <span class="eyebrow">
+                            TU MUNDO
+                        </span>
 
-        <span
-            id="activityBadge"
-            class="activity-badge"
-        >
-            0
-        </span>
+                        <h2>
+                            ¿Qué pasó mientras no estabas?
+                        </h2>
 
-    </div>
+                    </div>
 
 
-    <div
-        id="activityList"
-        class="activity-list"
-    >
+                    <span
+                        id="activityBadge"
+                        class="activity-badge"
+                    >
+                        0
+                    </span>
 
-        <div class="activity-empty">
-            <span>◌</span>
-
-            <div>
-                <strong>
-                    Todavía no hay novedades
-                </strong>
-
-                <small>
-                    Interactúa, sigue empresas y toma decisiones.
-                    MAHPE irá construyendo tu historia.
-                </small>
-            </div>
-        </div>
-
-    </div>
-
-</section>
+                </div>
 
 
-<!-- =====================================================
-     CONTROL DEL FEED
-====================================================== -->
+                <div
+                    id="activityList"
+                    class="activity-list"
+                >
 
-<section class="feed-control">
+                    <div class="activity-empty">
 
-    <button
-        id="exploreFeedButton"
-        class="feed-tab active"
-        type="button"
-        data-feed-mode="explore"
-    >
-        Explorar
-    </button>
+                        <span>◌</span>
 
-    <button
-        id="followingFeedButton"
-        class="feed-tab"
-        type="button"
-        data-feed-mode="following"
-    >
-        Siguiendo
+                        <div>
 
-        <span
-            id="followingCount"
-            class="feed-tab-count"
-        >
-            0
-        </span>
-    </button>
+                            <strong>
+                                Todavía no hay novedades
+                            </strong>
 
-</section>
+                            <small>
+                                Sigue empresas, descubre proyectos
+                                y observa cómo evoluciona tu mundo empresarial.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
 
 
-<!-- =====================================================
-     FEED
-====================================================== -->
+            <!-- =====================================================
+                 FEED MAHPE
+                 SIGUIENDO / DESCUBRIR / TENDENCIAS
+            ====================================================== -->
 
-<section
-    id="feedContainer"
-    class="feed"
-></section>
+            <section
+                id="feedControl"
+                class="feed-control"
+                aria-label="Secciones del feed"
+            >
+
+                <!-- SIGUIENDO -->
+
+                <button
+                    id="followingFeedButton"
+                    class="feed-tab"
+                    type="button"
+                    data-feed-mode="following"
+                >
+                    Siguiendo
+
+                    <span
+                        id="followingCount"
+                        class="feed-tab-count"
+                    >
+                        0
+                    </span>
+                </button>
+
+
+                <!--
+                    DESCUBRIR
+
+                    Se conserva internamente:
+                    id="exploreFeedButton"
+                    data-feed-mode="explore"
+
+                    Esto evita romper referencias existentes
+                    dentro de script.js.
+                -->
+
+                <button
+                    id="exploreFeedButton"
+                    class="feed-tab active"
+                    type="button"
+                    data-feed-mode="explore"
+                >
+                    Descubrir
+                </button>
+
+
+                <!-- TENDENCIAS -->
+
+                <button
+                    id="trendingFeedButton"
+                    class="feed-tab"
+                    type="button"
+                    data-feed-mode="trending"
+                >
+                    Tendencias
+                </button>
+
+            </section>
+
+
+            <!-- =====================================================
+                 FEED DINÁMICO
+
+                 IMPORTANTE:
+                 NO cambiar feedContainer.
+                 script.js genera aquí las publicaciones.
+            ====================================================== -->
+
+            <section
+                id="feedContainer"
+                class="feed"
+            ></section>
 
         </div>
 
@@ -209,7 +255,9 @@
         <div id="map"></div>
 
 
-        <!-- PANEL COYOTE -->
+        <!-- =====================================================
+             PANEL COYOTE
+        ====================================================== -->
 
         <aside class="map-panel">
 
@@ -249,6 +297,13 @@
                     y prueba tu posición dentro del territorio.
                 </p>
 
+
+                <!--
+                    IMPORTANTE:
+                    Este ID se mantiene.
+                    script.js controlará posteriormente
+                    ACTIVO / INACTIVO.
+                -->
 
                 <button
                     id="activateButton"
@@ -291,7 +346,7 @@
 
 
             <!-- ===============================
-                 BUSCADOR
+                 BUSCADOR COYOTE
             ================================ -->
 
             <section class="map-section">
@@ -313,6 +368,8 @@
                 >
 
 
+                <!-- DISTANCIAS -->
+
                 <div class="range-options">
 
                     <button
@@ -323,6 +380,7 @@
                         1 km
                     </button>
 
+
                     <button
                         class="range-button"
                         data-radius="3"
@@ -331,6 +389,7 @@
                         3 km
                     </button>
 
+
                     <button
                         class="range-button active"
                         data-radius="10"
@@ -338,6 +397,7 @@
                     >
                         10 km
                     </button>
+
 
                     <button
                         class="range-button"
@@ -349,6 +409,8 @@
 
                 </div>
 
+
+                <!-- REFERENCIA DE DISTANCIA -->
 
                 <div
                     id="referenceText"
@@ -378,6 +440,8 @@
 
             <section class="map-section">
 
+                <!-- OFERTA -->
+
                 <div class="metric">
 
                     Oferta encontrada
@@ -388,6 +452,8 @@
 
                 </div>
 
+
+                <!-- ACTIVIDAD -->
 
                 <div class="metric">
 
@@ -411,9 +477,12 @@
             </section>
 
 
+            <!-- ESTADO COYOTE -->
+
             <div
                 id="status"
                 class="status"
+                aria-live="polite"
             >
                 🟢 COYOTE está listo.
             </div>
@@ -468,7 +537,9 @@
                 </p>
 
 
-                <!-- NOMBRE -->
+                <!-- ===============================
+                     NOMBRE
+                ================================ -->
 
                 <label for="companyNameInput">
                     Nombre
@@ -482,7 +553,9 @@
                 >
 
 
-                <!-- CATEGORÍA -->
+                <!-- ===============================
+                     CATEGORÍA
+                ================================ -->
 
                 <label for="companyCategoryInput">
                     Categoría
@@ -525,7 +598,9 @@
                 </select>
 
 
-                <!-- DESCRIPCIÓN -->
+                <!-- ===============================
+                     DESCRIPCIÓN
+                ================================ -->
 
                 <label for="companyDescriptionInput">
                     Descripción
@@ -537,7 +612,9 @@
                 ></textarea>
 
 
-                <!-- PRODUCTO -->
+                <!-- ===============================
+                     PRODUCTO
+                ================================ -->
 
                 <label for="companyProductInput">
                     Producto principal
@@ -551,7 +628,9 @@
                 >
 
 
-                <!-- PRECIO -->
+                <!-- ===============================
+                     PRECIO
+                ================================ -->
 
                 <label for="companyPriceInput">
                     Precio estimado
@@ -567,7 +646,9 @@
                 >
 
 
-                <!-- PÚBLICO -->
+                <!-- ===============================
+                     PÚBLICO
+                ================================ -->
 
                 <label for="companyAudienceInput">
                     Público objetivo
@@ -581,7 +662,9 @@
                 >
 
 
-                <!-- CREAR -->
+                <!-- ===============================
+                     CREAR
+                ================================ -->
 
                 <button
                     id="createCompanyButton"
@@ -644,6 +727,9 @@
             - Business Engine
             - decisiones COYOTE
             - historial
+
+            IMPORTANTE:
+            NO cambiar companyDashboard.
         -->
 
         <div
@@ -683,6 +769,10 @@
 
         <div class="page narrow">
 
+            <!-- ===============================
+                 TARJETA DE PERFIL
+            ================================ -->
+
             <section class="profile-card">
 
                 <div class="profile-avatar">
@@ -702,9 +792,13 @@
 
 
 
-            <!-- ESTADÍSTICAS -->
+            <!-- ===============================
+                 ESTADÍSTICAS
+            ================================ -->
 
             <section class="stats-grid">
+
+                <!-- MAHPES -->
 
                 <div class="stat-card">
 
@@ -721,6 +815,8 @@
                 </div>
 
 
+                <!-- EMPRESAS -->
+
                 <div class="stat-card">
 
                     <span>🏢</span>
@@ -736,6 +832,8 @@
                 </div>
 
 
+                <!-- INTERÉS -->
+
                 <div class="stat-card">
 
                     <span>🔥</span>
@@ -750,6 +848,8 @@
 
                 </div>
 
+
+                <!-- COMPROMISO -->
 
                 <div class="stat-card">
 
@@ -769,7 +869,9 @@
 
 
 
-            <!-- OBJETIVO -->
+            <!-- ===============================
+                 OBJETIVO
+            ================================ -->
 
             <section class="info-card">
 
@@ -800,6 +902,10 @@
 
 <!-- =========================================================
      NAVEGACIÓN PRINCIPAL
+
+     IMPORTANTE:
+     Se mantienen exactamente los data-view utilizados
+     por script.js.
 ========================================================= -->
 
 <nav
@@ -807,7 +913,9 @@
     aria-label="Navegación principal"
 >
 
-    <!-- INICIO -->
+    <!-- ===============================
+         INICIO
+    ================================ -->
 
     <button
         class="nav-button active"
@@ -825,7 +933,9 @@
     </button>
 
 
-    <!-- MAPA -->
+    <!-- ===============================
+         MAPA
+    ================================ -->
 
     <button
         class="nav-button"
@@ -843,7 +953,9 @@
     </button>
 
 
-    <!-- CREAR -->
+    <!-- ===============================
+         CREAR
+    ================================ -->
 
     <button
         class="nav-button create-nav"
@@ -861,7 +973,9 @@
     </button>
 
 
-    <!-- EMPRESA -->
+    <!-- ===============================
+         EMPRESA
+    ================================ -->
 
     <button
         class="nav-button"
@@ -879,7 +993,9 @@
     </button>
 
 
-    <!-- PERFIL -->
+    <!-- ===============================
+         PERFIL
+    ================================ -->
 
     <button
         class="nav-button"
@@ -902,6 +1018,10 @@
 
 <!-- =========================================================
      JAVASCRIPT
+
+     IMPORTANTE:
+     No se introduce lógica MAHPE dentro de index.html.
+     Toda la lógica permanece en script.js.
 ========================================================= -->
 
 <!-- LEAFLET -->
