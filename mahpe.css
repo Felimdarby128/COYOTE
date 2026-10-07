@@ -7496,3 +7496,216 @@ and (
         padding: 11px;
     }
 }
+
+/* ============================================================
+   MAHPE — PANTALLAS SECUNDARIAS DEL PERFIL
+============================================================ */
+
+.mahpe-profile-content {
+    width: 100%;
+    margin-top: 18px;
+}
+
+.mahpe-profile-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    margin-bottom: 18px;
+    padding: 11px 16px;
+
+    border: 1px solid rgba(0,232,109,.25);
+    border-radius: 12px;
+
+    background: #132018;
+    color: #00e86d;
+
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.mahpe-profile-back:hover {
+    background: #1a3021;
+}
+
+.mahpe-profile-section-title {
+    margin: 0 0 17px;
+    color: #fff;
+    font-size: 21px;
+    font-weight: 900;
+}
+
+/* ESTADOS VACÍOS */
+
+.mahpe-profile-empty {
+    padding: 35px 20px;
+    border: 1px dashed rgba(0,232,109,.2);
+    border-radius: 18px;
+    background: #101713;
+    text-align: center;
+}
+
+.mahpe-profile-empty h4 {
+    margin: 0 0 10px;
+    color: white;
+    font-size: 15px;
+}
+
+.mahpe-profile-empty p {
+    margin: 0 auto 10px;
+    max-width: 330px;
+    color: #a2aaa5;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.mahpe-profile-empty small {
+    color: #748078;
+    font-size: 10px;
+}
+
+/* MIS MAHPES */
+
+.mahpe-profile-mahpes {
+    padding: 25px;
+    border: 1px solid rgba(0,232,109,.2);
+    border-radius: 20px;
+    background: linear-gradient(
+        145deg,
+        #102218,
+        #0c110e
+    );
+}
+
+.mahpe-profile-mahpes-value {
+    margin: 17px 0;
+    color: #00e86d;
+    font-size: 32px;
+    font-weight: 950;
+}
+
+.mahpe-profile-mahpes p {
+    color: #c1cac4;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.mahpe-profile-mahpes small {
+    color: #829187;
+    font-size: 10px;
+}
+
+/* CONFIGURACIÓN */
+
+.mahpe-profile-settings {
+    display: grid;
+    gap: 14px;
+}
+
+.mahpe-profile-setting-button {
+    width: 100%;
+    padding: 17px;
+    border: 1px solid rgba(0,232,109,.2);
+    border-radius: 14px;
+    background: #111a15;
+    color: white;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.mahpe-profile-setting-note {
+    padding: 16px;
+    border-radius: 12px;
+    background: #0e1511;
+    color: #929f96;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* ACTIVIDAD */
+
+.mahpe-profile-activity-list {
+    display: grid;
+    gap: 10px;
+}
+
+.mahpe-profile-activity-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    border: 1px solid #253129;
+    border-radius: 14px;
+    background: #101713;
+}
+
+.mahpe-profile-activity-item > span {
+    font-size: 21px;
+}
+
+.mahpe-profile-activity-item strong {
+    display: block;
+    color: white;
+    font-size: 12px;
+}
+
+.mahpe-profile-activity-item small {
+    display: block;
+    margin-top: 5px;
+    color: #819086;
+    font-size: 10px;
+}
+
+/* RECOMENDACIONES */
+
+.mahpe-recommendations-list {
+    display: grid;
+    gap: 12px;
+}
+
+.mahpe-recommendation-card {
+    padding: 18px;
+    border: 1px solid #26342b;
+    border-radius: 16px;
+    background: #111914;
+}
+
+.mahpe-recommendation-card strong {
+    color: white;
+}
+
+.mahpe-recommendation-card p {
+    color: #a9b6ac;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* EDITOR */
+
+.mahpe-profile-editor {
+    padding: 22px;
+    border: 1px solid #26342b;
+    border-radius: 20px;
+    background: #111914;
+}
+
+.mahpe-profile-editor label {
+    display: block;
+    margin: 15px 0 7px;
+    color: #cbd6ce;
+    font-size: 11px;
+}
+
+.mahpe-profile-editor input,
+.mahpe-profile-editor textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #29382e;
+    border-radius: 11px;
+    background: #090e0b;
+    color: white;
+}
