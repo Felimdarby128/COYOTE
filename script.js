@@ -10683,8 +10683,7 @@ function searchCommercialPoints() {
 
         let insideRadius = true;
 
-        if (userLocation) {
-
+        if (false) {
             const distance =
                 calculateDistanceKm(
                     userLocation.lat,
