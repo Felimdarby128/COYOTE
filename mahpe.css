@@ -6942,3 +6942,42 @@ and (
     }
 }
 
+/* MAHPE — CORRECCIONES DE INTEGRACIÓN */
+
+/* Botón: ver más novedades */
+.activity-more-button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 11px 14px;
+    border: 1px solid rgba(0, 232, 109, 0.2);
+    border-radius: 12px;
+    background: #111a15;
+    color: #00e86d;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+    cursor: pointer;
+}
+
+.activity-more-button:hover {
+    background: #18271e;
+}
+
+/* Punto Verde usado por script.js */
+.coyote-green-marker {
+    background: transparent;
+    border: none;
+}
+
+.coyote-green-dot {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: #00e86d;
+    box-shadow:
+        0 0 0 6px rgba(0, 232, 109, 0.22),
+        0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
