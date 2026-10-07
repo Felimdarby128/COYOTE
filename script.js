@@ -6178,8 +6178,6 @@ function bindCompanyDashboardEvents() {
    33. VARIABLES COYOTE
 ============================================================ */
 
-let map = null;
-
 let userLocation = null;
 
 let userMarker = null;
