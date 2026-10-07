@@ -90,15 +90,104 @@
             </section>
 
 
-            <!--
-                El JavaScript genera aquí
-                las publicaciones del feed.
-            -->
+        <!-- =====================================================
+     ACTIVIDAD / CONTINUIDAD MAHPE
+====================================================== -->
 
-            <section
-                id="feedContainer"
-                class="feed"
-            ></section>
+<section
+    id="activityInbox"
+    class="activity-inbox"
+>
+
+    <div class="activity-inbox-header">
+
+        <div>
+            <span class="eyebrow">
+                TU MUNDO
+            </span>
+
+            <h2>
+                ¿Qué pasó mientras no estabas?
+            </h2>
+        </div>
+
+        <span
+            id="activityBadge"
+            class="activity-badge"
+        >
+            0
+        </span>
+
+    </div>
+
+
+    <div
+        id="activityList"
+        class="activity-list"
+    >
+
+        <div class="activity-empty">
+            <span>◌</span>
+
+            <div>
+                <strong>
+                    Todavía no hay novedades
+                </strong>
+
+                <small>
+                    Interactúa, sigue empresas y toma decisiones.
+                    MAHPE irá construyendo tu historia.
+                </small>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     CONTROL DEL FEED
+====================================================== -->
+
+<section class="feed-control">
+
+    <button
+        id="exploreFeedButton"
+        class="feed-tab active"
+        type="button"
+        data-feed-mode="explore"
+    >
+        Explorar
+    </button>
+
+    <button
+        id="followingFeedButton"
+        class="feed-tab"
+        type="button"
+        data-feed-mode="following"
+    >
+        Siguiendo
+
+        <span
+            id="followingCount"
+            class="feed-tab-count"
+        >
+            0
+        </span>
+    </button>
+
+</section>
+
+
+<!-- =====================================================
+     FEED
+====================================================== -->
+
+<section
+    id="feedContainer"
+    class="feed"
+></section>
 
         </div>
 
