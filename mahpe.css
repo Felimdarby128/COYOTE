@@ -3534,3 +3534,3340 @@ select:focus {
 /* ============================================================
    FIN — MAHPE INTERACTION LOOP v1
 ============================================================ */
+/* ============================================================
+   MAHPE — VITRINA EMPRESARIAL v1
+   PARTE 1/2
+
+   PRODUCTOS
+   GALERÍA
+   PESTAÑAS DE EMPRESA
+   TARJETAS
+   IMÁGENES
+   MÉTRICAS DE PRODUCTO
+============================================================ */
+
+
+/* ============================================================
+   60. WORKSPACE DE PRODUCTOS
+============================================================ */
+
+.company-products-workspace {
+    position: relative;
+
+    padding-top: 18px;
+    padding-bottom: 30px;
+}
+
+
+.company-products-container {
+    width: 100%;
+}
+
+
+/* ============================================================
+   61. NAVEGACIÓN INTERNA DE EMPRESA
+   RESUMEN / PRODUCTOS / ESTADÍSTICAS
+============================================================ */
+
+.company-tabs {
+    position: relative;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    align-items: center;
+
+    gap: 4px;
+
+    width: 100%;
+
+    margin: 15px 0 17px;
+
+    padding: 4px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    background:
+        rgba(13, 16, 15, 0.92);
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+
+.company-tab {
+    position: relative;
+
+    min-width: 0;
+    min-height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    padding: 8px 5px;
+
+    border: 0;
+
+    border-radius: 10px;
+
+    background: transparent;
+
+    color: #68716c;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    white-space: nowrap;
+
+    transition:
+        color 0.16s ease,
+        background 0.16s ease,
+        transform 0.16s ease;
+}
+
+
+.company-tab:hover {
+    color: #bec6c1;
+
+    background:
+        rgba(255, 255, 255, 0.025);
+}
+
+
+.company-tab:active {
+    transform: scale(0.97);
+}
+
+
+.company-tab.active {
+    background:
+        rgba(0, 232, 109, 0.085);
+
+    color: white;
+}
+
+
+.company-tab.active::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 3px;
+
+    transform: translateX(-50%);
+
+    width: 20px;
+    height: 2px;
+
+    border-radius: 100px;
+
+    background: var(--green);
+
+    box-shadow:
+        0 0 10px rgba(0, 232, 109, 0.32);
+}
+
+
+/* ============================================================
+   62. CABECERA DE LA VITRINA
+============================================================ */
+
+.products-header {
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 14px;
+}
+
+
+.products-header-copy {
+    min-width: 0;
+}
+
+
+.products-header .eyebrow {
+    margin-bottom: 5px;
+}
+
+
+.products-header h2 {
+    margin: 0;
+
+    color: white;
+
+    font-size: 20px;
+    font-weight: 900;
+
+    letter-spacing: -0.4px;
+}
+
+
+.products-header p {
+    max-width: 330px;
+
+    margin: 6px 0 0;
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+    line-height: 1.55;
+}
+
+
+.add-product-button {
+    width: auto;
+
+    min-width: 116px;
+
+    flex-shrink: 0;
+
+    padding-left: 14px;
+    padding-right: 14px;
+}
+
+
+/* ============================================================
+   63. RESUMEN DE CATÁLOGO
+============================================================ */
+
+.product-summary {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 7px;
+
+    margin-bottom: 14px;
+}
+
+
+.product-summary-card {
+    min-width: 0;
+
+    padding: 12px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #101411,
+            #0b0e0c
+        );
+}
+
+
+.product-summary-card span,
+.product-summary-card strong,
+.product-summary-card small {
+    display: block;
+}
+
+
+.product-summary-card span {
+    margin-bottom: 6px;
+
+    color: var(--green);
+
+    font-size: 12px;
+}
+
+
+.product-summary-card strong {
+    overflow: hidden;
+
+    color: white;
+
+    font-size: 17px;
+    font-weight: 950;
+
+    text-overflow: ellipsis;
+}
+
+
+.product-summary-card small {
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    font-size: 6.5px;
+    font-weight: 750;
+}
+
+
+/* ============================================================
+   64. GRID DE PRODUCTOS
+============================================================ */
+
+.products-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+
+    width: 100%;
+}
+
+
+/* ============================================================
+   65. TARJETA DE PRODUCTO
+============================================================ */
+
+.product-card {
+    position: relative;
+
+    min-width: 0;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #101411,
+            #0a0d0b
+        );
+
+    box-shadow:
+        0 13px 35px rgba(0, 0, 0, 0.20);
+
+    transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+
+.product-card:hover {
+    transform:
+        translateY(-2px);
+
+    border-color:
+        rgba(0, 232, 109, 0.20);
+
+    box-shadow:
+        0 17px 42px rgba(0, 0, 0, 0.26);
+}
+
+
+/* ============================================================
+   66. IMAGEN PRINCIPAL DEL PRODUCTO
+============================================================ */
+
+.product-card-image {
+    position: relative;
+
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            #252d29,
+            #111512 58%,
+            #080a09
+        );
+}
+
+
+.product-card-image img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+        transform 0.3s ease;
+}
+
+
+.product-card:hover
+.product-card-image img {
+    transform: scale(1.025);
+}
+
+
+/* ============================================================
+   67. PRODUCTO SIN IMAGEN
+============================================================ */
+
+.product-image-placeholder {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 20px;
+
+    color: #68716c;
+
+    text-align: center;
+}
+
+
+.product-image-placeholder span {
+    font-size: 25px;
+}
+
+
+.product-image-placeholder strong {
+    color: #8c9690;
+
+    font-size: 9px;
+    font-weight: 850;
+}
+
+
+.product-image-placeholder small {
+    color: #515954;
+
+    font-size: 7px;
+}
+
+
+/* ============================================================
+   68. ETIQUETA DE PORTADA
+============================================================ */
+
+.product-cover-badge {
+    position: absolute;
+
+    z-index: 4;
+
+    top: 8px;
+    left: 8px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    padding: 5px 7px;
+
+    border: 1px solid
+        rgba(0, 232, 109, 0.20);
+
+    border-radius: 100px;
+
+    background:
+        rgba(5, 10, 7, 0.86);
+
+    color: var(--green);
+
+    font-size: 6px;
+    font-weight: 900;
+
+    letter-spacing: 0.4px;
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+
+/* ============================================================
+   69. ESTADO DEL PRODUCTO
+============================================================ */
+
+.product-status {
+    position: absolute;
+
+    z-index: 4;
+
+    top: 8px;
+    right: 8px;
+
+    padding: 5px 7px;
+
+    border: 1px solid
+        rgba(255, 255, 255, 0.10);
+
+    border-radius: 100px;
+
+    background:
+        rgba(5, 7, 6, 0.82);
+
+    color: #a3aca7;
+
+    font-size: 6px;
+    font-weight: 900;
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+
+.product-status.published {
+    border-color:
+        rgba(0, 232, 109, 0.24);
+
+    background:
+        rgba(0, 30, 14, 0.82);
+
+    color: var(--green);
+}
+
+
+/* ============================================================
+   70. CUERPO DE PRODUCTO
+============================================================ */
+
+.product-card-body {
+    padding: 12px;
+}
+
+
+.product-card-category {
+    display: block;
+
+    margin-bottom: 4px;
+
+    overflow: hidden;
+
+    color: #65706a;
+
+    font-size: 6.5px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+
+.product-card-title {
+    margin: 0;
+
+    overflow: hidden;
+
+    color: white;
+
+    font-size: 13px;
+    font-weight: 900;
+
+    line-height: 1.3;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.product-card-price {
+    display: block;
+
+    margin-top: 6px;
+
+    color: var(--green);
+
+    font-size: 13px;
+    font-weight: 950;
+}
+
+
+.product-card-description {
+    display: -webkit-box;
+
+    min-height: 29px;
+
+    margin: 7px 0 0;
+
+    overflow: hidden;
+
+    color: #747d78;
+
+    font-size: 8px;
+
+    line-height: 1.45;
+
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+
+/* ============================================================
+   71. SEÑALES DEL PRODUCTO
+============================================================ */
+
+.product-signals {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 3px;
+
+    margin-top: 10px;
+}
+
+
+.product-signal {
+    min-width: 0;
+
+    padding: 6px 2px;
+
+    border: 1px solid
+        rgba(255, 255, 255, 0.055);
+
+    border-radius: 8px;
+
+    background:
+        rgba(255, 255, 255, 0.022);
+
+    text-align: center;
+}
+
+
+.product-signal span,
+.product-signal strong {
+    display: block;
+}
+
+
+.product-signal span {
+    margin-bottom: 2px;
+
+    font-size: 9px;
+}
+
+
+.product-signal strong {
+    overflow: hidden;
+
+    color: #bec5c1;
+
+    font-size: 7px;
+    font-weight: 900;
+
+    text-overflow: ellipsis;
+}
+
+
+/* ============================================================
+   72. ACCIONES DE PRODUCTO
+============================================================ */
+
+.product-card-actions {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 5px;
+
+    margin-top: 10px;
+}
+
+
+.product-card-actions button {
+    min-width: 0;
+
+    padding: 8px 5px;
+
+    border-radius: 9px;
+
+    font-size: 7px;
+    font-weight: 900;
+}
+
+
+.product-publish-button {
+    border: 0;
+
+    background: var(--green);
+
+    color: #00210f;
+}
+
+
+.product-edit-button {
+    border: 1px solid var(--border);
+
+    background: var(--surface-3);
+
+    color: #c6cdc9;
+}
+
+
+.product-publish-button:hover,
+.product-edit-button:hover {
+    transform:
+        translateY(-1px);
+}
+
+
+/* ============================================================
+   73. TARJETA + AGREGAR PRODUCTO
+============================================================ */
+
+.add-product-card {
+    min-height: 270px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 22px;
+
+    border: 1px dashed
+        rgba(0, 232, 109, 0.20);
+
+    border-radius: 18px;
+
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            rgba(0, 232, 109, 0.055),
+            transparent 52%
+        ),
+        rgba(255, 255, 255, 0.012);
+
+    color: var(--muted);
+
+    text-align: center;
+
+    transition:
+        border-color 0.18s ease,
+        background 0.18s ease,
+        transform 0.18s ease;
+}
+
+
+.add-product-card:hover {
+    transform:
+        translateY(-2px);
+
+    border-color:
+        rgba(0, 232, 109, 0.42);
+
+    background:
+        rgba(0, 232, 109, 0.035);
+}
+
+
+.add-product-card .plus {
+    width: 43px;
+    height: 43px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid
+        rgba(0, 232, 109, 0.22);
+
+    border-radius: 14px;
+
+    background:
+        rgba(0, 232, 109, 0.08);
+
+    color: var(--green);
+
+    font-size: 25px;
+    font-weight: 300;
+}
+
+
+.add-product-card strong {
+    margin-top: 4px;
+
+    color: white;
+
+    font-size: 11px;
+}
+
+
+.add-product-card small {
+    max-width: 150px;
+
+    color: var(--muted);
+
+    font-size: 7px;
+
+    line-height: 1.5;
+}
+
+
+/* ============================================================
+   74. VISTA DETALLADA DEL PRODUCTO
+============================================================ */
+
+.product-detail {
+    overflow: hidden;
+
+    margin-top: 14px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 21px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #101411,
+            #090c0a
+        );
+
+    box-shadow:
+        0 16px 45px rgba(0, 0, 0, 0.22);
+}
+
+
+.product-detail-main-image {
+    position: relative;
+
+    width: 100%;
+    aspect-ratio: 4 / 3;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            #29312d,
+            #101411 58%,
+            #080a09
+        );
+}
+
+
+.product-detail-main-image img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+/* ============================================================
+   75. MINI GALERÍA
+============================================================ */
+
+.product-gallery {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 5px;
+
+    padding: 8px 10px 0;
+}
+
+
+.product-gallery-thumb {
+    position: relative;
+
+    min-width: 0;
+
+    aspect-ratio: 1 / 1;
+
+    overflow: hidden;
+
+    padding: 0;
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+
+    background: var(--surface-2);
+
+    opacity: 0.58;
+
+    transition:
+        opacity 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.15s ease;
+}
+
+
+.product-gallery-thumb:hover {
+    opacity: 0.85;
+}
+
+
+.product-gallery-thumb.active {
+    border-color: var(--green);
+
+    opacity: 1;
+}
+
+
+.product-gallery-thumb:active {
+    transform: scale(0.96);
+}
+
+
+.product-gallery-thumb img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+/* ============================================================
+   76. INFORMACIÓN DETALLADA
+============================================================ */
+
+.product-detail-body {
+    padding: 16px;
+}
+
+
+.product-detail-top {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 14px;
+}
+
+
+.product-detail-copy {
+    min-width: 0;
+}
+
+
+.product-detail-category {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: var(--green);
+
+    font-size: 7px;
+    font-weight: 900;
+
+    letter-spacing: 1.2px;
+
+    text-transform: uppercase;
+}
+
+
+.product-detail-title {
+    margin: 0;
+
+    color: white;
+
+    font-size: 21px;
+    font-weight: 950;
+
+    line-height: 1.15;
+
+    letter-spacing: -0.4px;
+}
+
+
+.product-detail-price {
+    flex-shrink: 0;
+
+    color: var(--green);
+
+    font-size: 18px;
+    font-weight: 950;
+}
+
+
+.product-detail-description {
+    margin: 12px 0 0;
+
+    color: #858e89;
+
+    font-size: 9px;
+
+    line-height: 1.65;
+}
+
+
+/* ============================================================
+   77. MÉTRICAS DEL PRODUCTO DETALLADO
+============================================================ */
+
+.product-detail-metrics {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 5px;
+
+    margin-top: 14px;
+}
+
+
+.product-detail-metric {
+    min-width: 0;
+
+    padding: 9px 4px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    background:
+        rgba(255, 255, 255, 0.022);
+
+    text-align: center;
+}
+
+
+.product-detail-metric span,
+.product-detail-metric strong,
+.product-detail-metric small {
+    display: block;
+}
+
+
+.product-detail-metric span {
+    margin-bottom: 3px;
+
+    font-size: 12px;
+}
+
+
+.product-detail-metric strong {
+    overflow: hidden;
+
+    color: white;
+
+    font-size: 11px;
+    font-weight: 950;
+
+    text-overflow: ellipsis;
+}
+
+
+.product-detail-metric small {
+    margin-top: 2px;
+
+    color: var(--muted);
+
+    font-size: 5.5px;
+}
+
+
+/* ============================================================
+   78. POTENCIAL COMERCIAL
+============================================================ */
+
+.product-potential {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-top: 12px;
+
+    padding: 11px 12px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 11px;
+
+    background:
+        rgba(255, 255, 255, 0.018);
+}
+
+
+.product-potential > div {
+    min-width: 0;
+}
+
+
+.product-potential span {
+    display: block;
+
+    color: var(--muted);
+
+    font-size: 7px;
+}
+
+
+.product-potential strong {
+    display: block;
+
+    margin-top: 3px;
+
+    color: white;
+
+    font-size: 10px;
+}
+
+
+.product-potential-badge {
+    flex-shrink: 0;
+
+    padding: 6px 9px;
+
+    border: 1px solid
+        rgba(0, 232, 109, 0.22);
+
+    border-radius: 100px;
+
+    background:
+        rgba(0, 232, 109, 0.08);
+
+    color: var(--green);
+
+    font-size: 7px;
+    font-weight: 950;
+}
+
+
+.product-potential-badge.medium {
+    border-color:
+        rgba(255, 200, 87, 0.24);
+
+    background:
+        rgba(255, 200, 87, 0.07);
+
+    color: var(--warning);
+}
+
+
+.product-potential-badge.low {
+    border-color:
+        rgba(255, 255, 255, 0.10);
+
+    background:
+        rgba(255, 255, 255, 0.035);
+
+    color: #89918d;
+}
+
+
+/* ============================================================
+   79. ACCIONES DE DETALLE
+============================================================ */
+
+.product-detail-actions {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 7px;
+
+    margin-top: 14px;
+}
+
+
+/* ============================================================
+   80. PRODUCTOS VACÍOS
+============================================================ */
+
+.products-empty {
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 38px 22px;
+
+    border: 1px dashed
+        rgba(255, 255, 255, 0.11);
+
+    border-radius: 20px;
+
+    background:
+        radial-gradient(
+            circle at 50% 0,
+            rgba(0, 232, 109, 0.065),
+            transparent 47%
+        ),
+        rgba(255, 255, 255, 0.012);
+
+    text-align: center;
+}
+
+
+.products-empty-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 13px;
+
+    border: 1px solid
+        rgba(0, 232, 109, 0.18);
+
+    border-radius: 17px;
+
+    background:
+        rgba(0, 232, 109, 0.07);
+
+    color: var(--green);
+
+    font-size: 24px;
+}
+
+
+.products-empty h2 {
+    margin: 0;
+
+    color: white;
+
+    font-size: 17px;
+}
+
+
+.products-empty p {
+    max-width: 310px;
+
+    margin: 7px auto 0;
+
+    color: var(--muted);
+
+    font-size: 9px;
+
+    line-height: 1.6;
+}
+
+
+.products-empty .primary-button {
+    width: auto;
+
+    min-width: 160px;
+
+    margin-top: 16px;
+
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+
+/* ============================================================
+   81. ESTADÍSTICAS DE PRODUCTOS
+============================================================ */
+
+.product-statistics {
+    margin-top: 14px;
+}
+
+
+.product-statistics-header {
+    margin-bottom: 12px;
+}
+
+
+.product-statistics-header h2 {
+    margin: 0;
+
+    color: white;
+
+    font-size: 18px;
+}
+
+
+.product-statistics-header p {
+    margin: 5px 0 0;
+
+    color: var(--muted);
+
+    font-size: 8px;
+
+    line-height: 1.5;
+}
+
+
+.product-performance-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+.product-performance-item {
+    display: grid;
+
+    grid-template-columns:
+        42px
+        minmax(0, 1fr)
+        auto;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 10px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 13px;
+
+    background: var(--surface);
+}
+
+
+.product-performance-image {
+    width: 42px;
+    height: 42px;
+
+    overflow: hidden;
+
+    border-radius: 10px;
+
+    background: var(--surface-3);
+}
+
+
+.product-performance-image img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+.product-performance-copy {
+    min-width: 0;
+}
+
+
+.product-performance-copy strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: white;
+
+    font-size: 9px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.product-performance-copy small {
+    display: block;
+
+    margin-top: 3px;
+
+    overflow: hidden;
+
+    color: var(--muted);
+
+    font-size: 6.5px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.product-performance-score {
+    flex-shrink: 0;
+
+    color: var(--green);
+
+    font-size: 11px;
+    font-weight: 950;
+}
+
+
+/* ============================================================
+   82. BARRA DE RENDIMIENTO
+============================================================ */
+
+.product-performance-track {
+    width: 100%;
+    height: 4px;
+
+    margin-top: 6px;
+
+    overflow: hidden;
+
+    border-radius: 100px;
+
+    background: #202622;
+}
+
+
+.product-performance-fill {
+    width: 0%;
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+        linear-gradient(
+            90deg,
+            #00b956,
+            var(--green)
+        );
+
+    transition:
+        width 0.35s ease;
+}
+
+
+/* ============================================================
+   83. POST CON IMAGEN REAL DE PRODUCTO
+============================================================ */
+
+.post-visual.has-product-image {
+    min-height: 0;
+
+    padding: 0;
+
+    background: #0b0e0c;
+}
+
+
+.post-visual.has-product-image::before {
+    display: none;
+}
+
+
+.post-visual.has-product-image::after {
+    background:
+        linear-gradient(
+            180deg,
+            transparent 62%,
+            rgba(0, 0, 0, 0.22)
+        );
+}
+
+
+.post-product-image {
+    position: relative;
+
+    z-index: 1;
+
+    width: 100%;
+    aspect-ratio: 4 / 5;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+.post-product-overlay {
+    position: absolute;
+
+    z-index: 3;
+
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 12px;
+}
+
+
+.post-product-overlay > div {
+    min-width: 0;
+}
+
+
+.post-product-overlay small {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color:
+        rgba(255, 255, 255, 0.68);
+
+    font-size: 6px;
+    font-weight: 850;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+
+.post-product-overlay strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: white;
+
+    font-size: 13px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.post-product-overlay .price {
+    flex-shrink: 0;
+
+    padding: 6px 8px;
+
+    border: 1px solid
+        rgba(255, 255, 255, 0.15);
+
+    border-radius: 9px;
+
+    background:
+        rgba(4, 7, 5, 0.74);
+
+    color: var(--green);
+
+    font-size: 10px;
+    font-weight: 950;
+
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+}
+
+
+/* ============================================================
+   FIN PARTE 1/2
+   NO CIERRES NI BORRES NADA.
+   LA PARTE 2 CONTINÚA INMEDIATAMENTE DEBAJO.
+============================================================ */
+/* ============================================================
+   MAHPE — VITRINA EMPRESARIAL v1
+   PARTE 2/2
+
+   EDITOR DE PRODUCTO
+   PREVISUALIZACIÓN DE IMÁGENES
+   SELECTOR DE PORTADA
+   ESTADOS
+   RESPONSIVE
+   INTEGRACIÓN FINAL
+============================================================ */
+
+
+/* ============================================================
+   84. EDITOR DE PRODUCTO
+============================================================ */
+
+.product-editor {
+    position: relative;
+
+    padding-top: 18px;
+    padding-bottom: 35px;
+}
+
+
+.product-editor .form-card {
+    margin-top: 0;
+}
+
+
+.product-editor .form-card h2 {
+    margin: 0 0 5px;
+
+    color: white;
+
+    font-size: 22px;
+    font-weight: 950;
+
+    letter-spacing: -0.5px;
+}
+
+
+.product-editor .form-card > .eyebrow {
+    margin-bottom: 6px;
+}
+
+
+/* ============================================================
+   85. INPUT DE IMÁGENES
+============================================================ */
+
+#productImagesInput {
+    position: relative;
+
+    min-height: 48px;
+
+    padding: 9px;
+
+    border: 1px dashed
+        rgba(0, 232, 109, 0.25);
+
+    background:
+        rgba(0, 232, 109, 0.025);
+
+    color: #9ba49f;
+
+    cursor: pointer;
+}
+
+
+#productImagesInput:hover {
+    border-color:
+        rgba(0, 232, 109, 0.45);
+
+    background:
+        rgba(0, 232, 109, 0.045);
+}
+
+
+#productImagesInput:focus {
+    border-color: var(--green);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(0, 232, 109, 0.07);
+}
+
+
+#productImagesInput::file-selector-button {
+    margin-right: 10px;
+
+    padding: 8px 10px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background:
+        rgba(0, 232, 109, 0.11);
+
+    color: var(--green);
+
+    font-size: 8px;
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+
+#productImagesInput::-webkit-file-upload-button {
+    margin-right: 10px;
+
+    padding: 8px 10px;
+
+    border: 0;
+
+    border-radius: 8px;
+
+    background:
+        rgba(0, 232, 109, 0.11);
+
+    color: var(--green);
+
+    font-size: 8px;
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   86. AYUDA DE IMÁGENES
+============================================================ */
+
+.product-image-help {
+    display: block;
+
+    margin-top: 7px;
+
+    color: #626b66;
+
+    font-size: 7px;
+
+    line-height: 1.55;
+}
+
+
+/* ============================================================
+   87. PREVISUALIZACIÓN DE IMÁGENES
+============================================================ */
+
+.product-image-preview {
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 6px;
+
+    margin-top: 11px;
+}
+
+
+.product-image-preview:empty {
+    display: none;
+}
+
+
+/* ============================================================
+   88. IMAGEN INDIVIDUAL DEL EDITOR
+============================================================ */
+
+.product-preview-item {
+    position: relative;
+
+    min-width: 0;
+
+    aspect-ratio: 1 / 1;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+
+    border-radius: 11px;
+
+    background: var(--surface-2);
+
+    transition:
+        border-color 0.16s ease,
+        transform 0.16s ease,
+        box-shadow 0.16s ease;
+}
+
+
+.product-preview-item:hover {
+    transform:
+        translateY(-1px);
+
+    border-color:
+        rgba(255, 255, 255, 0.15);
+}
+
+
+.product-preview-item.cover {
+    border-color: var(--green);
+
+    box-shadow:
+        0 0 0 2px
+        rgba(0, 232, 109, 0.07);
+}
+
+
+.product-preview-item img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+/* ============================================================
+   89. OVERLAY DE IMAGEN
+============================================================ */
+
+.product-preview-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    padding: 5px;
+
+    opacity: 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            transparent 30%,
+            rgba(0, 0, 0, 0.88)
+        );
+
+    transition:
+        opacity 0.16s ease;
+}
+
+
+.product-preview-item:hover
+.product-preview-overlay {
+    opacity: 1;
+}
+
+
+.product-preview-item.cover
+.product-preview-overlay {
+    opacity: 1;
+
+    background:
+        linear-gradient(
+            180deg,
+            transparent 50%,
+            rgba(0, 0, 0, 0.82)
+        );
+}
+
+
+/* ============================================================
+   90. BOTONES DE IMAGEN
+============================================================ */
+
+.product-preview-actions {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 3px;
+}
+
+
+.product-preview-button {
+    min-width: 0;
+
+    flex: 1;
+
+    padding: 5px 2px;
+
+    border: 1px solid
+        rgba(255, 255, 255, 0.13);
+
+    border-radius: 6px;
+
+    background:
+        rgba(8, 11, 9, 0.86);
+
+    color: #c3cbc6;
+
+    font-size: 5.5px;
+    font-weight: 900;
+
+    cursor: pointer;
+}
+
+
+.product-preview-button:hover {
+    border-color:
+        rgba(0, 232, 109, 0.30);
+
+    color: var(--green);
+}
+
+
+.product-preview-button.delete:hover {
+    border-color:
+        rgba(255, 79, 101, 0.30);
+
+    color: var(--danger);
+}
+
+
+/* ============================================================
+   91. INDICADOR PORTADA
+============================================================ */
+
+.product-preview-cover {
+    position: absolute;
+
+    z-index: 5;
+
+    top: 5px;
+    left: 5px;
+
+    padding: 4px 5px;
+
+    border: 1px solid
+        rgba(0, 232, 109, 0.28);
+
+    border-radius: 100px;
+
+    background:
+        rgba(4, 10, 6, 0.84);
+
+    color: var(--green);
+
+    font-size: 5px;
+    font-weight: 950;
+
+    letter-spacing: 0.3px;
+
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+}
+
+
+/* ============================================================
+   92. CONTADOR DE IMÁGENES
+============================================================ */
+
+.product-image-counter {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-top: 7px;
+
+    color: #626b66;
+
+    font-size: 7px;
+}
+
+
+.product-image-counter strong {
+    color: #8d9691;
+
+    font-size: 7px;
+}
+
+
+.product-image-counter.limit strong {
+    color: var(--warning);
+}
+
+
+/* ============================================================
+   93. ACCIONES DEL EDITOR
+============================================================ */
+
+.product-editor-actions {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1.4fr;
+
+    gap: 7px;
+
+    margin-top: 19px;
+}
+
+
+.product-editor-actions
+.primary-button,
+.product-editor-actions
+.secondary-button {
+    margin: 0;
+}
+
+
+/* ============================================================
+   94. ESTADO DEL EDITOR
+============================================================ */
+
+#productEditorStatus {
+    min-height: 14px;
+}
+
+
+#productEditorStatus.error {
+    color: var(--danger);
+}
+
+
+#productEditorStatus.warning {
+    color: var(--warning);
+}
+
+
+#productEditorStatus.success {
+    color: var(--green);
+}
+
+
+/* ============================================================
+   95. BOTÓN ELIMINAR PRODUCTO
+============================================================ */
+
+.product-delete-button {
+    width: 100%;
+
+    margin-top: 7px;
+
+    padding: 8px;
+
+    border: 1px solid
+        rgba(255, 79, 101, 0.15);
+
+    border-radius: 9px;
+
+    background:
+        rgba(255, 79, 101, 0.035);
+
+    color: #c97782;
+
+    font-size: 7px;
+    font-weight: 900;
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+
+.product-delete-button:hover {
+    border-color:
+        rgba(255, 79, 101, 0.35);
+
+    background:
+        rgba(255, 79, 101, 0.07);
+
+    color: var(--danger);
+}
+
+
+/* ============================================================
+   96. ESTADO PUBLICADO
+============================================================ */
+
+.product-published-notice {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 10px;
+
+    padding: 9px 10px;
+
+    border: 1px solid
+        rgba(0, 232, 109, 0.14);
+
+    border-radius: 10px;
+
+    background:
+        rgba(0, 232, 109, 0.04);
+
+    color: #7ea38d;
+
+    font-size: 7px;
+
+    line-height: 1.5;
+}
+
+
+.product-published-notice span {
+    flex-shrink: 0;
+
+    color: var(--green);
+
+    font-size: 11px;
+}
+
+
+/* ============================================================
+   97. INDICADOR DE PRODUCTO DESTACADO
+============================================================ */
+
+.product-featured {
+    position: absolute;
+
+    z-index: 5;
+
+    left: 8px;
+    bottom: 8px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    padding: 5px 7px;
+
+    border: 1px solid
+        rgba(255, 200, 87, 0.20);
+
+    border-radius: 100px;
+
+    background:
+        rgba(20, 16, 5, 0.80);
+
+    color: var(--warning);
+
+    font-size: 5.5px;
+    font-weight: 900;
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+
+/* ============================================================
+   98. PANEL DE ESTADÍSTICAS EMPRESARIALES
+============================================================ */
+
+.company-statistics-panel {
+    margin-top: 14px;
+}
+
+
+.company-statistics-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+}
+
+
+.company-statistic-card {
+    min-width: 0;
+
+    padding: 14px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #101411,
+            #0b0e0c
+        );
+}
+
+
+.company-statistic-card span,
+.company-statistic-card strong,
+.company-statistic-card small {
+    display: block;
+}
+
+
+.company-statistic-card span {
+    margin-bottom: 7px;
+
+    color: var(--green);
+
+    font-size: 14px;
+}
+
+
+.company-statistic-card strong {
+    overflow: hidden;
+
+    color: white;
+
+    font-size: 20px;
+    font-weight: 950;
+
+    text-overflow: ellipsis;
+}
+
+
+.company-statistic-card small {
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    font-size: 7px;
+}
+
+
+/* ============================================================
+   99. CRECIMIENTO
+============================================================ */
+
+.company-growth-card {
+    margin-top: 9px;
+
+    padding: 15px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 15px;
+
+    background: var(--surface);
+}
+
+
+.company-growth-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+
+.company-growth-header strong {
+    color: white;
+
+    font-size: 10px;
+}
+
+
+.company-growth-header span {
+    color: var(--green);
+
+    font-size: 9px;
+    font-weight: 900;
+}
+
+
+.company-growth-track {
+    position: relative;
+
+    width: 100%;
+    height: 7px;
+
+    margin-top: 12px;
+
+    overflow: hidden;
+
+    border-radius: 100px;
+
+    background: #202622;
+}
+
+
+.company-growth-fill {
+    width: 0%;
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+        linear-gradient(
+            90deg,
+            #00a84f,
+            var(--green)
+        );
+
+    box-shadow:
+        0 0 12px
+        rgba(0, 232, 109, 0.18);
+
+    transition:
+        width 0.35s ease;
+}
+
+
+/* ============================================================
+   100. PRODUCTO MÁS FUERTE
+============================================================ */
+
+.best-product-card {
+    display: grid;
+
+    grid-template-columns:
+        56px
+        minmax(0, 1fr);
+
+    align-items: center;
+
+    gap: 11px;
+
+    margin-top: 9px;
+
+    padding: 10px;
+
+    border: 1px solid
+        rgba(0, 232, 109, 0.13);
+
+    border-radius: 14px;
+
+    background:
+        radial-gradient(
+            circle at 0 50%,
+            rgba(0, 232, 109, 0.07),
+            transparent 45%
+        ),
+        var(--surface);
+}
+
+
+.best-product-image {
+    width: 56px;
+    height: 56px;
+
+    overflow: hidden;
+
+    border-radius: 11px;
+
+    background: var(--surface-3);
+}
+
+
+.best-product-image img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+.best-product-copy {
+    min-width: 0;
+}
+
+
+.best-product-copy small {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: var(--green);
+
+    font-size: 6px;
+    font-weight: 900;
+
+    letter-spacing: 1px;
+}
+
+
+.best-product-copy strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: white;
+
+    font-size: 11px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.best-product-copy span {
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--muted);
+
+    font-size: 7px;
+}
+
+
+/* ============================================================
+   101. FILTROS / ORDEN DE PRODUCTOS
+============================================================ */
+
+.products-toolbar {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+
+    margin-bottom: 10px;
+}
+
+
+.products-filter {
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+}
+
+
+.products-filter::-webkit-scrollbar {
+    display: none;
+}
+
+
+.product-filter-button {
+    flex-shrink: 0;
+
+    padding: 6px 9px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 100px;
+
+    background:
+        rgba(255, 255, 255, 0.02);
+
+    color: #7c8580;
+
+    font-size: 6.5px;
+    font-weight: 850;
+}
+
+
+.product-filter-button.active {
+    border-color:
+        rgba(0, 232, 109, 0.22);
+
+    background:
+        rgba(0, 232, 109, 0.07);
+
+    color: var(--green);
+}
+
+
+/* ============================================================
+   102. FEED — IMAGEN DE PRODUCTO
+============================================================ */
+
+.post-product-image-wrapper {
+    position: relative;
+
+    width: 100%;
+
+    overflow: hidden;
+
+    background: #090c0a;
+}
+
+
+.post-product-image-wrapper img {
+    width: 100%;
+    max-height: 520px;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+/* ============================================================
+   103. PRECIO EN PUBLICACIÓN
+============================================================ */
+
+.post-product-price {
+    display: inline-flex;
+
+    align-items: center;
+
+    margin-top: 8px;
+
+    padding: 5px 8px;
+
+    border: 1px solid
+        rgba(0, 232, 109, 0.16);
+
+    border-radius: 8px;
+
+    background:
+        rgba(0, 232, 109, 0.055);
+
+    color: var(--green);
+
+    font-size: 9px;
+    font-weight: 950;
+}
+
+
+/* ============================================================
+   104. TRANSICIÓN DE PANELES
+============================================================ */
+
+.company-panel {
+    animation:
+        mahpePanelEnter
+        0.22s ease both;
+}
+
+
+@keyframes mahpePanelEnter {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+
+}
+
+
+/* ============================================================
+   105. ESTADO DE CARGA DE IMAGEN
+============================================================ */
+
+.product-image-loading {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        rgba(7, 10, 8, 0.80);
+
+    color: var(--green);
+
+    font-size: 8px;
+    font-weight: 900;
+}
+
+
+.product-image-loading::before {
+    content: "";
+
+    width: 15px;
+    height: 15px;
+
+    margin-right: 7px;
+
+    border: 2px solid
+        rgba(0, 232, 109, 0.16);
+
+    border-top-color:
+        var(--green);
+
+    border-radius: 50%;
+
+    animation:
+        mahpeSpin
+        0.7s linear infinite;
+}
+
+
+@keyframes mahpeSpin {
+
+    to {
+        transform:
+            rotate(360deg);
+    }
+
+}
+
+
+/* ============================================================
+   106. IMAGEN FALLIDA
+============================================================ */
+
+.product-image-error {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    padding: 15px;
+
+    background: var(--surface-2);
+
+    color: var(--muted);
+
+    text-align: center;
+}
+
+
+.product-image-error span {
+    font-size: 18px;
+}
+
+
+.product-image-error small {
+    font-size: 6px;
+}
+
+
+/* ============================================================
+   107. DESKTOP — VITRINA
+============================================================ */
+
+@media (min-width: 850px) {
+
+    .company-products-workspace {
+        padding-top: 20px;
+    }
+
+
+    .products-grid {
+        gap: 12px;
+    }
+
+
+    .product-card {
+        border-radius: 20px;
+    }
+
+
+    .product-card-body {
+        padding: 14px;
+    }
+
+
+    .product-card-title {
+        font-size: 14px;
+    }
+
+
+    .product-card-price {
+        font-size: 14px;
+    }
+
+
+    .product-detail {
+        border-radius: 23px;
+    }
+
+
+    .product-editor .form-card {
+        padding: 22px;
+    }
+
+}
+
+
+/* ============================================================
+   108. TABLET
+============================================================ */
+
+@media (
+    min-width: 601px
+)
+and (
+    max-width: 849px
+) {
+
+    .products-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .product-image-preview {
+        grid-template-columns:
+            repeat(5, minmax(0, 1fr));
+    }
+
+}
+
+
+/* ============================================================
+   109. MÓVIL
+============================================================ */
+
+@media (max-width: 600px) {
+
+    .company-products-workspace {
+        padding-top: 13px;
+        padding-bottom: 25px;
+    }
+
+
+    /* -----------------------------------------
+       TABS
+    ----------------------------------------- */
+
+    .company-tabs {
+        margin-top: 11px;
+        margin-bottom: 13px;
+
+        padding: 3px;
+
+        border-radius: 12px;
+    }
+
+
+    .company-tab {
+        min-height: 35px;
+
+        padding: 7px 3px;
+
+        font-size: 7px;
+    }
+
+
+    /* -----------------------------------------
+       CABECERA PRODUCTOS
+    ----------------------------------------- */
+
+    .products-header {
+        align-items: center;
+
+        gap: 9px;
+    }
+
+
+    .products-header h2 {
+        font-size: 18px;
+    }
+
+
+    .products-header p {
+        font-size: 8px;
+    }
+
+
+    .add-product-button {
+        min-width: 98px;
+
+        padding:
+            9px 10px;
+
+        font-size: 7px;
+    }
+
+
+    /* -----------------------------------------
+       RESUMEN
+    ----------------------------------------- */
+
+    .product-summary {
+        gap: 5px;
+    }
+
+
+    .product-summary-card {
+        padding: 10px 7px;
+
+        text-align: center;
+    }
+
+
+    .product-summary-card strong {
+        font-size: 15px;
+    }
+
+
+    .product-summary-card small {
+        font-size: 5.5px;
+    }
+
+
+    /* -----------------------------------------
+       PRODUCTOS
+    ----------------------------------------- */
+
+    .products-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 7px;
+    }
+
+
+    .product-card {
+        border-radius: 15px;
+    }
+
+
+    .product-card-body {
+        padding: 9px;
+    }
+
+
+    .product-card-category {
+        font-size: 5.5px;
+    }
+
+
+    .product-card-title {
+        font-size: 11px;
+    }
+
+
+    .product-card-price {
+        margin-top: 4px;
+
+        font-size: 11px;
+    }
+
+
+    .product-card-description {
+        min-height: 25px;
+
+        margin-top: 5px;
+
+        font-size: 7px;
+    }
+
+
+    /* -----------------------------------------
+       SEÑALES
+    ----------------------------------------- */
+
+    .product-signals {
+        gap: 2px;
+
+        margin-top: 7px;
+    }
+
+
+    .product-signal {
+        padding: 5px 1px;
+    }
+
+
+    .product-signal span {
+        font-size: 8px;
+    }
+
+
+    .product-signal strong {
+        font-size: 6px;
+    }
+
+
+    /* -----------------------------------------
+       ACCIONES
+    ----------------------------------------- */
+
+    .product-card-actions {
+        grid-template-columns: 1fr;
+
+        gap: 4px;
+
+        margin-top: 7px;
+    }
+
+
+    .product-card-actions button {
+        padding: 7px 4px;
+
+        font-size: 6px;
+    }
+
+
+    /* -----------------------------------------
+       AGREGAR
+    ----------------------------------------- */
+
+    .add-product-card {
+        min-height: 230px;
+
+        padding: 15px;
+
+        border-radius: 15px;
+    }
+
+
+    .add-product-card .plus {
+        width: 38px;
+        height: 38px;
+
+        border-radius: 12px;
+
+        font-size: 21px;
+    }
+
+
+    /* -----------------------------------------
+       DETALLE
+    ----------------------------------------- */
+
+    .product-detail {
+        border-radius: 17px;
+    }
+
+
+    .product-detail-body {
+        padding: 13px;
+    }
+
+
+    .product-detail-title {
+        font-size: 18px;
+    }
+
+
+    .product-detail-price {
+        font-size: 15px;
+    }
+
+
+    .product-detail-description {
+        font-size: 8px;
+    }
+
+
+    .product-detail-metrics {
+        gap: 3px;
+    }
+
+
+    .product-detail-metric {
+        padding:
+            8px 2px;
+    }
+
+
+    .product-detail-metric span {
+        font-size: 10px;
+    }
+
+
+    .product-detail-metric strong {
+        font-size: 9px;
+    }
+
+
+    .product-detail-metric small {
+        display: none;
+    }
+
+
+    /* -----------------------------------------
+       GALERÍA
+    ----------------------------------------- */
+
+    .product-gallery {
+        gap: 4px;
+
+        padding:
+            6px 8px 0;
+    }
+
+
+    .product-gallery-thumb {
+        border-radius: 7px;
+    }
+
+
+    /* -----------------------------------------
+       EDITOR
+    ----------------------------------------- */
+
+    .product-editor {
+        padding-top: 13px;
+        padding-bottom: 25px;
+    }
+
+
+    .product-editor .form-card {
+        padding: 16px;
+    }
+
+
+    .product-editor .form-card h2 {
+        font-size: 19px;
+    }
+
+
+    /* -----------------------------------------
+       PREVIEW DE IMÁGENES
+    ----------------------------------------- */
+
+    .product-image-preview {
+        grid-template-columns:
+            repeat(5, minmax(0, 1fr));
+
+        gap: 4px;
+    }
+
+
+    .product-preview-item {
+        border-radius: 8px;
+    }
+
+
+    .product-preview-overlay {
+        padding: 3px;
+    }
+
+
+    .product-preview-button {
+        padding: 4px 1px;
+
+        font-size: 4.8px;
+    }
+
+
+    .product-preview-cover {
+        top: 3px;
+        left: 3px;
+
+        padding: 3px 4px;
+
+        font-size: 4.5px;
+    }
+
+
+    /* -----------------------------------------
+       ACCIONES EDITOR
+    ----------------------------------------- */
+
+    .product-editor-actions {
+        grid-template-columns:
+            0.8fr 1.2fr;
+
+        gap: 5px;
+
+        margin-top: 16px;
+    }
+
+
+    /* -----------------------------------------
+       ESTADÍSTICAS
+    ----------------------------------------- */
+
+    .company-statistics-grid {
+        gap: 6px;
+    }
+
+
+    .company-statistic-card {
+        padding: 11px;
+    }
+
+
+    .company-statistic-card strong {
+        font-size: 17px;
+    }
+
+
+    .best-product-card {
+        grid-template-columns:
+            48px
+            minmax(0, 1fr);
+    }
+
+
+    .best-product-image {
+        width: 48px;
+        height: 48px;
+    }
+
+
+    /* -----------------------------------------
+       RENDIMIENTO
+    ----------------------------------------- */
+
+    .product-performance-item {
+        grid-template-columns:
+            37px
+            minmax(0, 1fr)
+            auto;
+
+        gap: 8px;
+
+        padding: 8px;
+    }
+
+
+    .product-performance-image {
+        width: 37px;
+        height: 37px;
+    }
+
+}
+
+
+/* ============================================================
+   110. MÓVILES PEQUEÑOS
+============================================================ */
+
+@media (max-width: 390px) {
+
+    .products-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .add-product-button {
+        width: 100%;
+    }
+
+
+    .product-summary {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+
+    .product-summary-card {
+        padding: 8px 4px;
+    }
+
+
+    .product-summary-card span {
+        font-size: 10px;
+    }
+
+
+    .product-summary-card strong {
+        font-size: 13px;
+    }
+
+
+    .products-grid {
+        gap: 6px;
+    }
+
+
+    .product-card-body {
+        padding: 8px;
+    }
+
+
+    .product-card-description {
+        display: none;
+    }
+
+
+    .product-signals {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .product-card-actions {
+        margin-top: 6px;
+    }
+
+
+    .product-image-preview {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+
+    .product-gallery {
+        grid-template-columns:
+            repeat(5, minmax(0, 1fr));
+    }
+
+
+    .product-detail-top {
+        flex-direction: column;
+
+        gap: 7px;
+    }
+
+
+    .product-detail-price {
+        font-size: 14px;
+    }
+
+
+    .product-detail-metrics {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .product-editor-actions {
+        grid-template-columns: 1fr;
+    }
+
+
+    .company-statistics-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* ============================================================
+   111. ACCESIBILIDAD / REDUCIR MOVIMIENTO
+============================================================ */
+
+@media (
+    prefers-reduced-motion:
+    reduce
+) {
+
+    .product-card,
+    .product-card-image img,
+    .product-preview-item,
+    .company-panel,
+    .product-performance-fill,
+    .company-growth-fill {
+        animation: none !important;
+
+        transition: none !important;
+    }
+
+}
+
+
+/* ============================================================
+   112. AJUSTES DE FOCO
+============================================================ */
+
+.company-tab:focus-visible,
+.product-gallery-thumb:focus-visible,
+.product-filter-button:focus-visible,
+.product-preview-button:focus-visible,
+.product-delete-button:focus-visible,
+.add-product-card:focus-visible {
+    outline: 2px solid
+        rgba(0, 232, 109, 0.65);
+
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
+   113. COMPATIBILIDAD DE IMÁGENES
+============================================================ */
+
+.product-card img,
+.product-detail img,
+.product-image-preview img,
+.post-product-image,
+.post-product-image-wrapper img {
+    user-select: none;
+
+    -webkit-user-drag: none;
+}
+
+
+/* ============================================================
+   114. OCULTAR ELEMENTOS DE PRODUCTOS CUANDO CORRESPONDA
+============================================================ */
+
+.company-products-workspace.hidden,
+.product-editor.hidden {
+    display: none !important;
+}
+
+
+/* ============================================================
+   115. CORRECCIÓN DE DESBORDAMIENTO
+============================================================ */
+
+.company-products-workspace *,
+.product-editor * {
+    max-width: 100%;
+}
+
+
+.product-card,
+.product-detail,
+.product-performance-item,
+.best-product-card {
+    min-width: 0;
+}
+
+
+/* ============================================================
+   116. SCROLL SUAVE DE GALERÍA / FILTROS
+============================================================ */
+
+.product-gallery,
+.products-filter {
+    scroll-behavior: smooth;
+}
+
+
+/* ============================================================
+   117. INTEGRACIÓN VISUAL FINAL CON MAHPE
+============================================================ */
+
+#companyView {
+    overflow-x: hidden;
+}
+
+
+#companyDashboard,
+#companyProductsWorkspace,
+#productEditor {
+    animation:
+        mahpeCompanyViewEnter
+        0.20s ease both;
+}
+
+
+@keyframes mahpeCompanyViewEnter {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+}
+
+
+/* ============================================================
+   FIN — MAHPE VITRINA EMPRESARIAL v1
+   PARTE 2/2
+
+   CSS COMPLETO.
+
+   SIGUIENTE:
+   SCRIPT.JS
+
+   - products[]
+   - máximo 5 imágenes
+   - portada
+   - crear / editar / eliminar
+   - publicar producto en MAHPE
+   - métricas 👁 ♡ 🔥 💰 por producto
+   - Resumen / Productos / Estadísticas
+   - persistencia local
+   - corregir feed duplicado
+============================================================ */
