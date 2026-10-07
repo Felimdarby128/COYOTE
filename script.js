@@ -9941,36 +9941,82 @@ function requestCoyoteLocation(options = {}) {
 }
 
 
+
 /* =========================================================
    134. RADIO DE BÚSQUEDA
+   COYOTE — MAHPE v2.0
 ========================================================= */
 
 function drawSearchRadius() {
 
-    if (!map) return;
+    if (!map || typeof L === "undefined") {
+        return;
+    }
 
+    // Eliminar el círculo anterior
     if (searchCircle) {
-
         map.removeLayer(searchCircle);
         searchCircle = null;
     }
 
-    if (!userLocation) return;
+    let center = null;
 
-    searchCircle = L.circle(
-        [
-            userLocation.lat,
-            userLocation.lng
-        ],
-        {
-            radius: selectedRadius * 1000,
-            color: "#348bff",
-            weight: 1,
-            fillColor: "#348bff",
-            fillOpacity: 0.035
+    // 1. Ubicación actual del usuario
+    if (
+        userLocation &&
+        Number.isFinite(Number(userLocation.lat)) &&
+        Number.isFinite(Number(userLocation.lng))
+    ) {
+        center = [
+            Number(userLocation.lat),
+            Number(userLocation.lng)
+        ];
+    }
+
+    // 2. Alternativa: Punto Verde activo
+    if (!center) {
+
+        const seller = getSavedSellerPoint();
+
+        if (
+            seller &&
+            seller.active &&
+            isValidCoyotePoint(seller)
+        ) {
+            center = [
+                Number(seller.lat),
+                Number(seller.lng)
+            ];
         }
-    ).addTo(map);
+    }
+
+    // No inventar ubicaciones
+    if (!center) {
+        return;
+    }
+
+    // Dibujar círculo azul
+    searchCircle = L.circle(center, {
+
+        radius: selectedRadius * 1000,
+
+        color: "#348bff",
+        weight: 2,
+        opacity: 0.9,
+
+        fillColor: "#348bff",
+        fillOpacity: 0.07,
+
+        interactive: false
+
+    }).addTo(map);
+
 }
+
+
+/* =========================================================
+   ACTUALIZAR REFERENCIA DE DISTANCIA
+========================================================= */
 
 function updateReference() {
 
@@ -9982,6 +10028,11 @@ function updateReference() {
 
     drawSearchRadius();
 }
+
+
+/* =========================================================
+   BOTONES DE DISTANCIA
+========================================================= */
 
 function initializeRadiusButtons() {
 
@@ -10006,8 +10057,10 @@ function initializeRadiusButtons() {
                     return;
                 }
 
+                // Actualizar distancia
                 selectedRadius = radius;
 
+                // Actualizar botón seleccionado
                 document
                     .querySelectorAll("[data-radius]")
                     .forEach(item => {
@@ -10016,12 +10069,19 @@ function initializeRadiusButtons() {
                             "active",
                             item === button
                         );
+
                     });
 
+                // Redibujar círculo azul
                 updateReference();
+
+                // Actualizar búsqueda comercial
                 searchCommercialPoints();
+
             };
+
         });
+
 }
 
 
