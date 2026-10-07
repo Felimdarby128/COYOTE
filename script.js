@@ -1,22 +1,44 @@
 /* =========================================================
-   MAHPE v1.2
-   JUEGO + SIMULADOR EMPRESARIAL
+   MAHPE v2.0
+   Crea. Simula. Haz crecer.
 
-   PARTE 1/4
+   BLOQUE 1/4
+   ---------------------------------------------------------
+   NÚCLEO + INICIO + FEED
 
    - Estado global
-   - Migración
-   - Identidad de marca
-   - Productos
-   - Imágenes
+   - Migraciones
+   - Utilidades
    - Navegación
-   - Actividad
+   - Actividad compacta
    - Feed
+   - Siguiendo
+   - Descubrir
+   - Tendencias
+   - Señales 👁 ♡ 🔥 💰
+   - Mahpes
+   - Productos conectados al feed
+   - Preparación del nuevo Perfil
+   ---------------------------------------------------------
+
+   IMPORTANTE:
+   Este archivo continúa con BLOQUE 2/4.
 ========================================================= */
 
 
 /* =========================================================
-   1. ESTADO MAHPE
+   1. CONFIGURACIÓN GENERAL
+========================================================= */
+
+const MAHPE_STORAGE_KEY = "mahpe_state_v2";
+
+const MAHPE_LEGACY_STORAGE_KEY = "mahpe_state_v1";
+
+const MAHPE_PROFILE_STORAGE_KEY = "mahpe_profile_v1";
+
+
+/* =========================================================
+   2. ESTADO BASE
 ========================================================= */
 
 const DEFAULT_STATE = {
@@ -37,10 +59,33 @@ const DEFAULT_STATE = {
 
     events: [],
 
-    decisionHistory: []
+    decisionHistory: [],
+
+    profile: {
+
+        name: "Emprendedor MAHPE",
+
+        username: "emprendedor",
+
+        bio:
+            "Construyendo ideas y probando empresas dentro de MAHPE.",
+
+        location: "",
+
+        photo: null,
+
+        recommendations: [],
+
+        createdAt: null
+
+    }
 
 };
 
+
+/* =========================================================
+   3. VARIABLES DE INTERFAZ
+========================================================= */
 
 let mahpeState =
     loadMahpeState();
@@ -48,7 +93,9 @@ let mahpeState =
 
 let currentCompanyId =
     mahpeState.companies.length
+
         ? mahpeState.companies[0].id
+
         : null;
 
 
@@ -57,7 +104,7 @@ let currentFeedMode =
 
 
 let currentCompanyTab =
-    "summary";
+    "products";
 
 
 let editingProductId =
@@ -73,7 +120,7 @@ let productEditorCoverIndex =
 
 
 /* =========================================================
-   2. EMPRESA DEMO — SURANO
+   4. EMPRESA DEMO — SURANO
 ========================================================= */
 
 const demoCompany = {
@@ -110,12 +157,36 @@ const demoCompany = {
 
     capital: 1000,
 
+    activity: 65,
+
+    marketResponse: 61,
+
+    locationStrength: 45,
+
+    risk: 22,
+
+    designLevel: 78,
+
+    productValidation: 63,
+
+    marketKnowledge: 51,
+
+    campaignPower: 30,
+
+    decisions: [],
+
     brandImage: null,
+
+    brandImageUpdatedAt: null,
 
     demo: true
 
 };
 
+
+/* =========================================================
+   5. PUBLICACIÓN DEMO
+========================================================= */
 
 const demoPost = {
 
@@ -136,6 +207,8 @@ const demoPost = {
     text:
         "Estamos probando una nueva identidad visual para la primera colección de SURANO.",
 
+    price: 180,
+
     views: 328,
 
     interactions: 84,
@@ -148,29 +221,58 @@ const demoPost = {
 
     image: null,
 
+    createdAt:
+        new Date().toISOString(),
+
     demo: true
 
 };
 
 
 /* =========================================================
-   3. LOCAL STORAGE
+   6. CLONAR OBJETOS
+========================================================= */
+
+function cloneData(data) {
+
+    return JSON.parse(
+        JSON.stringify(data)
+    );
+
+}
+
+
+/* =========================================================
+   7. CARGAR ESTADO
 ========================================================= */
 
 function loadMahpeState() {
 
-    const saved =
+    let raw =
         localStorage.getItem(
-            "mahpe_state_v1"
+            MAHPE_STORAGE_KEY
         );
 
 
-    if (!saved) {
+    /*
+       Si todavía no existe v2,
+       recuperamos automáticamente v1.
+    */
 
-        return JSON.parse(
-            JSON.stringify(
-                DEFAULT_STATE
-            )
+    if (!raw) {
+
+        raw =
+            localStorage.getItem(
+                MAHPE_LEGACY_STORAGE_KEY
+            );
+
+    }
+
+
+    if (!raw) {
+
+        return cloneData(
+            DEFAULT_STATE
         );
 
     }
@@ -179,107 +281,25 @@ function loadMahpeState() {
     try {
 
         const parsed =
-            JSON.parse(saved);
+            JSON.parse(raw);
 
 
-        if (!Array.isArray(parsed.companies)) {
-
-            parsed.companies = [];
-
-        }
-
-
-        if (!Array.isArray(parsed.products)) {
-
-            parsed.products = [];
-
-        }
-
-
-        if (!Array.isArray(parsed.posts)) {
-
-            parsed.posts = [];
-
-        }
-
-
-        if (
-            !parsed.interactions ||
-            typeof parsed.interactions !==
-                "object"
-        ) {
-
-            parsed.interactions = {};
-
-        }
-
-
-        if (
-            !parsed.following ||
-            typeof parsed.following !==
-                "object"
-        ) {
-
-            parsed.following = {};
-
-        }
-
-
-        if (
-            !parsed.followRewards ||
-            typeof parsed.followRewards !==
-                "object"
-        ) {
-
-            parsed.followRewards = {};
-
-        }
-
-
-        if (!Array.isArray(parsed.events)) {
-
-            parsed.events = [];
-
-        }
-
-
-        if (
-            !Array.isArray(
-                parsed.decisionHistory
-            )
-        ) {
-
-            parsed.decisionHistory = [];
-
-        }
-
-
-        if (
-            typeof parsed.mahpes !==
-            "number"
-        ) {
-
-            parsed.mahpes = 1250;
-
-        }
-
-
-        return parsed;
+        return migrateLoadedState(
+            parsed
+        );
 
     }
 
     catch (error) {
 
         console.error(
-            "No se pudo cargar MAHPE:",
+            "MAHPE: no se pudo cargar el estado.",
             error
         );
 
 
-        return JSON.parse(
-            JSON.stringify(
-                DEFAULT_STATE
-            )
+        return cloneData(
+            DEFAULT_STATE
         );
 
     }
@@ -288,7 +308,613 @@ function loadMahpeState() {
 
 
 /* =========================================================
-   4. GUARDAR ESTADO
+   8. MIGRAR ESTADO GENERAL
+========================================================= */
+
+function migrateLoadedState(
+    state
+) {
+
+    const migrated =
+        state &&
+        typeof state === "object"
+
+            ? state
+
+            : {};
+
+
+    if (
+        typeof migrated.mahpes !==
+        "number"
+    ) {
+
+        migrated.mahpes =
+            DEFAULT_STATE.mahpes;
+
+    }
+
+
+    if (
+        !Array.isArray(
+            migrated.companies
+        )
+    ) {
+
+        migrated.companies = [];
+
+    }
+
+
+    if (
+        !Array.isArray(
+            migrated.products
+        )
+    ) {
+
+        migrated.products = [];
+
+    }
+
+
+    if (
+        !Array.isArray(
+            migrated.posts
+        )
+    ) {
+
+        migrated.posts = [];
+
+    }
+
+
+    if (
+        !migrated.interactions ||
+        typeof migrated.interactions !==
+            "object" ||
+        Array.isArray(
+            migrated.interactions
+        )
+    ) {
+
+        migrated.interactions = {};
+
+    }
+
+
+    if (
+        !migrated.following ||
+        typeof migrated.following !==
+            "object" ||
+        Array.isArray(
+            migrated.following
+        )
+    ) {
+
+        migrated.following = {};
+
+    }
+
+
+    if (
+        !migrated.followRewards ||
+        typeof migrated.followRewards !==
+            "object" ||
+        Array.isArray(
+            migrated.followRewards
+        )
+    ) {
+
+        migrated.followRewards = {};
+
+    }
+
+
+    if (
+        !Array.isArray(
+            migrated.events
+        )
+    ) {
+
+        migrated.events = [];
+
+    }
+
+
+    if (
+        !Array.isArray(
+            migrated.decisionHistory
+        )
+    ) {
+
+        migrated.decisionHistory = [];
+
+    }
+
+
+    migrateProfileData(
+        migrated
+    );
+
+
+    migrated.companies.forEach(
+        migrateCompanyBusinessData
+    );
+
+
+    migrated.products.forEach(
+        migrateProductData
+    );
+
+
+    migrated.posts.forEach(
+        migratePostData
+    );
+
+
+    return migrated;
+
+}
+
+
+/* =========================================================
+   9. MIGRACIÓN PERFIL
+========================================================= */
+
+function migrateProfileData(
+    state
+) {
+
+    if (
+        !state.profile ||
+        typeof state.profile !==
+            "object" ||
+        Array.isArray(
+            state.profile
+        )
+    ) {
+
+        state.profile =
+            cloneData(
+                DEFAULT_STATE.profile
+            );
+
+    }
+
+
+    const profile =
+        state.profile;
+
+
+    if (
+        typeof profile.name !==
+        "string"
+    ) {
+
+        profile.name =
+            "Emprendedor MAHPE";
+
+    }
+
+
+    if (
+        typeof profile.username !==
+        "string"
+    ) {
+
+        profile.username =
+            "emprendedor";
+
+    }
+
+
+    if (
+        typeof profile.bio !==
+        "string"
+    ) {
+
+        profile.bio =
+            "Construyendo ideas dentro de MAHPE.";
+
+    }
+
+
+    if (
+        typeof profile.location !==
+        "string"
+    ) {
+
+        profile.location = "";
+
+    }
+
+
+    if (
+        typeof profile.photo !==
+        "string"
+    ) {
+
+        profile.photo = null;
+
+    }
+
+
+    if (
+        !Array.isArray(
+            profile.recommendations
+        )
+    ) {
+
+        profile.recommendations = [];
+
+    }
+
+
+    if (
+        typeof profile.createdAt !==
+        "string"
+    ) {
+
+        profile.createdAt =
+            null;
+
+    }
+
+}
+
+
+/* =========================================================
+   10. MIGRACIÓN EMPRESA
+========================================================= */
+
+function migrateCompanyBusinessData(
+    company
+) {
+
+    if (!company) {
+
+        return;
+
+    }
+
+
+    const numericDefaults = {
+
+        followers: 0,
+
+        interactions: 0,
+
+        interested: 0,
+
+        committed: 0,
+
+        value: 500,
+
+        capital: 500,
+
+        activity: 20,
+
+        marketResponse: 20,
+
+        locationStrength: 20,
+
+        risk: 15,
+
+        designLevel: 20,
+
+        productValidation: 10,
+
+        marketKnowledge: 10,
+
+        campaignPower: 0
+
+    };
+
+
+    Object.entries(
+        numericDefaults
+    ).forEach(
+        ([key, defaultValue]) => {
+
+            if (
+                typeof company[key] !==
+                    "number" ||
+                !Number.isFinite(
+                    company[key]
+                )
+            ) {
+
+                company[key] =
+                    defaultValue;
+
+            }
+
+        }
+    );
+
+
+    if (
+        !Array.isArray(
+            company.decisions
+        )
+    ) {
+
+        company.decisions = [];
+
+    }
+
+
+    if (
+        typeof company.brandImage !==
+        "string"
+    ) {
+
+        company.brandImage = null;
+
+    }
+
+
+    if (
+        typeof company.brandImageUpdatedAt !==
+        "string"
+    ) {
+
+        company.brandImageUpdatedAt =
+            null;
+
+    }
+
+
+    if (
+        typeof company.stage !==
+        "string"
+    ) {
+
+        company.stage =
+            "Idea";
+
+    }
+
+
+    if (
+        typeof company.description !==
+        "string"
+    ) {
+
+        company.description = "";
+
+    }
+
+
+    if (
+        typeof company.category !==
+        "string"
+    ) {
+
+        company.category =
+            "Empresa";
+
+    }
+
+}
+
+
+/* =========================================================
+   11. MIGRACIÓN PRODUCTO
+========================================================= */
+
+function migrateProductData(
+    product
+) {
+
+    if (!product) {
+
+        return;
+
+    }
+
+
+    if (
+        !Array.isArray(
+            product.images
+        )
+    ) {
+
+        product.images = [];
+
+    }
+
+
+    if (
+        typeof product.coverIndex !==
+        "number" ||
+        !Number.isFinite(
+            product.coverIndex
+        )
+    ) {
+
+        product.coverIndex = 0;
+
+    }
+
+
+    if (
+        !product.metrics ||
+        typeof product.metrics !==
+            "object"
+    ) {
+
+        product.metrics = {};
+
+    }
+
+
+    const metrics = {
+
+        views: 0,
+
+        interactions: 0,
+
+        interested: 0,
+
+        committed: 0
+
+    };
+
+
+    Object.entries(
+        metrics
+    ).forEach(
+        ([key, value]) => {
+
+            if (
+                typeof product.metrics[key] !==
+                    "number"
+            ) {
+
+                product.metrics[key] =
+                    value;
+
+            }
+
+        }
+    );
+
+
+    if (
+        typeof product.published !==
+        "boolean"
+    ) {
+
+        product.published = false;
+
+    }
+
+
+    if (
+        typeof product.name !==
+        "string"
+    ) {
+
+        product.name =
+            "Producto";
+
+    }
+
+
+    if (
+        typeof product.description !==
+        "string"
+    ) {
+
+        product.description = "";
+
+    }
+
+
+    if (
+        typeof product.category !==
+        "string"
+    ) {
+
+        product.category = "";
+
+    }
+
+
+    if (
+        typeof product.price !==
+        "number"
+    ) {
+
+        product.price =
+            Number(
+                product.price
+            ) || 0;
+
+    }
+
+}
+
+
+/* =========================================================
+   12. MIGRACIÓN PUBLICACIÓN
+========================================================= */
+
+function migratePostData(
+    post
+) {
+
+    if (!post) {
+
+        return;
+
+    }
+
+
+    const metrics = [
+        "views",
+        "interactions",
+        "interested",
+        "committed"
+    ];
+
+
+    metrics.forEach(
+        metric => {
+
+            if (
+                typeof post[metric] !==
+                    "number"
+            ) {
+
+                post[metric] =
+                    Number(
+                        post[metric]
+                    ) || 0;
+
+            }
+
+        }
+    );
+
+
+    if (
+        typeof post.productId !==
+        "string"
+    ) {
+
+        post.productId = null;
+
+    }
+
+
+    if (
+        typeof post.image !==
+        "string"
+    ) {
+
+        post.image = null;
+
+    }
+
+
+    if (
+        typeof post.createdAt !==
+        "string"
+    ) {
+
+        post.createdAt =
+            new Date()
+                .toISOString();
+
+    }
+
+}
+
+
+/* =========================================================
+   13. GUARDAR ESTADO
 ========================================================= */
 
 function saveMahpeState() {
@@ -296,10 +922,29 @@ function saveMahpeState() {
     try {
 
         localStorage.setItem(
-            "mahpe_state_v1",
+
+            MAHPE_STORAGE_KEY,
+
             JSON.stringify(
                 mahpeState
             )
+
+        );
+
+
+        /*
+           Conservamos v1 durante esta etapa
+           para no romper datos del prototipo.
+        */
+
+        localStorage.setItem(
+
+            MAHPE_LEGACY_STORAGE_KEY,
+
+            JSON.stringify(
+                mahpeState
+            )
+
         );
 
     }
@@ -311,12 +956,6 @@ function saveMahpeState() {
             error
         );
 
-        /*
-           Normalmente esto ocurrirá si las imágenes
-           almacenadas superan la capacidad de
-           localStorage del navegador.
-        */
-
     }
 
 
@@ -326,10 +965,29 @@ function saveMahpeState() {
 
 
 /* =========================================================
-   5. UTILIDADES
+   14. MIGRACIÓN INICIAL
 ========================================================= */
 
-function escapeHTML(text) {
+function migrateMahpeBusinessState() {
+
+    mahpeState =
+        migrateLoadedState(
+            mahpeState
+        );
+
+
+    saveMahpeState();
+
+}
+
+
+/* =========================================================
+   15. ESCAPAR HTML
+========================================================= */
+
+function escapeHTML(
+    text
+) {
 
     const div =
         document.createElement(
@@ -346,7 +1004,13 @@ function escapeHTML(text) {
 }
 
 
-function generateId(prefix) {
+/* =========================================================
+   16. GENERAR ID
+========================================================= */
+
+function generateId(
+    prefix = "item"
+) {
 
     return (
 
@@ -360,7 +1024,7 @@ function generateId(prefix) {
 
         Math.floor(
             Math.random() *
-            100000
+            1000000
         )
 
     );
@@ -368,11 +1032,19 @@ function generateId(prefix) {
 }
 
 
+/* =========================================================
+   17. CLAMP
+========================================================= */
+
 function clamp(
     value,
     min = 0,
     max = 100
 ) {
+
+    const number =
+        Number(value) || 0;
+
 
     return Math.max(
 
@@ -381,7 +1053,7 @@ function clamp(
         Math.min(
             max,
             Math.round(
-                Number(value) || 0
+                number
             )
         )
 
@@ -390,26 +1062,150 @@ function clamp(
 }
 
 
-function formatPrice(value) {
+/* =========================================================
+   18. PRECIO
+========================================================= */
+
+function formatPrice(
+    value
+) {
 
     const number =
         Number(value) || 0;
 
 
     return number.toLocaleString(
+
         "es-PE",
+
         {
+
             minimumFractionDigits:
                 number % 1 === 0
                     ? 0
                     : 2,
 
-            maximumFractionDigits: 2
+            maximumFractionDigits:
+                2
+
         }
+
     );
 
 }
 
+
+/* =========================================================
+   19. FECHA RELATIVA
+========================================================= */
+
+function formatRelativeDate(
+    isoDate
+) {
+
+    if (!isoDate) {
+
+        return "";
+
+    }
+
+
+    const date =
+        new Date(
+            isoDate
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "";
+
+    }
+
+
+    const difference =
+        Date.now() -
+        date.getTime();
+
+
+    const minutes =
+        Math.max(
+            0,
+            Math.floor(
+                difference /
+                60000
+            )
+        );
+
+
+    if (minutes < 1) {
+
+        return "Ahora";
+
+    }
+
+
+    if (minutes < 60) {
+
+        return (
+            "Hace " +
+            minutes +
+            " min"
+        );
+
+    }
+
+
+    const hours =
+        Math.floor(
+            minutes /
+            60
+        );
+
+
+    if (hours < 24) {
+
+        return (
+            "Hace " +
+            hours +
+            " h"
+        );
+
+    }
+
+
+    const days =
+        Math.floor(
+            hours /
+            24
+        );
+
+
+    if (days < 7) {
+
+        return (
+            "Hace " +
+            days +
+            " d"
+        );
+
+    }
+
+
+    return date.toLocaleDateString(
+        "es-PE"
+    );
+
+}
+
+
+/* =========================================================
+   20. EMPRESA ACTUAL
+========================================================= */
 
 function getCurrentCompany() {
 
@@ -427,6 +1223,10 @@ function getCurrentCompany() {
 
 }
 
+
+/* =========================================================
+   21. EMPRESA POR ID
+========================================================= */
 
 function getCompanyById(
     companyId
@@ -457,6 +1257,10 @@ function getCompanyById(
 }
 
 
+/* =========================================================
+   22. PRODUCTO POR ID
+========================================================= */
+
 function getProductById(
     productId
 ) {
@@ -483,6 +1287,10 @@ function getProductById(
 }
 
 
+/* =========================================================
+   23. PRODUCTOS DE EMPRESA
+========================================================= */
+
 function getCompanyProducts(
     companyId
 ) {
@@ -491,7 +1299,7 @@ function getCompanyProducts(
 
         product =>
             product.companyId ===
-                companyId
+            companyId
 
     );
 
@@ -499,420 +1307,7 @@ function getCompanyProducts(
 
 
 /* =========================================================
-   6. MIGRACIÓN BUSINESS ENGINE
-========================================================= */
-
-function migrateCompanyBusinessData(
-    company
-) {
-
-    if (!company) {
-
-        return;
-
-    }
-
-
-    if (
-        typeof company.activity !==
-        "number"
-    ) {
-
-        company.activity = 20;
-
-    }
-
-
-    if (
-        typeof company.marketResponse !==
-        "number"
-    ) {
-
-        company.marketResponse = 20;
-
-    }
-
-
-    if (
-        typeof company.locationStrength !==
-        "number"
-    ) {
-
-        company.locationStrength = 20;
-
-    }
-
-
-    if (
-        typeof company.risk !==
-        "number"
-    ) {
-
-        company.risk = 15;
-
-    }
-
-
-    if (
-        typeof company.designLevel !==
-        "number"
-    ) {
-
-        company.designLevel = 20;
-
-    }
-
-
-    if (
-        typeof company.productValidation !==
-        "number"
-    ) {
-
-        company.productValidation = 10;
-
-    }
-
-
-    if (
-        typeof company.marketKnowledge !==
-        "number"
-    ) {
-
-        company.marketKnowledge = 10;
-
-    }
-
-
-    if (
-        typeof company.campaignPower !==
-        "number"
-    ) {
-
-        company.campaignPower = 0;
-
-    }
-
-
-    if (
-        typeof company.interactions !==
-        "number"
-    ) {
-
-        company.interactions = 0;
-
-    }
-
-
-    if (
-        typeof company.interested !==
-        "number"
-    ) {
-
-        company.interested = 0;
-
-    }
-
-
-    if (
-        typeof company.committed !==
-        "number"
-    ) {
-
-        company.committed = 0;
-
-    }
-
-
-    if (
-        typeof company.followers !==
-        "number"
-    ) {
-
-        company.followers = 0;
-
-    }
-
-
-    if (
-        typeof company.value !==
-        "number"
-    ) {
-
-        company.value = 500;
-
-    }
-
-
-    if (
-        typeof company.capital !==
-        "number"
-    ) {
-
-        company.capital = 500;
-
-    }
-
-
-    if (
-        !Array.isArray(
-            company.decisions
-        )
-    ) {
-
-        company.decisions = [];
-
-    }
-
-
-    /*
-       NUEVO:
-       identidad visual.
-    */
-
-    if (
-        typeof company.brandImage !==
-        "string"
-    ) {
-
-        company.brandImage = null;
-
-    }
-
-
-    if (
-        typeof company.brandImageUpdatedAt !==
-        "string"
-    ) {
-
-        company.brandImageUpdatedAt =
-            null;
-
-    }
-
-}
-
-
-/* =========================================================
-   7. MIGRACIÓN PRODUCTOS
-========================================================= */
-
-function migrateProductData(
-    product
-) {
-
-    if (!product) {
-
-        return;
-
-    }
-
-
-    if (!Array.isArray(product.images)) {
-
-        product.images = [];
-
-    }
-
-
-    if (
-        typeof product.coverIndex !==
-        "number"
-    ) {
-
-        product.coverIndex = 0;
-
-    }
-
-
-    if (
-        !product.metrics ||
-        typeof product.metrics !==
-            "object"
-    ) {
-
-        product.metrics = {};
-
-    }
-
-
-    if (
-        typeof product.metrics.views !==
-        "number"
-    ) {
-
-        product.metrics.views = 0;
-
-    }
-
-
-    if (
-        typeof product.metrics.interactions !==
-        "number"
-    ) {
-
-        product.metrics.interactions = 0;
-
-    }
-
-
-    if (
-        typeof product.metrics.interested !==
-        "number"
-    ) {
-
-        product.metrics.interested = 0;
-
-    }
-
-
-    if (
-        typeof product.metrics.committed !==
-        "number"
-    ) {
-
-        product.metrics.committed = 0;
-
-    }
-
-
-    if (
-        typeof product.published !==
-        "boolean"
-    ) {
-
-        product.published = false;
-
-    }
-
-}
-
-
-/* =========================================================
-   8. MIGRAR ESTADO COMPLETO
-========================================================= */
-
-function migrateMahpeBusinessState() {
-
-    if (
-        !Array.isArray(
-            mahpeState.products
-        )
-    ) {
-
-        mahpeState.products = [];
-
-    }
-
-
-    if (
-        !Array.isArray(
-            mahpeState.decisionHistory
-        )
-    ) {
-
-        mahpeState.decisionHistory = [];
-
-    }
-
-
-    mahpeState.companies.forEach(
-        migrateCompanyBusinessData
-    );
-
-
-    mahpeState.products.forEach(
-        migrateProductData
-    );
-
-
-    try {
-
-        localStorage.setItem(
-            "mahpe_state_v1",
-            JSON.stringify(
-                mahpeState
-            )
-        );
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "MAHPE: error durante migración.",
-            error
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   9. AVATAR / LOGO DE EMPRESA
-========================================================= */
-
-function renderCompanyAvatar(
-    company,
-    className =
-        "company-avatar"
-) {
-
-    if (
-        company &&
-        company.brandImage
-    ) {
-
-        return `
-
-            <div
-                class="${className} has-image"
-            >
-
-                <img
-                    src="${company.brandImage}"
-                    alt="Logo de ${escapeHTML(
-                        company.name
-                    )}"
-                >
-
-            </div>
-
-        `;
-
-    }
-
-
-    const initial =
-        company &&
-        company.name
-
-            ? company.name
-                .charAt(0)
-                .toUpperCase()
-
-            : "?";
-
-
-    return `
-
-        <div
-            class="${className}"
-        >
-
-            ${escapeHTML(
-                initial
-            )}
-
-        </div>
-
-    `;
-
-}
-
-
-/* =========================================================
-   10. OBTENER PORTADA DE PRODUCTO
+   24. PORTADA DE PRODUCTO
 ========================================================= */
 
 function getProductCover(
@@ -951,21 +1346,86 @@ function getProductCover(
 
 
     return (
+
         product.images[index] ||
         product.images[0] ||
         null
+
     );
 
 }
 
 
 /* =========================================================
-   11. COMPRESIÓN DE IMAGEN
+   25. AVATAR DE EMPRESA
+========================================================= */
 
-   Para el MVP local:
-   - máximo 1200 px
-   - JPEG comprimido
-   - evita llenar localStorage demasiado rápido
+function renderCompanyAvatar(
+    company,
+    className = "company-avatar"
+) {
+
+    if (
+        company &&
+        company.brandImage
+    ) {
+
+        return `
+
+            <div
+                class="${className} has-image"
+            >
+
+                <img
+                    src="${company.brandImage}"
+                    alt="Logo de ${escapeHTML(
+                        company.name
+                    )}"
+                >
+
+            </div>
+
+        `;
+
+    }
+
+
+    const initial =
+
+        company &&
+        company.name
+
+            ? company.name
+                .charAt(0)
+                .toUpperCase()
+
+            : "?";
+
+
+    return `
+
+        <div
+            class="${className}"
+        >
+
+            ${escapeHTML(
+                initial
+            )}
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   26. COMPRESIÓN DE IMAGEN
+
+   Se reutiliza para:
+   - logo
+   - foto de perfil
+   - productos
 ========================================================= */
 
 function compressImageFile(
@@ -1113,11 +1573,6 @@ function compressImageFile(
                             }
 
 
-                            /*
-                               Fondo blanco para imágenes
-                               transparentes convertidas a JPEG.
-                            */
-
                             context.fillStyle =
                                 "#ffffff";
 
@@ -1139,30 +1594,26 @@ function compressImageFile(
                             );
 
 
-                            const dataURL =
+                            resolve(
+
                                 canvas.toDataURL(
                                     "image/jpeg",
                                     quality
-                                );
+                                )
 
-
-                            resolve(
-                                dataURL
                             );
 
                         };
 
 
                     image.onerror =
-                        function() {
+                        () =>
 
                             reject(
                                 new Error(
                                     "No se pudo leer la imagen."
                                 )
                             );
-
-                        };
 
 
                     image.src =
@@ -1172,15 +1623,13 @@ function compressImageFile(
 
 
             reader.onerror =
-                function() {
+                () =>
 
                     reject(
                         new Error(
                             "No se pudo cargar el archivo."
                         )
                     );
-
-                };
 
 
             reader.readAsDataURL(
@@ -1194,26 +1643,32 @@ function compressImageFile(
 
 
 /* =========================================================
-   12. NAVEGACIÓN
+   27. NAVEGACIÓN PRINCIPAL
 ========================================================= */
 
-const appViews =
-    document.querySelectorAll(
+function getAppViews() {
+
+    return document.querySelectorAll(
         ".app-view"
     );
 
+}
 
-const navButtons =
-    document.querySelectorAll(
+
+function getNavButtons() {
+
+    return document.querySelectorAll(
         ".nav-button"
     );
+
+}
 
 
 function openView(
     viewId
 ) {
 
-    appViews.forEach(
+    getAppViews().forEach(
         view => {
 
             view.classList.remove(
@@ -1239,7 +1694,7 @@ function openView(
     }
 
 
-    navButtons.forEach(
+    getNavButtons().forEach(
         button => {
 
             button.classList.toggle(
@@ -1256,13 +1711,18 @@ function openView(
 
 
     /*
-       Si abandonamos Empresa,
-       cerramos el editor independiente.
+       Estas funciones están definidas
+       en los siguientes bloques.
+
+       typeof evita errores mientras
+       se construye el archivo completo.
     */
 
     if (
         viewId !==
-        "companyView"
+            "companyView" &&
+        typeof closeProductEditor ===
+            "function"
     ) {
 
         closeProductEditor(
@@ -1278,9 +1738,13 @@ function openView(
     ) {
 
         setTimeout(
-            function() {
+            () => {
 
-                if (map) {
+                if (
+                    typeof map !==
+                        "undefined" &&
+                    map
+                ) {
 
                     map.invalidateSize();
 
@@ -1295,7 +1759,9 @@ function openView(
 
     if (
         viewId ===
-        "companyView"
+            "companyView" &&
+        typeof renderCompanyDashboard ===
+            "function"
     ) {
 
         renderCompanyDashboard();
@@ -1305,7 +1771,9 @@ function openView(
 
     if (
         viewId ===
-        "profileView"
+            "profileView" &&
+        typeof updateProfile ===
+            "function"
     ) {
 
         updateProfile();
@@ -1315,35 +1783,15 @@ function openView(
 }
 
 
-navButtons.forEach(
-    button => {
-
-        button.addEventListener(
-
-            "click",
-
-            function() {
-
-                openView(
-                    this.dataset.view
-                );
-
-            }
-
-        );
-
-    }
-);
-
-
 /* =========================================================
-   13. ACTIVIDAD MAHPE
+   28. ACTIVIDAD MAHPE
 ========================================================= */
 
 function addMahpeEvent(
     type,
     message,
-    companyId = null
+    companyId = null,
+    metadata = {}
 ) {
 
     if (
@@ -1370,6 +1818,8 @@ function addMahpeEvent(
 
         companyId,
 
+        metadata,
+
         read: false,
 
         createdAt:
@@ -1379,17 +1829,22 @@ function addMahpeEvent(
     });
 
 
+    /*
+       Evitamos crecimiento infinito
+       de localStorage.
+    */
+
     mahpeState.events =
         mahpeState.events.slice(
             0,
-            30
+            50
         );
 
 }
 
 
 /* =========================================================
-   14. ICONO DE ACTIVIDAD
+   29. ICONOS DE ACTIVIDAD
 ========================================================= */
 
 function getActivityIcon(
@@ -1410,7 +1865,13 @@ function getActivityIcon(
 
         signal: "🔥",
 
-        decision: "⚡"
+        decision: "⚡",
+
+        profile: "●",
+
+        coyote: "📍",
+
+        recommendation: "★"
 
     };
 
@@ -1424,10 +1885,61 @@ function getActivityIcon(
 
 
 /* =========================================================
-   15. RENDER BANDEJA DE ACTIVIDAD
+   30. ACTIVIDAD NO LEÍDA
+========================================================= */
+
+function getUnreadActivityCount() {
+
+    return mahpeState.events.filter(
+
+        event =>
+            !event.read
+
+    ).length;
+
+}
+
+
+/* =========================================================
+   31. MARCAR ACTIVIDAD LEÍDA
+========================================================= */
+
+function markActivityAsRead() {
+
+    mahpeState.events.forEach(
+        event => {
+
+            event.read =
+                true;
+
+        }
+    );
+
+
+    saveMahpeState();
+
+
+    renderActivityInbox();
+
+}
+
+
+/* =========================================================
+   32. BANDEJA COMPACTA
+
+   Objetivo:
+   NO ocupar media pantalla del Inicio.
+
+   Muestra máximo 2 novedades.
 ========================================================= */
 
 function renderActivityInbox() {
+
+    const inbox =
+        document.getElementById(
+            "activityInbox"
+        );
+
 
     const list =
         document.getElementById(
@@ -1441,16 +1953,6 @@ function renderActivityInbox() {
         );
 
 
-    if (
-        !list &&
-        !badge
-    ) {
-
-        return;
-
-    }
-
-
     const events =
         Array.isArray(
             mahpeState.events
@@ -1462,10 +1964,7 @@ function renderActivityInbox() {
 
 
     const unread =
-        events.filter(
-            event =>
-                !event.read
-        ).length;
+        getUnreadActivityCount();
 
 
     if (badge) {
@@ -1477,6 +1976,16 @@ function renderActivityInbox() {
         badge.classList.toggle(
             "hidden",
             unread === 0
+        );
+
+    }
+
+
+    if (inbox) {
+
+        inbox.classList.toggle(
+            "has-unread",
+            unread > 0
         );
 
     }
@@ -1494,15 +2003,139 @@ function renderActivityInbox() {
         list.innerHTML = `
 
             <div
-                class="activity-empty"
+                class="activity-compact-empty"
             >
 
-                Todavía no hay novedades.
+                <span>
+                    Todo al día.
+                </span>
+
+                <small>
+                    Tus novedades aparecerán aquí.
+                </small>
 
             </div>
 
         `;
 
+        return;
+
+    }
+
+
+    const visibleEvents =
+        events.slice(
+            0,
+            2
+        );
+
+
+    list.innerHTML =
+        visibleEvents
+            .map(
+                event => `
+
+                    <article
+                        class="activity-item compact ${
+                            event.read
+                                ? ""
+                                : "unread"
+                        }"
+                    >
+
+                        <span
+                            class="activity-icon"
+                        >
+
+                            ${getActivityIcon(
+                                event.type
+                            )}
+
+                        </span>
+
+
+                        <div
+                            class="activity-copy"
+                        >
+
+                            <strong>
+
+                                ${escapeHTML(
+                                    event.message
+                                )}
+
+                            </strong>
+
+
+                            <small>
+
+                                ${formatRelativeDate(
+                                    event.createdAt
+                                )}
+
+                            </small>
+
+                        </div>
+
+                    </article>
+
+                `
+            )
+            .join("") +
+
+        (
+            events.length > 2
+
+                ? `
+
+                    <button
+                        class="activity-more-button"
+                        type="button"
+                        onclick="openMahpeActivity()"
+                    >
+
+                        ${
+                            events.length - 2
+                        }
+                        novedades más →
+
+                    </button>
+
+                `
+
+                : ""
+        );
+
+}
+
+
+/* =========================================================
+   33. VER ACTIVIDAD
+
+   Por ahora amplía la propia bandeja.
+   En el futuro puede ser una pantalla.
+========================================================= */
+
+function openMahpeActivity() {
+
+    const list =
+        document.getElementById(
+            "activityList"
+        );
+
+
+    if (!list) {
+
+        return;
+
+    }
+
+
+    const events =
+        mahpeState.events;
+
+
+    if (!events.length) {
 
         return;
 
@@ -1513,7 +2146,7 @@ function renderActivityInbox() {
         events
             .slice(
                 0,
-                8
+                12
             )
             .map(
                 event => `
@@ -1552,10 +2185,8 @@ function renderActivityInbox() {
 
                             <small>
 
-                                ${new Date(
+                                ${formatRelativeDate(
                                     event.createdAt
-                                ).toLocaleString(
-                                    "es-PE"
                                 )}
 
                             </small>
@@ -1566,33 +2197,102 @@ function renderActivityInbox() {
 
                 `
             )
-            .join("");
+            .join("") +
+
+        `
+
+            <button
+                class="activity-more-button"
+                type="button"
+                onclick="collapseMahpeActivity()"
+            >
+
+                Mostrar menos
+
+            </button>
+
+        `;
+
+
+    markActivityAsRead();
 
 }
 
 
 /* =========================================================
-   16. FEED — OBTENER PUBLICACIONES
+   34. CONTRAER ACTIVIDAD
+========================================================= */
+
+function collapseMahpeActivity() {
+
+    renderActivityInbox();
+
+}
+
+
+/* =========================================================
+   35. TODAS LAS PUBLICACIONES
 ========================================================= */
 
 function getAllPosts() {
+
+    const realPosts =
+        mahpeState.posts
+            .slice()
+            .sort(
+                (
+                    a,
+                    b
+                ) => {
+
+                    const dateA =
+                        new Date(
+                            a.createdAt ||
+                            0
+                        ).getTime();
+
+
+                    const dateB =
+                        new Date(
+                            b.createdAt ||
+                            0
+                        ).getTime();
+
+
+                    return (
+                        dateB -
+                        dateA
+                    );
+
+                }
+            );
+
 
     return [
 
         demoPost,
 
-        ...mahpeState.posts
-            .slice()
-            .reverse()
+        ...realPosts
 
     ];
 
 }
 
 
+/* =========================================================
+   36. EMPRESA DE UNA PUBLICACIÓN
+========================================================= */
+
 function getPostCompany(
     post
 ) {
+
+    if (!post) {
+
+        return null;
+
+    }
+
 
     if (post.demo) {
 
@@ -1607,6 +2307,10 @@ function getPostCompany(
 
 }
 
+
+/* =========================================================
+   37. SIGUIENDO
+========================================================= */
 
 function isFollowingCompany(
     companyId
@@ -1625,6 +2329,10 @@ function isFollowingCompany(
 }
 
 
+/* =========================================================
+   38. NÚMERO DE EMPRESAS SEGUIDAS
+========================================================= */
+
 function getFollowingCount() {
 
     return Object.values(
@@ -1640,7 +2348,7 @@ function getFollowingCount() {
 
 
 /* =========================================================
-   17. MÉTRICAS VISIBLES
+   39. MÉTRICA VISIBLE DEL POST
 ========================================================= */
 
 function getDisplayedPostMetric(
@@ -1656,11 +2364,10 @@ function getDisplayedPostMetric(
 
 
     /*
-       Los posts reales actualizan directamente
-       sus métricas.
+       SURANO demo no se modifica directamente.
 
-       SURANO es demo, así que sumamos
-       visualmente la interacción local.
+       Las señales del usuario se añaden
+       visualmente sobre la métrica demo.
     */
 
     if (!post.demo) {
@@ -1713,36 +2420,53 @@ function getDisplayedPostMetric(
 
 
 /* =========================================================
-   18. PUNTUACIÓN DE TENDENCIA
+   40. PUNTUACIÓN DE TENDENCIA
 ========================================================= */
 
 function getPostTrendScore(
     post
 ) {
 
-    return (
-
+    const views =
         getDisplayedPostMetric(
             post,
             "views"
-        ) *
-        0.05 +
+        );
 
+
+    const interactions =
         getDisplayedPostMetric(
             post,
             "interactions"
-        ) +
+        );
 
+
+    const interested =
         getDisplayedPostMetric(
             post,
             "interested"
-        ) *
-        4 +
+        );
 
+
+    const committed =
         getDisplayedPostMetric(
             post,
             "committed"
-        ) *
+        );
+
+
+    return (
+
+        views *
+        0.05 +
+
+        interactions *
+        1 +
+
+        interested *
+        4 +
+
+        committed *
         10
 
     );
@@ -1751,7 +2475,7 @@ function getPostTrendScore(
 
 
 /* =========================================================
-   19. POSTS VISIBLES
+   41. PUBLICACIONES VISIBLES
 ========================================================= */
 
 function getVisiblePosts() {
@@ -1810,13 +2534,14 @@ function getVisiblePosts() {
 
 
 /* =========================================================
-   20. FEED SHELL
+   42. FEED SHELL
 
-   IMPORTANTE:
-   index.html YA contiene:
+   MUY IMPORTANTE:
+   index.html es dueño de:
+
    Siguiendo | Descubrir | Tendencias
 
-   JavaScript NO crea otra barra.
+   JS NO CREA OTRA BARRA.
 ========================================================= */
 
 function ensureFeedShell() {
@@ -1829,7 +2554,7 @@ function ensureFeedShell() {
 
     if (!feedContainer) {
 
-        return;
+        return false;
 
     }
 
@@ -1859,40 +2584,44 @@ function ensureFeedShell() {
     ) {
 
         console.warn(
-            "MAHPE: controles del feed no encontrados en index.html"
+            "MAHPE: faltan controles del feed en index.html."
         );
 
     }
+
+
+    return true;
 
 }
 
 
 /* =========================================================
-   21. CAMBIAR FEED
+   43. CAMBIAR FEED
 ========================================================= */
 
 function setFeedMode(
     mode
 ) {
 
-    if (
-        ![
-            "explore",
-            "following",
-            "trending"
-        ].includes(
-            mode
-        )
-    ) {
+    const validModes = [
 
-        mode =
-            "explore";
+        "following",
 
-    }
+        "explore",
+
+        "trending"
+
+    ];
 
 
     currentFeedMode =
-        mode;
+        validModes.includes(
+            mode
+        )
+
+            ? mode
+
+            : "explore";
 
 
     updateFeedControls();
@@ -1904,7 +2633,7 @@ function setFeedMode(
 
 
 /* =========================================================
-   22. INICIALIZAR TABS DEL FEED
+   44. INICIALIZAR TABS DEL FEED
 ========================================================= */
 
 function initializeFeedTabs() {
@@ -1920,11 +2649,13 @@ function initializeFeedTabs() {
             button => {
 
                 button.onclick =
-                    () =>
+                    () => {
 
                         setFeedMode(
                             button.dataset.feedMode
                         );
+
+                    };
 
             }
         );
@@ -1936,7 +2667,7 @@ function initializeFeedTabs() {
 
 
 /* =========================================================
-   23. ACTUALIZAR TABS DEL FEED
+   45. ACTUALIZAR TABS
 ========================================================= */
 
 function updateFeedControls() {
@@ -1978,7 +2709,7 @@ function updateFeedControls() {
 
 
 /* =========================================================
-   24. FEED VACÍO
+   46. FEED VACÍO
 ========================================================= */
 
 function renderEmptyFeed(
@@ -1990,7 +2721,7 @@ function renderEmptyFeed(
 
 
     let text =
-        "Las nuevas empresas aparecerán aquí.";
+        "Las nuevas empresas y productos aparecerán aquí.";
 
 
     if (
@@ -1999,11 +2730,11 @@ function renderEmptyFeed(
     ) {
 
         title =
-            "Tu bandeja de Siguiendo está vacía";
+            "Todavía no sigues publicaciones";
 
 
         text =
-            "Ve a Descubrir y sigue empresas para construir tu propio feed.";
+            "Ve a Descubrir y sigue empresas que te interesen.";
 
     }
 
@@ -2018,7 +2749,7 @@ function renderEmptyFeed(
 
 
         text =
-            "Las señales de mercado decidirán qué empresas suben aquí.";
+            "Las señales de la comunidad decidirán qué productos y empresas suben.";
 
     }
 
@@ -2045,7 +2776,9 @@ function renderEmptyFeed(
             </h2>
 
 
-            <p class="muted">
+            <p
+                class="muted"
+            >
 
                 ${escapeHTML(
                     text
@@ -2066,7 +2799,7 @@ function renderEmptyFeed(
                             onclick="setFeedMode('explore')"
                         >
 
-                            DESCUBRIR EMPRESAS
+                            DESCUBRIR
 
                         </button>
 
@@ -2083,7 +2816,7 @@ function renderEmptyFeed(
 
 
 /* =========================================================
-   25. VISUAL DE PUBLICACIÓN
+   47. VISUAL DE PUBLICACIÓN
 ========================================================= */
 
 function renderPostVisual(
@@ -2104,23 +2837,29 @@ function renderPostVisual(
         );
 
 
+    const productName =
+
+        product
+
+            ? product.name
+
+            : post.title;
+
+
+    const price =
+
+        product
+
+            ? Number(
+                product.price
+            ) || 0
+
+            : Number(
+                post.price
+            ) || 0;
+
+
     if (image) {
-
-        const productName =
-            product
-                ? product.name
-                : post.title;
-
-
-        const price =
-            product
-                ? Number(
-                    product.price
-                ) || 0
-                : Number(
-                    post.price
-                ) || 0;
-
 
         return `
 
@@ -2134,6 +2873,7 @@ function renderPostVisual(
                     alt="${escapeHTML(
                         productName
                     )}"
+                    loading="lazy"
                 >
 
 
@@ -2165,7 +2905,7 @@ function renderPostVisual(
                             ? `
 
                                 <span
-                                    class="price"
+                                    class="post-product-price"
                                 >
 
                                     S/ ${formatPrice(
@@ -2208,7 +2948,8 @@ function renderPostVisual(
             <strong>
 
                 ${escapeHTML(
-                    post.title
+                    post.title ||
+                    company.name
                 )}
 
             </strong>
@@ -2217,7 +2958,8 @@ function renderPostVisual(
             <p>
 
                 ${escapeHTML(
-                    post.text
+                    post.text ||
+                    ""
                 )}
 
             </p>
@@ -2230,7 +2972,77 @@ function renderPostVisual(
 
 
 /* =========================================================
-   26. RENDER FEED
+   48. BOTÓN DE SEÑAL
+========================================================= */
+
+function renderSignalButton(
+    post,
+    signal,
+    emoji,
+    metric,
+    label
+) {
+
+    const key =
+        post.id +
+        "-" +
+        signal;
+
+
+    const selected =
+        Boolean(
+            mahpeState.interactions[
+                key
+            ]
+        );
+
+
+    return `
+
+        <button
+            class="signal-button ${
+                selected
+                    ? "selected"
+                    : ""
+            }"
+            data-post="${post.id}"
+            data-signal="${signal}"
+            type="button"
+            aria-pressed="${
+                selected
+                    ? "true"
+                    : "false"
+            }"
+        >
+
+            <span>
+                ${emoji}
+            </span>
+
+
+            <strong>
+
+                ${getDisplayedPostMetric(
+                    post,
+                    metric
+                )}
+
+            </strong>
+
+
+            <small>
+                ${label}
+            </small>
+
+        </button>
+
+    `;
+
+}
+
+
+/* =========================================================
+   49. RENDER FEED
 ========================================================= */
 
 function renderFeed() {
@@ -2289,6 +3101,12 @@ function renderFeed() {
             }
 
 
+            const following =
+                isFollowingCompany(
+                    company.id
+                );
+
+
             const article =
                 document.createElement(
                     "article"
@@ -2299,30 +3117,8 @@ function renderFeed() {
                 "post";
 
 
-            const viewKey =
-                post.id +
-                "-view";
-
-
-            const interactionKey =
-                post.id +
-                "-interaction";
-
-
-            const interestKey =
-                post.id +
-                "-interest";
-
-
-            const commitmentKey =
-                post.id +
-                "-commitment";
-
-
-            const following =
-                isFollowingCompany(
-                    company.id
-                );
+            article.dataset.postId =
+                post.id;
 
 
             article.innerHTML = `
@@ -2353,13 +3149,15 @@ function renderFeed() {
                         <span>
 
                             ${escapeHTML(
-                                company.category
+                                company.category ||
+                                "Empresa"
                             )}
 
                             ·
 
                             ${escapeHTML(
-                                company.stage
+                                company.stage ||
+                                "Idea"
                             )}
 
                         </span>
@@ -2410,141 +3208,73 @@ function renderFeed() {
 
                         </strong>
 
-                        ·
-
                         ${escapeHTML(
-                            post.text
+                            post.text ||
+                            ""
                         )}
 
                     </p>
+
+
+                    ${
+                        post.createdAt
+
+                            ? `
+
+                                <small
+                                    class="post-time"
+                                >
+
+                                    ${formatRelativeDate(
+                                        post.createdAt
+                                    )}
+
+                                </small>
+
+                            `
+
+                            : ""
+                    }
 
 
                     <div
                         class="signals"
                     >
 
-                        <button
-                            class="signal-button ${
-                                mahpeState.interactions[
-                                    viewKey
-                                ]
-                                    ? "selected"
-                                    : ""
-                            }"
-                            data-post="${post.id}"
-                            data-signal="view"
-                            type="button"
-                        >
-
-                            <span>👁</span>
-
-                            <strong>
-
-                                ${getDisplayedPostMetric(
-                                    post,
-                                    "views"
-                                )}
-
-                            </strong>
-
-                            <small>
-                                Vistas
-                            </small>
-
-                        </button>
+                        ${renderSignalButton(
+                            post,
+                            "view",
+                            "👁",
+                            "views",
+                            "Vistas"
+                        )}
 
 
-                        <button
-                            class="signal-button ${
-                                mahpeState.interactions[
-                                    interactionKey
-                                ]
-                                    ? "selected"
-                                    : ""
-                            }"
-                            data-post="${post.id}"
-                            data-signal="interaction"
-                            type="button"
-                        >
-
-                            <span>♡</span>
-
-                            <strong>
-
-                                ${getDisplayedPostMetric(
-                                    post,
-                                    "interactions"
-                                )}
-
-                            </strong>
-
-                            <small>
-                                Interacción
-                            </small>
-
-                        </button>
+                        ${renderSignalButton(
+                            post,
+                            "interaction",
+                            "♡",
+                            "interactions",
+                            "Interacción"
+                        )}
 
 
-                        <button
-                            class="signal-button ${
-                                mahpeState.interactions[
-                                    interestKey
-                                ]
-                                    ? "selected"
-                                    : ""
-                            }"
-                            data-post="${post.id}"
-                            data-signal="interest"
-                            type="button"
-                        >
-
-                            <span>🔥</span>
-
-                            <strong>
-
-                                ${getDisplayedPostMetric(
-                                    post,
-                                    "interested"
-                                )}
-
-                            </strong>
-
-                            <small>
-                                Interesado
-                            </small>
-
-                        </button>
+                        ${renderSignalButton(
+                            post,
+                            "interest",
+                            "🔥",
+                            "interested",
+                            "Interesado"
+                        )}
 
 
-                        <button
-                            class="signal-button ${
-                                mahpeState.interactions[
-                                    commitmentKey
-                                ]
-                                    ? "selected"
-                                    : ""
-                            }"
-                            data-post="${post.id}"
-                            data-signal="commitment"
-                            type="button"
-                        >
-
-                            <span>💰</span>
-
-                            <strong>
-
-                                ${getDisplayedPostMetric(
-                                    post,
-                                    "committed"
-                                )}
-
-                            </strong>
-
-                            <small>
-                                Comprometido
-                            </small>
-
-                        </button>
+                        ${renderSignalButton(
+                            post,
+                            "commitment",
+                            "💰",
+                            "committed",
+                            "Comprometido"
+                        )}
 
                     </div>
 
@@ -2567,7 +3297,7 @@ function renderFeed() {
 
 
 /* =========================================================
-   27. SEGUIR / DEJAR DE SEGUIR
+   50. SEGUIR / DEJAR DE SEGUIR
 ========================================================= */
 
 function toggleCompanyFollow(
@@ -2656,6 +3386,11 @@ function toggleCompanyFollow(
                 1;
 
 
+            /*
+               Valor SIMULADO.
+               No representa dinero real.
+            */
+
             company.value =
                 Number(
                     company.value ||
@@ -2665,6 +3400,10 @@ function toggleCompanyFollow(
 
         }
 
+
+        /*
+           Recompensa única interna MAHPE.
+        */
 
         if (
             !mahpeState.followRewards[
@@ -2706,11 +3445,31 @@ function toggleCompanyFollow(
 
     renderActivityInbox();
 
+
+    if (
+        typeof renderCompanyDashboard ===
+        "function"
+    ) {
+
+        renderCompanyDashboard();
+
+    }
+
+
+    if (
+        typeof updateProfile ===
+        "function"
+    ) {
+
+        updateProfile();
+
+    }
+
 }
 
 
 /* =========================================================
-   28. EVENTOS DEL FEED
+   51. EVENTOS DEL FEED
 ========================================================= */
 
 function bindFeedEvents() {
@@ -2723,11 +3482,13 @@ function bindFeedEvents() {
             button => {
 
                 button.onclick =
-                    () =>
+                    () => {
 
                         toggleCompanyFollow(
                             button.dataset.company
                         );
+
+                    };
 
             }
         );
@@ -2758,8 +3519,9 @@ function bindFeedEvents() {
 
 
                         /*
-                           Una señal por usuario local
-                           para cada publicación/tipo.
+                           Una misma instalación local
+                           solo puede enviar una señal
+                           de cada tipo a cada post.
                         */
 
                         if (
@@ -2792,7 +3554,7 @@ function bindFeedEvents() {
 
 
 /* =========================================================
-   29. APLICAR SEÑAL
+   52. APLICAR SEÑAL
 ========================================================= */
 
 function applySignal(
@@ -2803,21 +3565,23 @@ function applySignal(
     const realPost =
         mahpeState.posts.find(
 
-            item =>
-                item.id ===
+            post =>
+                post.id ===
                 postId
 
         );
 
 
     const post =
+
         realPost ||
 
         (
             postId ===
-                demoPost.id
+            demoPost.id
 
                 ? demoPost
+
                 : null
         );
 
@@ -2843,6 +3607,7 @@ function applySignal(
 
 
     const product =
+
         realPost &&
         realPost.productId
 
@@ -2862,9 +3627,9 @@ function applySignal(
     }
 
 
-    /* -------------------------
+    /*
        👁 VISTA
-    ------------------------- */
+    */
 
     if (
         signal ===
@@ -2893,11 +3658,11 @@ function applySignal(
     }
 
 
-    /* -------------------------
+    /*
        ♡ INTERACCIÓN
-    ------------------------- */
+    */
 
-    if (
+    else if (
         signal ===
         "interaction"
     ) {
@@ -2948,11 +3713,11 @@ function applySignal(
     }
 
 
-    /* -------------------------
-       🔥 INTERESADO
-    ------------------------- */
+    /*
+       🔥 INTERÉS
+    */
 
-    if (
+    else if (
         signal ===
         "interest"
     ) {
@@ -3010,11 +3775,15 @@ function applySignal(
     }
 
 
-    /* -------------------------
+    /*
        💰 COMPROMETIDO
-    ------------------------- */
 
-    if (
+       IMPORTANTE:
+       Es una señal de intención de mercado.
+       NO es una compra ni inversión.
+    */
+
+    else if (
         signal ===
         "commitment"
     ) {
@@ -3056,6 +3825,11 @@ function applySignal(
                 50;
 
 
+            /*
+               Capital del simulador.
+               NO dinero real.
+            */
+
             company.capital +=
                 10;
 
@@ -3076,7 +3850,11 @@ function applySignal(
     }
 
 
-    if (realPost) {
+    if (
+        realPost &&
+        typeof recalculateCompanyStage ===
+            "function"
+    ) {
 
         recalculateCompanyStage(
             company
@@ -3091,59 +3869,196 @@ function applySignal(
     renderFeed();
 
 
-    renderCompanyDashboard();
-
-
     renderActivityInbox();
+
+
+    if (
+        typeof renderCompanyDashboard ===
+        "function"
+    ) {
+
+        renderCompanyDashboard();
+
+    }
+
+
+    if (
+        typeof updateProfile ===
+        "function"
+    ) {
+
+        updateProfile();
+
+    }
 
 }
 
 
 /* =========================================================
-   30. FUNCIONES GLOBALES DEL FEED
+   53. ACTUALIZACIÓN GLOBAL
+
+   Se completa visualmente con los bloques
+   siguientes, pero ya puede actualizar
+   contadores existentes.
+========================================================= */
+
+function updateGlobalUI() {
+
+    const mahpesTargets = [
+
+        document.getElementById(
+            "mahpesCount"
+        ),
+
+        document.getElementById(
+            "profileMahpes"
+        )
+
+    ];
+
+
+    mahpesTargets.forEach(
+        element => {
+
+            if (element) {
+
+                element.textContent =
+                    Number(
+                        mahpeState.mahpes ||
+                        0
+                    ).toLocaleString(
+                        "es-PE"
+                    );
+
+            }
+
+        }
+    );
+
+
+    const followingCount =
+        document.getElementById(
+            "followingCount"
+        );
+
+
+    if (followingCount) {
+
+        followingCount.textContent =
+            getFollowingCount();
+
+    }
+
+}
+
+
+/* =========================================================
+   54. PREPARAR NAVEGACIÓN
+
+   La inicialización definitiva ocurre
+   una sola vez en BLOQUE 4/4.
+========================================================= */
+
+function bindMainNavigation() {
+
+    getNavButtons().forEach(
+        button => {
+
+            button.onclick =
+                function() {
+
+                    const viewId =
+                        this.dataset.view;
+
+
+                    if (!viewId) {
+
+                        return;
+
+                    }
+
+
+                    openView(
+                        viewId
+                    );
+
+                };
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   55. EXPONER FUNCIONES NECESARIAS
 ========================================================= */
 
 window.setFeedMode =
     setFeedMode;
 
 
+window.toggleCompanyFollow =
+    toggleCompanyFollow;
+
+
+window.openMahpeActivity =
+    openMahpeActivity;
+
+
+window.collapseMahpeActivity =
+    collapseMahpeActivity;
+
+
 /* =========================================================
-   FIN PARTE 1/4
+   FIN BLOQUE 1/4
 
-   NO PEGUES CÓDIGO ENTRE ESTA PARTE
-   Y LA PARTE 2.
+   NO INICIALIZAR AQUÍ.
 
-   PARTE 2/4 CONTINÚA CON:
-
-   - Crear empresa
-   - Logo / foto de marca
-   - "Crea tu logo con IA"
-   - links externos
-   - Productos
-   - 5 imágenes
-   - portada
-   - editor
-   - publicar producto
-========================================================= */
-/* =========================================================
-   MAHPE v1.2
-
-   PARTE 2/4
+   BLOQUE 2/4 CONTINÚA INMEDIATAMENTE CON:
 
    - Crear empresa
    - Identidad visual
+   - "Crea tu logo con IA:"
    - Subir logo
-   - Recursos externos para crear logo con IA
-   - Productos
-   - Galería de imágenes
-   - Portada
-   - Crear / editar / eliminar producto
+   - Crear productos
+   - Hasta 5 imágenes
+   - Elegir portada
+   - Editar producto
+   - Eliminar producto
+   - Publicar producto
+   - Galería / vitrina empresarial
+
+========================================================= */
+/* =========================================================
+   MAHPE v2.0
+   Crea. Simula. Haz crecer.
+
+   BLOQUE 2/4
+   ---------------------------------------------------------
+   EMPRESA + IDENTIDAD + PRODUCTOS
+
+   - Crear empresa
+   - Identidad visual
+   - Logo de empresa
+   - Links externos para crear logo con IA
+   - Crear producto
+   - Hasta 5 imágenes
+   - Elegir portada
+   - Editar producto
+   - Eliminar producto
    - Publicar producto en MAHPE
+   - Publicaciones empresariales
+   - Métricas por producto
+   - Potencial del producto
+   ---------------------------------------------------------
+
+   CONTINÚA DIRECTAMENTE DESPUÉS DEL BLOQUE 1/4
 ========================================================= */
 
 
 /* =========================================================
-   31. ELEMENTOS — CREAR EMPRESA
+   56. ELEMENTOS — CREAR EMPRESA
 ========================================================= */
 
 const companyNameInput =
@@ -3195,7 +4110,92 @@ const createCompanyStatus =
 
 
 /* =========================================================
-   32. CREAR EMPRESA
+   57. MENSAJE — CREAR EMPRESA
+========================================================= */
+
+function setCreateCompanyStatus(
+    message,
+    type = ""
+) {
+
+    if (!createCompanyStatus) {
+
+        return;
+
+    }
+
+
+    createCompanyStatus.textContent =
+        message;
+
+
+    createCompanyStatus.className =
+        "form-message";
+
+
+    if (type) {
+
+        createCompanyStatus.classList.add(
+            type
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   58. LIMPIAR FORMULARIO DE EMPRESA
+========================================================= */
+
+function clearCompanyForm() {
+
+    if (companyNameInput) {
+
+        companyNameInput.value = "";
+
+    }
+
+
+    if (companyCategoryInput) {
+
+        companyCategoryInput.value = "";
+
+    }
+
+
+    if (companyDescriptionInput) {
+
+        companyDescriptionInput.value = "";
+
+    }
+
+
+    if (companyProductInput) {
+
+        companyProductInput.value = "";
+
+    }
+
+
+    if (companyPriceInput) {
+
+        companyPriceInput.value = "";
+
+    }
+
+
+    if (companyAudienceInput) {
+
+        companyAudienceInput.value = "";
+
+    }
+
+}
+
+
+/* =========================================================
+   59. CREAR EMPRESA
 ========================================================= */
 
 function createCompany() {
@@ -3218,7 +4218,7 @@ function createCompany() {
             : "";
 
 
-    const product =
+    const firstProduct =
         companyProductInput
             ? companyProductInput.value.trim()
             : "";
@@ -3228,7 +4228,7 @@ function createCompany() {
         companyPriceInput
             ? Number(
                 companyPriceInput.value
-            )
+            ) || 0
             : 0;
 
 
@@ -3238,19 +4238,48 @@ function createCompany() {
             : "";
 
 
-    if (
-        !name ||
-        !category ||
-        !description
-    ) {
+    if (!name) {
 
-        if (createCompanyStatus) {
+        setCreateCompanyStatus(
+            "Escribe el nombre de tu empresa.",
+            "error"
+        );
 
-            createCompanyStatus.textContent =
-                "Completa el nombre, categoría y descripción.";
+        return;
 
-        }
+    }
 
+
+    if (!category) {
+
+        setCreateCompanyStatus(
+            "Indica la categoría de tu empresa.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const duplicate =
+        mahpeState.companies.some(
+
+            company =>
+                company.name
+                    .trim()
+                    .toLowerCase() ===
+                name.toLowerCase()
+
+        );
+
+
+    if (duplicate) {
+
+        setCreateCompanyStatus(
+            "Ya tienes una empresa con ese nombre.",
+            "error"
+        );
 
         return;
 
@@ -3270,12 +4299,10 @@ function createCompany() {
 
         description,
 
-        product,
+        product:
+            firstProduct,
 
-        price:
-            Number.isFinite(price)
-                ? price
-                : 0,
+        price,
 
         audience,
 
@@ -3290,21 +4317,31 @@ function createCompany() {
 
         committed: 0,
 
+        /*
+           Valor interno del simulador.
+           NO representa dinero real.
+        */
+
         value: 500,
+
+        /*
+           Capital ficticio del simulador.
+           NO es saldo retirable.
+        */
 
         capital: 500,
 
         activity: 20,
 
-        marketResponse: 20,
+        marketResponse: 10,
 
-        locationStrength: 20,
+        locationStrength: 10,
 
         risk: 15,
 
-        designLevel: 20,
+        designLevel: 10,
 
-        productValidation: 10,
+        productValidation: 5,
 
         marketKnowledge: 10,
 
@@ -3323,13 +4360,80 @@ function createCompany() {
     };
 
 
-    mahpeState.companies.push(
+    mahpeState.companies.unshift(
         company
     );
 
 
     currentCompanyId =
         company.id;
+
+
+    /*
+       Si el usuario escribió un producto
+       durante la creación de empresa,
+       lo convertimos en producto real
+       dentro de la vitrina.
+    */
+
+    if (firstProduct) {
+
+        const product = {
+
+            id:
+                generateId(
+                    "product"
+                ),
+
+            companyId:
+                company.id,
+
+            name:
+                firstProduct,
+
+            category,
+
+            price,
+
+            description:
+                "Primer producto de " +
+                name +
+                ".",
+
+            images: [],
+
+            coverIndex: 0,
+
+            published: false,
+
+            metrics: {
+
+                views: 0,
+
+                interactions: 0,
+
+                interested: 0,
+
+                committed: 0
+
+            },
+
+            createdAt:
+                new Date()
+                    .toISOString(),
+
+            updatedAt:
+                new Date()
+                    .toISOString()
+
+        };
+
+
+        mahpeState.products.unshift(
+            product
+        );
+
+    }
 
 
     addMahpeEvent(
@@ -3348,97 +4452,51 @@ function createCompany() {
     saveMahpeState();
 
 
-    if (createCompanyStatus) {
-
-        createCompanyStatus.textContent =
-            "✓ Empresa creada. Ya puedes desarrollar su identidad y productos.";
-
-    }
+    clearCompanyForm();
 
 
-    if (companyNameInput) {
-
-        companyNameInput.value =
-            "";
-
-    }
+    setCreateCompanyStatus(
+        "Empresa creada. Ya puedes desarrollar su identidad y productos.",
+        "success"
+    );
 
 
-    if (companyCategoryInput) {
+    if (
+        typeof renderCompanyDashboard ===
+        "function"
+    ) {
 
-        companyCategoryInput.value =
-            "";
+        renderCompanyDashboard();
 
     }
 
 
-    if (companyDescriptionInput) {
+    if (
+        typeof updateProfile ===
+        "function"
+    ) {
 
-        companyDescriptionInput.value =
-            "";
-
-    }
-
-
-    if (companyProductInput) {
-
-        companyProductInput.value =
-            "";
+        updateProfile();
 
     }
 
 
-    if (companyPriceInput) {
+    setTimeout(
+        () => {
 
-        companyPriceInput.value =
-            "";
+            openView(
+                "companyView"
+            );
 
-    }
-
-
-    if (companyAudienceInput) {
-
-        companyAudienceInput.value =
-            "";
-
-    }
-
-
-    renderActivityInbox();
-
-
-    renderCompanyDashboard();
-
-
-    updateProfile();
-
-
-    openView(
-        "companyView"
+        },
+        250
     );
 
 }
 
 
 /* =========================================================
-   33. BOTÓN CREAR EMPRESA
-========================================================= */
-
-if (createCompanyButton) {
-
-    createCompanyButton.addEventListener(
-
-        "click",
-
-        createCompany
-
-    );
-
-}
-
-
-/* =========================================================
-   34. IDENTIDAD DE MARCA
+   60. IDENTIDAD VISUAL
 ========================================================= */
 
 function renderBrandIdentity(
@@ -3452,43 +4510,6 @@ function renderBrandIdentity(
     }
 
 
-    const avatar =
-        company.brandImage
-
-            ? `
-
-                <div
-                    class="brand-profile-image has-image"
-                >
-
-                    <img
-                        src="${company.brandImage}"
-                        alt="Logo de ${escapeHTML(
-                            company.name
-                        )}"
-                    >
-
-                </div>
-
-            `
-
-            : `
-
-                <div
-                    class="brand-profile-image"
-                >
-
-                    ${escapeHTML(
-                        company.name
-                            .charAt(0)
-                            .toUpperCase()
-                    )}
-
-                </div>
-
-            `;
-
-
     return `
 
         <section
@@ -3499,102 +4520,28 @@ function renderBrandIdentity(
                 class="brand-identity-header"
             >
 
-                ${avatar}
-
-
-                <div
-                    class="brand-identity-copy"
-                >
+                <div>
 
                     <span
                         class="eyebrow"
                     >
-                        IDENTIDAD DE MARCA
+                        IDENTIDAD
                     </span>
 
 
                     <h3>
-
-                        ${escapeHTML(
-                            company.name
-                        )}
-
+                        Identidad visual
                     </h3>
-
-
-                    <p class="muted">
-
-                        ${
-                            company.brandImage
-
-                                ? "Este logo representa tu empresa dentro de MAHPE."
-
-                                : "Agrega un logo para que tu empresa sea reconocible."
-                        }
-
-                    </p>
 
                 </div>
 
-            </div>
 
-
-            <div
-                class="brand-identity-actions"
-            >
-
-                <label
-                    class="secondary-button brand-upload-button"
-                    for="brandLogoInput"
-                >
-
-                    ${
-                        company.brandImage
-
-                            ? "CAMBIAR LOGO"
-
-                            : "SUBIR LOGO"
-                    }
-
-                </label>
-
-
-                <input
-                    id="brandLogoInput"
-                    type="file"
-                    accept="image/*"
-                    hidden
-                >
-
-
-                ${
-                    company.brandImage
-
-                        ? `
-
-                            <button
-                                id="removeBrandLogoButton"
-                                class="secondary-button"
-                                type="button"
-                            >
-
-                                QUITAR
-
-                            </button>
-
-                        `
-
-                        : ""
-                }
+                ${renderCompanyAvatar(
+                    company,
+                    "brand-profile-avatar"
+                )}
 
             </div>
-
-
-            <div
-                id="brandUploadStatus"
-                class="form-message"
-                aria-live="polite"
-            ></div>
 
 
             <div
@@ -3602,13 +4549,8 @@ function renderBrandIdentity(
             >
 
                 <strong>
-                    ¿Aún no tienes logo?
-                </strong>
-
-
-                <p>
                     Crea tu logo con IA:
-                </p>
+                </strong>
 
 
                 <div
@@ -3634,7 +4576,7 @@ function renderBrandIdentity(
 
 
                     <a
-                        href="https://www.adobe.com/express/create/ai/logo"
+                        href="https://www.adobe.com/express/create/logo"
                         target="_blank"
                         rel="noopener noreferrer"
                     >
@@ -3643,7 +4585,7 @@ function renderBrandIdentity(
 
 
                     <a
-                        href="https://looka.com/ai-logo-generator/"
+                        href="https://looka.com/"
                         target="_blank"
                         rel="noopener noreferrer"
                     >
@@ -3651,6 +4593,56 @@ function renderBrandIdentity(
                     </a>
 
                 </div>
+
+            </div>
+
+
+            <div
+                class="brand-upload-row"
+            >
+
+                <input
+                    id="companyLogoInput"
+                    type="file"
+                    accept="image/*"
+                    hidden
+                >
+
+
+                <button
+                    class="secondary-button"
+                    type="button"
+                    onclick="openCompanyLogoPicker()"
+                >
+
+                    ${
+                        company.brandImage
+                            ? "CAMBIAR LOGO"
+                            : "SUBIR LOGO"
+                    }
+
+                </button>
+
+
+                ${
+                    company.brandImage
+
+                        ? `
+
+                            <button
+                                class="text-button danger"
+                                type="button"
+                                onclick="removeCompanyLogo()"
+                            >
+
+                                Quitar
+
+                            </button>
+
+                        `
+
+                        : ""
+                }
 
             </div>
 
@@ -3662,35 +4654,20 @@ function renderBrandIdentity(
 
 
 /* =========================================================
-   35. CONECTAR IDENTIDAD DE MARCA
+   61. ABRIR SELECTOR DE LOGO
 ========================================================= */
 
-function bindBrandIdentityEvents() {
+function openCompanyLogoPicker() {
 
     const input =
         document.getElementById(
-            "brandLogoInput"
-        );
-
-
-    const removeButton =
-        document.getElementById(
-            "removeBrandLogoButton"
+            "companyLogoInput"
         );
 
 
     if (input) {
 
-        input.onchange =
-            handleBrandLogoUpload;
-
-    }
-
-
-    if (removeButton) {
-
-        removeButton.onclick =
-            removeBrandLogo;
+        input.click();
 
     }
 
@@ -3698,58 +4675,28 @@ function bindBrandIdentityEvents() {
 
 
 /* =========================================================
-   36. SUBIR LOGO
+   62. PROCESAR LOGO
 ========================================================= */
 
-async function handleBrandLogoUpload(
-    event
+async function handleCompanyLogoFile(
+    file
 ) {
 
     const company =
         getCurrentCompany();
 
 
-    if (!company) {
+    if (
+        !company ||
+        !file
+    ) {
 
         return;
-
-    }
-
-
-    const file =
-        event.target.files &&
-        event.target.files[0];
-
-
-    if (!file) {
-
-        return;
-
-    }
-
-
-    const status =
-        document.getElementById(
-            "brandUploadStatus"
-        );
-
-
-    if (status) {
-
-        status.textContent =
-            "Procesando imagen...";
 
     }
 
 
     try {
-
-        /*
-           Logo:
-           resolución menor que producto
-           porque se utilizará principalmente
-           como avatar.
-        */
 
         const image =
             await compressImageFile(
@@ -3776,20 +4723,14 @@ async function handleBrandLogoUpload(
                 .toISOString();
 
 
-        migrateCompanyBusinessData(
-            company
-        );
-
-
         company.designLevel =
             clamp(
-                company.designLevel +
-                4
+                Number(
+                    company.designLevel ||
+                    0
+                ) +
+                8
             );
-
-
-        company.value +=
-            15;
 
 
         addMahpeEvent(
@@ -3808,16 +4749,17 @@ async function handleBrandLogoUpload(
         saveMahpeState();
 
 
-        renderCompanyDashboard();
+        if (
+            typeof renderCompanyDashboard ===
+            "function"
+        ) {
+
+            renderCompanyDashboard();
+
+        }
 
 
         renderFeed();
-
-
-        renderActivityInbox();
-
-
-        updateProfile();
 
     }
 
@@ -3828,12 +4770,10 @@ async function handleBrandLogoUpload(
         );
 
 
-        if (status) {
-
-            status.textContent =
-                "No se pudo procesar el logo.";
-
-        }
+        alert(
+            error.message ||
+            "No se pudo procesar el logo."
+        );
 
     }
 
@@ -3841,10 +4781,10 @@ async function handleBrandLogoUpload(
 
 
 /* =========================================================
-   37. QUITAR LOGO
+   63. QUITAR LOGO
 ========================================================= */
 
-function removeBrandLogo() {
+function removeCompanyLogo() {
 
     const company =
         getCurrentCompany();
@@ -3881,94 +4821,137 @@ function removeBrandLogo() {
     saveMahpeState();
 
 
-    renderCompanyDashboard();
+    if (
+        typeof renderCompanyDashboard ===
+        "function"
+    ) {
+
+        renderCompanyDashboard();
+
+    }
 
 
     renderFeed();
-
-
-    renderActivityInbox();
 
 }
 
 
 /* =========================================================
-   38. ELEMENTOS DEL EDITOR DE PRODUCTO
+   64. CONECTAR INPUT DE LOGO DINÁMICO
 ========================================================= */
 
-const productEditor =
-    document.getElementById(
-        "productEditor"
-    );
+function bindCompanyLogoInput() {
+
+    const input =
+        document.getElementById(
+            "companyLogoInput"
+        );
 
 
-const productEditorTitle =
-    document.getElementById(
-        "productEditorTitle"
-    );
+    if (!input) {
+
+        return;
+
+    }
 
 
-const productNameInput =
-    document.getElementById(
-        "productNameInput"
-    );
+    input.onchange =
+        async function() {
+
+            const file =
+                this.files &&
+                this.files[0];
 
 
-const productCategoryInput =
-    document.getElementById(
-        "productCategoryInput"
-    );
+            if (file) {
+
+                await handleCompanyLogoFile(
+                    file
+                );
+
+            }
 
 
-const productPriceInput =
-    document.getElementById(
-        "productPriceInput"
-    );
+            this.value = "";
 
+        };
 
-const productDescriptionInput =
-    document.getElementById(
-        "productDescriptionInput"
-    );
-
-
-const productImagesInput =
-    document.getElementById(
-        "productImagesInput"
-    );
-
-
-const productImagePreview =
-    document.getElementById(
-        "productImagePreview"
-    );
-
-
-const cancelProductButton =
-    document.getElementById(
-        "cancelProductButton"
-    );
-
-
-const saveProductButton =
-    document.getElementById(
-        "saveProductButton"
-    );
-
-
-const productEditorStatus =
-    document.getElementById(
-        "productEditorStatus"
-    );
+}
 
 
 /* =========================================================
-   39. ABRIR EDITOR DE PRODUCTO
+   65. ELEMENTOS — EDITOR DE PRODUCTO
 ========================================================= */
 
-function openProductEditor(
-    productId = null
-) {
+function getProductEditorElements() {
+
+    return {
+
+        editor:
+            document.getElementById(
+                "productEditor"
+            ),
+
+        title:
+            document.getElementById(
+                "productEditorTitle"
+            ),
+
+        name:
+            document.getElementById(
+                "productNameInput"
+            ),
+
+        category:
+            document.getElementById(
+                "productCategoryInput"
+            ),
+
+        price:
+            document.getElementById(
+                "productPriceInput"
+            ),
+
+        description:
+            document.getElementById(
+                "productDescriptionInput"
+            ),
+
+        images:
+            document.getElementById(
+                "productImagesInput"
+            ),
+
+        preview:
+            document.getElementById(
+                "productImagePreview"
+            ),
+
+        save:
+            document.getElementById(
+                "saveProductButton"
+            ),
+
+        cancel:
+            document.getElementById(
+                "cancelProductButton"
+            ),
+
+        status:
+            document.getElementById(
+                "productEditorStatus"
+            )
+
+    };
+
+}
+
+
+/* =========================================================
+   66. ABRIR EDITOR — NUEVO PRODUCTO
+========================================================= */
+
+function openNewProductEditor() {
 
     const company =
         getCurrentCompany();
@@ -3982,7 +4965,7 @@ function openProductEditor(
 
 
     editingProductId =
-        productId;
+        null;
 
 
     productEditorImages =
@@ -3993,136 +4976,71 @@ function openProductEditor(
         0;
 
 
-    if (productId) {
-
-        const product =
-            getProductById(
-                productId
-            );
+    const elements =
+        getProductEditorElements();
 
 
-        if (!product) {
+    if (
+        !elements.editor
+    ) {
 
-            return;
+        console.warn(
+            "MAHPE: #productEditor no existe en index.html."
+        );
 
-        }
-
-
-        if (productNameInput) {
-
-            productNameInput.value =
-                product.name || "";
-
-        }
-
-
-        if (productCategoryInput) {
-
-            productCategoryInput.value =
-                product.category || "";
-
-        }
-
-
-        if (productPriceInput) {
-
-            productPriceInput.value =
-                Number(
-                    product.price
-                ) || "";
-
-        }
-
-
-        if (productDescriptionInput) {
-
-            productDescriptionInput.value =
-                product.description ||
-                "";
-
-        }
-
-
-        productEditorImages =
-            Array.isArray(
-                product.images
-            )
-
-                ? product.images.slice()
-
-                : [];
-
-
-        productEditorCoverIndex =
-            Number(
-                product.coverIndex
-            ) || 0;
-
-
-        if (productEditorTitle) {
-
-            productEditorTitle.textContent =
-                "Editar producto";
-
-        }
-
-    }
-
-    else {
-
-        if (productNameInput) {
-
-            productNameInput.value =
-                "";
-
-        }
-
-
-        if (productCategoryInput) {
-
-            productCategoryInput.value =
-                "";
-
-        }
-
-
-        if (productPriceInput) {
-
-            productPriceInput.value =
-                "";
-
-        }
-
-
-        if (productDescriptionInput) {
-
-            productDescriptionInput.value =
-                "";
-
-        }
-
-
-        if (productImagesInput) {
-
-            productImagesInput.value =
-                "";
-
-        }
-
-
-        if (productEditorTitle) {
-
-            productEditorTitle.textContent =
-                "Agregar producto";
-
-        }
+        return;
 
     }
 
 
-    if (productEditorStatus) {
+    if (elements.title) {
 
-        productEditorStatus.textContent =
+        elements.title.textContent =
+            "Agregar producto";
+
+    }
+
+
+    if (elements.name) {
+
+        elements.name.value = "";
+
+    }
+
+
+    if (elements.category) {
+
+        elements.category.value =
+            company.category ||
+            "";
+
+    }
+
+
+    if (elements.price) {
+
+        elements.price.value = "";
+
+    }
+
+
+    if (elements.description) {
+
+        elements.description.value = "";
+
+    }
+
+
+    if (elements.images) {
+
+        elements.images.value = "";
+
+    }
+
+
+    if (elements.status) {
+
+        elements.status.textContent =
             "";
 
     }
@@ -4131,26 +5049,29 @@ function openProductEditor(
     renderProductImagePreview();
 
 
-    if (productEditor) {
+    elements.editor.classList.remove(
+        "hidden"
+    );
 
-        productEditor.classList.remove(
-            "hidden"
-        );
 
+    elements.editor.scrollIntoView({
+
+        behavior: "smooth",
+
+        block: "start"
+
+    });
+
+
+    if (elements.name) {
 
         setTimeout(
             () => {
 
-                productEditor.scrollIntoView({
-
-                    behavior: "smooth",
-
-                    block: "start"
-
-                });
+                elements.name.focus();
 
             },
-            40
+            200
         );
 
     }
@@ -4159,42 +5080,196 @@ function openProductEditor(
 
 
 /* =========================================================
-   40. CERRAR EDITOR
+   67. EDITAR PRODUCTO
+========================================================= */
+
+function editProduct(
+    productId
+) {
+
+    const product =
+        getProductById(
+            productId
+        );
+
+
+    if (!product) {
+
+        return;
+
+    }
+
+
+    const company =
+        getCurrentCompany();
+
+
+    if (
+        !company ||
+        product.companyId !==
+            company.id
+    ) {
+
+        return;
+
+    }
+
+
+    editingProductId =
+        product.id;
+
+
+    productEditorImages =
+        Array.isArray(
+            product.images
+        )
+
+            ? [
+                ...product.images
+            ]
+
+            : [];
+
+
+    productEditorCoverIndex =
+        Number(
+            product.coverIndex ||
+            0
+        );
+
+
+    const elements =
+        getProductEditorElements();
+
+
+    if (!elements.editor) {
+
+        return;
+
+    }
+
+
+    if (elements.title) {
+
+        elements.title.textContent =
+            "Editar producto";
+
+    }
+
+
+    if (elements.name) {
+
+        elements.name.value =
+            product.name ||
+            "";
+
+    }
+
+
+    if (elements.category) {
+
+        elements.category.value =
+            product.category ||
+            "";
+
+    }
+
+
+    if (elements.price) {
+
+        elements.price.value =
+            Number(
+                product.price ||
+                0
+            );
+
+    }
+
+
+    if (elements.description) {
+
+        elements.description.value =
+            product.description ||
+            "";
+
+    }
+
+
+    if (elements.images) {
+
+        elements.images.value =
+            "";
+
+    }
+
+
+    if (elements.status) {
+
+        elements.status.textContent =
+            "";
+
+    }
+
+
+    renderProductImagePreview();
+
+
+    elements.editor.classList.remove(
+        "hidden"
+    );
+
+
+    elements.editor.scrollIntoView({
+
+        behavior: "smooth",
+
+        block: "start"
+
+    });
+
+}
+
+
+/* =========================================================
+   68. CERRAR EDITOR
 ========================================================= */
 
 function closeProductEditor(
-    clear = true
+    scrollToCompany = true
 ) {
 
-    if (productEditor) {
+    const elements =
+        getProductEditorElements();
 
-        productEditor.classList.add(
+
+    if (elements.editor) {
+
+        elements.editor.classList.add(
             "hidden"
         );
 
     }
 
 
-    if (clear) {
-
-        editingProductId =
-            null;
+    editingProductId =
+        null;
 
 
-        productEditorImages =
-            [];
+    productEditorImages =
+        [];
 
 
-        productEditorCoverIndex =
-            0;
+    productEditorCoverIndex =
+        0;
 
 
-        if (productImagesInput) {
+    if (
+        scrollToCompany &&
+        typeof renderCompanyDashboard ===
+            "function"
+    ) {
 
-            productImagesInput.value =
-                "";
-
-        }
+        renderCompanyDashboard();
 
     }
 
@@ -4202,21 +5277,55 @@ function closeProductEditor(
 
 
 /* =========================================================
-   41. CARGAR IMÁGENES DE PRODUCTO
+   69. ESTADO DEL EDITOR
 ========================================================= */
 
-async function handleProductImages(
-    event
+function setProductEditorStatus(
+    message,
+    type = ""
 ) {
 
-    const files =
-        Array.from(
-            event.target.files ||
-            []
+    const element =
+        document.getElementById(
+            "productEditorStatus"
         );
 
 
-    if (!files.length) {
+    if (!element) {
+
+        return;
+
+    }
+
+
+    element.textContent =
+        message;
+
+
+    element.className =
+        "form-message";
+
+
+    if (type) {
+
+        element.classList.add(
+            type
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   70. LEER IMÁGENES DEL PRODUCTO
+========================================================= */
+
+async function handleProductImages(
+    files
+) {
+
+    if (!files) {
 
         return;
 
@@ -4234,58 +5343,56 @@ async function handleProductImages(
         );
 
 
-    if (available === 0) {
+    if (available <= 0) {
 
-        if (productEditorStatus) {
-
-            productEditorStatus.textContent =
-                "Puedes guardar hasta 5 imágenes por producto.";
-
-        }
-
-
-        event.target.value =
-            "";
-
+        setProductEditorStatus(
+            "Puedes usar hasta 5 imágenes por producto.",
+            "error"
+        );
 
         return;
 
     }
 
 
-    const selectedFiles =
-        files.slice(
+    const selected =
+        Array.from(
+            files
+        ).slice(
             0,
             available
         );
 
 
-    if (productEditorStatus) {
+    if (!selected.length) {
 
-        productEditorStatus.textContent =
-            "Procesando imágenes...";
+        return;
 
     }
 
 
+    setProductEditorStatus(
+        "Procesando imágenes..."
+    );
+
+
     for (
-        const file of selectedFiles
+        const file
+        of selected
     ) {
 
         try {
 
-            const image =
+            const compressed =
                 await compressImageFile(
 
                     file,
 
                     {
 
-                        maxDimension:
-                            1200,
+                        maxDimension: 1200,
 
-                        quality:
-                            0.76
+                        quality: 0.76
 
                     }
 
@@ -4293,15 +5400,14 @@ async function handleProductImages(
 
 
             productEditorImages.push(
-                image
+                compressed
             );
 
         }
 
         catch (error) {
 
-            console.error(
-                "Imagen de producto:",
+            console.warn(
                 error
             );
 
@@ -4321,44 +5427,36 @@ async function handleProductImages(
     }
 
 
-    event.target.value =
-        "";
-
-
-    if (productEditorStatus) {
-
-        if (
-            files.length >
-            available
-        ) {
-
-            productEditorStatus.textContent =
-                "Se añadieron las imágenes disponibles hasta completar el máximo de 5.";
-
-        }
-
-        else {
-
-            productEditorStatus.textContent =
-                "";
-
-        }
-
-    }
-
-
     renderProductImagePreview();
+
+
+    setProductEditorStatus(
+
+        productEditorImages.length
+
+            ? productEditorImages.length +
+              "/5 imágenes listas."
+
+            : ""
+
+    );
 
 }
 
 
 /* =========================================================
-   42. PREVISUALIZACIÓN DE IMÁGENES
+   71. PREVISUALIZACIÓN DE IMÁGENES
 ========================================================= */
 
 function renderProductImagePreview() {
 
-    if (!productImagePreview) {
+    const container =
+        document.getElementById(
+            "productImagePreview"
+        );
+
+
+    if (!container) {
 
         return;
 
@@ -4369,25 +5467,30 @@ function renderProductImagePreview() {
         !productEditorImages.length
     ) {
 
-        productImagePreview.innerHTML = `
+        container.innerHTML = `
 
             <div
                 class="product-preview-empty"
             >
 
-                Aún no has agregado imágenes.
+                <span>
+                    ＋
+                </span>
+
+                <small>
+                    Añade imágenes para construir la vitrina del producto.
+                </small>
 
             </div>
 
         `;
-
 
         return;
 
     }
 
 
-    productImagePreview.innerHTML =
+    container.innerHTML =
         productEditorImages
             .map(
                 (
@@ -4395,78 +5498,64 @@ function renderProductImagePreview() {
                     index
                 ) => `
 
-                    <article
+                    <div
                         class="product-preview-item ${
                             index ===
                             productEditorCoverIndex
 
-                                ? "is-cover"
+                                ? "cover"
 
                                 : ""
                         }"
                     >
 
-                        <div
-                            class="product-preview-image"
+                        <img
+                            src="${image}"
+                            alt="Imagen ${
+                                index + 1
+                            } del producto"
                         >
 
-                            <img
-                                src="${image}"
-                                alt="Imagen ${
-                                    index + 1
-                                } del producto"
-                            >
 
+                        ${
+                            index ===
+                            productEditorCoverIndex
 
-                            ${
-                                index ===
-                                productEditorCoverIndex
+                                ? `
 
-                                    ? `
+                                    <span
+                                        class="product-preview-cover"
+                                    >
+                                        PORTADA
+                                    </span>
 
-                                        <span
-                                            class="cover-label"
-                                        >
+                                `
 
-                                            PORTADA
-
-                                        </span>
-
-                                    `
-
-                                    : ""
-                            }
-
-                        </div>
+                                : ""
+                        }
 
 
                         <div
-                            class="product-preview-actions"
+                            class="product-preview-overlay"
                         >
 
                             <button
-                                class="product-cover-button"
+                                class="product-preview-button"
                                 type="button"
-                                data-cover-index="${index}"
+                                onclick="setProductCover(${index})"
+                                title="Usar como portada"
                             >
 
-                                ${
-                                    index ===
-                                    productEditorCoverIndex
-
-                                        ? "PORTADA"
-
-                                        : "USAR DE PORTADA"
-                                }
+                                ★
 
                             </button>
 
 
                             <button
-                                class="product-remove-image"
+                                class="product-preview-button"
                                 type="button"
-                                data-remove-index="${index}"
-                                aria-label="Eliminar imagen"
+                                onclick="removeProductEditorImage(${index})"
+                                title="Eliminar imagen"
                             >
 
                                 ×
@@ -4475,65 +5564,57 @@ function renderProductImagePreview() {
 
                         </div>
 
-                    </article>
+                    </div>
 
                 `
             )
-            .join("");
+            .join("") +
 
+        `
 
-    productImagePreview
-        .querySelectorAll(
-            "[data-cover-index]"
-        )
-        .forEach(
-            button => {
+            <div
+                class="product-image-counter"
+            >
 
-                button.onclick =
-                    function() {
+                ${productEditorImages.length}/5
 
-                        productEditorCoverIndex =
-                            Number(
-                                this.dataset.coverIndex
-                            ) || 0;
+            </div>
 
-
-                        renderProductImagePreview();
-
-                    };
-
-            }
-        );
-
-
-    productImagePreview
-        .querySelectorAll(
-            "[data-remove-index]"
-        )
-        .forEach(
-            button => {
-
-                button.onclick =
-                    function() {
-
-                        removeProductEditorImage(
-
-                            Number(
-                                this.dataset.removeIndex
-                            )
-
-                        );
-
-                    };
-
-            }
-        );
+        `;
 
 }
 
 
 /* =========================================================
-   43. ELIMINAR IMAGEN DEL EDITOR
+   72. ELEGIR PORTADA
+========================================================= */
+
+function setProductCover(
+    index
+) {
+
+    if (
+        index < 0 ||
+        index >=
+            productEditorImages.length
+    ) {
+
+        return;
+
+    }
+
+
+    productEditorCoverIndex =
+        index;
+
+
+    renderProductImagePreview();
+
+}
+
+
+/* =========================================================
+   73. QUITAR IMAGEN
 ========================================================= */
 
 function removeProductEditorImage(
@@ -4566,23 +5647,24 @@ function removeProductEditorImage(
 
     }
 
-    else if (
-        index <
-        productEditorCoverIndex
-    ) {
-
-        productEditorCoverIndex -=
-            1;
-
-    }
 
     else if (
-        productEditorCoverIndex >=
-        productEditorImages.length
+        productEditorCoverIndex ===
+        index
     ) {
 
         productEditorCoverIndex =
-            productEditorImages.length -
+            0;
+
+    }
+
+
+    else if (
+        productEditorCoverIndex >
+        index
+    ) {
+
+        productEditorCoverIndex -=
             1;
 
     }
@@ -4594,10 +5676,10 @@ function removeProductEditorImage(
 
 
 /* =========================================================
-   44. GUARDAR PRODUCTO
+   74. GUARDAR PRODUCTO
 ========================================================= */
 
-function saveProduct() {
+function saveProductFromEditor() {
 
     const company =
         getCurrentCompany();
@@ -4605,99 +5687,73 @@ function saveProduct() {
 
     if (!company) {
 
-        if (productEditorStatus) {
-
-            productEditorStatus.textContent =
-                "Primero debes crear una empresa.";
-
-        }
-
+        setProductEditorStatus(
+            "Primero crea una empresa.",
+            "error"
+        );
 
         return;
 
     }
 
 
+    const elements =
+        getProductEditorElements();
+
+
     const name =
-        productNameInput
-            ? productNameInput.value.trim()
+        elements.name
+            ? elements.name.value.trim()
             : "";
 
 
     const category =
-        productCategoryInput
-            ? productCategoryInput.value.trim()
+        elements.category
+            ? elements.category.value.trim()
             : "";
 
 
     const price =
-        productPriceInput
+        elements.price
             ? Number(
-                productPriceInput.value
-            )
+                elements.price.value
+            ) || 0
             : 0;
 
 
     const description =
-        productDescriptionInput
-            ? productDescriptionInput.value.trim()
+        elements.description
+            ? elements.description.value.trim()
             : "";
 
 
-    if (
-        !name ||
-        !category ||
-        !description
-    ) {
+    if (!name) {
 
-        if (productEditorStatus) {
-
-            productEditorStatus.textContent =
-                "Completa el nombre, categoría y descripción.";
-
-        }
-
+        setProductEditorStatus(
+            "Escribe el nombre del producto.",
+            "error"
+        );
 
         return;
 
     }
 
 
-    if (
-        !Number.isFinite(price) ||
-        price < 0
-    ) {
+    if (price < 0) {
 
-        if (productEditorStatus) {
-
-            productEditorStatus.textContent =
-                "Ingresa un precio válido.";
-
-        }
-
+        setProductEditorStatus(
+            "El precio no puede ser negativo.",
+            "error"
+        );
 
         return;
 
     }
 
 
-    if (
-        productEditorImages.length >
-        5
-    ) {
-
-        if (productEditorStatus) {
-
-            productEditorStatus.textContent =
-                "El máximo es de 5 imágenes.";
-
-        }
-
-
-        return;
-
-    }
-
+    /*
+       EDITAR PRODUCTO EXISTENTE
+    */
 
     if (editingProductId) {
 
@@ -4708,6 +5764,11 @@ function saveProduct() {
 
 
         if (!product) {
+
+            setProductEditorStatus(
+                "No encontramos el producto.",
+                "error"
+            );
 
             return;
 
@@ -4731,7 +5792,9 @@ function saveProduct() {
 
 
         product.images =
-            productEditorImages.slice();
+            [
+                ...productEditorImages
+            ];
 
 
         product.coverIndex =
@@ -4743,11 +5806,6 @@ function saveProduct() {
                 .toISOString();
 
 
-        migrateProductData(
-            product
-        );
-
-
         addMahpeEvent(
 
             "product",
@@ -4756,11 +5814,32 @@ function saveProduct() {
             product.name +
             ".",
 
-            company.id
+            company.id,
+
+            {
+
+                productId:
+                    product.id
+
+            }
 
         );
 
+
+        saveMahpeState();
+
+
+        setProductEditorStatus(
+            "Producto actualizado.",
+            "success"
+        );
+
     }
+
+
+    /*
+       NUEVO PRODUCTO
+    */
 
     else {
 
@@ -4783,10 +5862,14 @@ function saveProduct() {
             description,
 
             images:
-                productEditorImages.slice(),
+                [
+                    ...productEditorImages
+                ],
 
             coverIndex:
                 productEditorCoverIndex,
+
+            published: false,
 
             metrics: {
 
@@ -4800,9 +5883,6 @@ function saveProduct() {
 
             },
 
-            published:
-                false,
-
             createdAt:
                 new Date()
                     .toISOString(),
@@ -4814,106 +5894,80 @@ function saveProduct() {
         };
 
 
-        mahpeState.products.push(
+        mahpeState.products.unshift(
             product
-        );
-
-
-        migrateCompanyBusinessData(
-            company
         );
 
 
         company.productValidation =
             clamp(
-                company.productValidation +
-                2
+                Number(
+                    company.productValidation ||
+                    0
+                ) +
+                3
             );
 
 
         company.activity =
             clamp(
-                company.activity +
+                Number(
+                    company.activity ||
+                    0
+                ) +
                 2
             );
-
-
-        company.value +=
-            15;
 
 
         addMahpeEvent(
 
             "product",
 
-            "Creaste el producto " +
+            "Añadiste " +
             product.name +
+            " a " +
+            company.name +
             ".",
 
-            company.id
+            company.id,
 
+            {
+
+                productId:
+                    product.id
+
+            }
+
+        );
+
+
+        saveMahpeState();
+
+
+        setProductEditorStatus(
+            "Producto creado.",
+            "success"
         );
 
     }
 
 
-    recalculateCompanyStage(
-        company
-    );
+    setTimeout(
+        () => {
 
+            closeProductEditor(
+                true
+            );
 
-    saveMahpeState();
-
-
-    closeProductEditor();
-
-
-    currentCompanyTab =
-        "products";
-
-
-    renderCompanyDashboard();
-
-
-    renderActivityInbox();
-
-}
-
-
-/* =========================================================
-   45. EDITAR PRODUCTO
-========================================================= */
-
-function editProduct(
-    productId
-) {
-
-    const product =
-        getProductById(
-            productId
-        );
-
-
-    if (!product) {
-
-        return;
-
-    }
-
-
-    currentCompanyTab =
-        "products";
-
-
-    openProductEditor(
-        productId
+        },
+        300
     );
 
 }
 
 
 /* =========================================================
-   46. ELIMINAR PRODUCTO
+   75. ELIMINAR PRODUCTO
 ========================================================= */
 
 function deleteProduct(
@@ -4926,20 +5980,23 @@ function deleteProduct(
         );
 
 
-    if (!product) {
+    const company =
+        getCurrentCompany();
+
+
+    if (
+        !product ||
+        !company ||
+        product.companyId !==
+            company.id
+    ) {
 
         return;
 
     }
 
 
-    const company =
-        getCompanyById(
-            product.companyId
-        );
-
-
-    const confirmed =
+    const accepted =
         window.confirm(
 
             "¿Eliminar " +
@@ -4949,7 +6006,7 @@ function deleteProduct(
         );
 
 
-    if (!confirmed) {
+    if (!accepted) {
 
         return;
 
@@ -4967,10 +6024,9 @@ function deleteProduct(
 
 
     /*
-       Las publicaciones históricas no se borran.
-
-       Simplemente dejan de estar vinculadas
-       a un producto activo.
+       Conservamos publicaciones históricas,
+       pero eliminamos la relación directa
+       con el producto eliminado.
     */
 
     mahpeState.posts.forEach(
@@ -4990,39 +6046,39 @@ function deleteProduct(
     );
 
 
-    if (company) {
+    addMahpeEvent(
 
-        addMahpeEvent(
+        "product",
 
-            "product",
+        "Eliminaste " +
+        product.name +
+        ".",
 
-            "Eliminaste " +
-            product.name +
-            ".",
+        company.id
 
-            company.id
-
-        );
-
-    }
+    );
 
 
     saveMahpeState();
 
 
-    renderCompanyDashboard();
+    if (
+        typeof renderCompanyDashboard ===
+        "function"
+    ) {
+
+        renderCompanyDashboard();
+
+    }
 
 
     renderFeed();
-
-
-    renderActivityInbox();
 
 }
 
 
 /* =========================================================
-   47. PUBLICAR PRODUCTO EN MAHPE
+   76. PUBLICAR PRODUCTO EN MAHPE
 ========================================================= */
 
 function publishProduct(
@@ -5077,22 +6133,30 @@ function publishProduct(
         category:
             company.category,
 
+        productId:
+            product.id,
+
         title:
             product.name,
 
         text:
-            product.description,
-
-        productId:
-            product.id,
-
-        image:
-            cover,
+            product.description ||
+            (
+                "Conoce " +
+                product.name +
+                " de " +
+                company.name +
+                "."
+            ),
 
         price:
             Number(
-                product.price
-            ) || 0,
+                product.price ||
+                0
+            ),
+
+        image:
+            cover,
 
         views: 0,
 
@@ -5109,7 +6173,7 @@ function publishProduct(
     };
 
 
-    mahpeState.posts.push(
+    mahpeState.posts.unshift(
         post
     );
 
@@ -5122,20 +6186,18 @@ function publishProduct(
         post.createdAt;
 
 
-    migrateCompanyBusinessData(
-        company
-    );
+    product.updatedAt =
+        post.createdAt;
 
 
     company.activity =
         clamp(
-            company.activity +
-            3
+            Number(
+                company.activity ||
+                0
+            ) +
+            4
         );
-
-
-    company.value +=
-        10;
 
 
     addMahpeEvent(
@@ -5146,32 +6208,40 @@ function publishProduct(
         product.name +
         " en MAHPE.",
 
-        company.id
+        company.id,
 
-    );
+        {
 
+            productId:
+                product.id,
 
-    recalculateCompanyStage(
-        company
+            postId:
+                post.id
+
+        }
+
     );
 
 
     saveMahpeState();
 
 
-    renderCompanyDashboard();
-
-
     renderFeed();
 
 
-    renderActivityInbox();
+    if (
+        typeof renderCompanyDashboard ===
+        "function"
+    ) {
+
+        renderCompanyDashboard();
+
+    }
 
 
     /*
-       Después de publicar dejamos
-       al usuario en Descubrir para que
-       vea inmediatamente el resultado.
+       Después de publicar mostramos
+       el producto en Descubrir.
     */
 
     currentFeedMode =
@@ -5192,16 +6262,147 @@ function publishProduct(
 
 
 /* =========================================================
-   48. PUNTUACIÓN DE PRODUCTO
+   77. PUBLICACIÓN GENERAL DE EMPRESA
 ========================================================= */
 
-function getProductScore(
+function publishCompanyPost(
+    text
+) {
+
+    const company =
+        getCurrentCompany();
+
+
+    if (!company) {
+
+        return false;
+
+    }
+
+
+    const content =
+        String(
+            text || ""
+        ).trim();
+
+
+    if (!content) {
+
+        return false;
+
+    }
+
+
+    const post = {
+
+        id:
+            generateId(
+                "post"
+            ),
+
+        companyId:
+            company.id,
+
+        companyName:
+            company.name,
+
+        category:
+            company.category,
+
+        productId:
+            null,
+
+        title:
+            company.name,
+
+        text:
+            content,
+
+        price: 0,
+
+        image: null,
+
+        views: 0,
+
+        interactions: 0,
+
+        interested: 0,
+
+        committed: 0,
+
+        createdAt:
+            new Date()
+                .toISOString()
+
+    };
+
+
+    mahpeState.posts.unshift(
+        post
+    );
+
+
+    company.activity =
+        clamp(
+            Number(
+                company.activity ||
+                0
+            ) +
+            2
+        );
+
+
+    addMahpeEvent(
+
+        "post",
+
+        company.name +
+        " publicó una actualización.",
+
+        company.id,
+
+        {
+
+            postId:
+                post.id
+
+        }
+
+    );
+
+
+    saveMahpeState();
+
+
+    renderFeed();
+
+
+    return true;
+
+}
+
+
+/* =========================================================
+   78. MÉTRICAS DEL PRODUCTO
+========================================================= */
+
+function getProductMetrics(
     product
 ) {
 
     if (!product) {
 
-        return 0;
+        return {
+
+            views: 0,
+
+            interactions: 0,
+
+            interested: 0,
+
+            committed: 0
+
+        };
 
     }
 
@@ -5211,19 +6412,64 @@ function getProductScore(
     );
 
 
+    return {
+
+        views:
+            Number(
+                product.metrics.views ||
+                0
+            ),
+
+        interactions:
+            Number(
+                product.metrics.interactions ||
+                0
+            ),
+
+        interested:
+            Number(
+                product.metrics.interested ||
+                0
+            ),
+
+        committed:
+            Number(
+                product.metrics.committed ||
+                0
+            )
+
+    };
+
+}
+
+
+/* =========================================================
+   79. SCORE DE PRODUCTO
+========================================================= */
+
+function getProductScore(
+    product
+) {
+
+    const metrics =
+        getProductMetrics(
+            product
+        );
+
+
     return (
 
-        product.metrics.views *
-            0.05 +
+        metrics.views *
+        0.05 +
 
-        product.metrics.interactions *
-            1 +
+        metrics.interactions *
+        1 +
 
-        product.metrics.interested *
-            4 +
+        metrics.interested *
+        4 +
 
-        product.metrics.committed *
-            10
+        metrics.committed *
+        10
 
     );
 
@@ -5231,7 +6477,7 @@ function getProductScore(
 
 
 /* =========================================================
-   49. POTENCIAL DE PRODUCTO
+   80. POTENCIAL DEL PRODUCTO
 ========================================================= */
 
 function getProductPotential(
@@ -5244,10 +6490,7 @@ function getProductPotential(
         );
 
 
-    if (
-        score >=
-        80
-    ) {
+    if (score >= 60) {
 
         return {
 
@@ -5262,10 +6505,7 @@ function getProductPotential(
     }
 
 
-    if (
-        score >=
-        25
-    ) {
+    if (score >= 20) {
 
         return {
 
@@ -5283,10 +6523,10 @@ function getProductPotential(
     return {
 
         label:
-            "BAJO",
+            "EN PRUEBA",
 
         className:
-            "low"
+            "testing"
 
     };
 
@@ -5294,7 +6534,7 @@ function getProductPotential(
 
 
 /* =========================================================
-   50. TARJETA DE PRODUCTO
+   81. TARJETA DE PRODUCTO
 ========================================================= */
 
 function renderProductCard(
@@ -5303,6 +6543,12 @@ function renderProductCard(
 
     const cover =
         getProductCover(
+            product
+        );
+
+
+    const metrics =
+        getProductMetrics(
             product
         );
 
@@ -5334,6 +6580,7 @@ function renderProductCard(
                                 alt="${escapeHTML(
                                     product.name
                                 )}"
+                                loading="lazy"
                             >
 
                         `
@@ -5345,7 +6592,11 @@ function renderProductCard(
                             >
 
                                 <span>
-                                    +
+                                    ${escapeHTML(
+                                        product.name
+                                            .charAt(0)
+                                            .toUpperCase()
+                                    )}
                                 </span>
 
                                 <small>
@@ -5359,14 +6610,14 @@ function renderProductCard(
 
 
                 ${
-                    cover
+                    product.published
 
                         ? `
 
                             <span
-                                class="product-cover-badge"
+                                class="product-published-badge"
                             >
-                                PORTADA
+                                PUBLICADO
                             </span>
 
                         `
@@ -5376,20 +6627,10 @@ function renderProductCard(
 
 
                 <span
-                    class="product-status ${
-                        product.published
-                            ? "published"
-                            : ""
-                    }"
+                    class="product-potential ${potential.className}"
                 >
 
-                    ${
-                        product.published
-
-                            ? "PUBLICADO"
-
-                            : "BORRADOR"
-                    }
+                    ${potential.label}
 
                 </span>
 
@@ -5405,7 +6646,8 @@ function renderProductCard(
                 >
 
                     ${escapeHTML(
-                        product.category
+                        product.category ||
+                        "Producto"
                     )}
 
                 </small>
@@ -5420,82 +6662,67 @@ function renderProductCard(
                 </h3>
 
 
-                <strong
-                    class="product-price"
-                >
-
-                    S/ ${formatPrice(
+                ${
+                    Number(
                         product.price
-                    )}
+                    ) > 0
 
-                </strong>
+                        ? `
+
+                            <strong
+                                class="product-price"
+                            >
+
+                                S/ ${formatPrice(
+                                    product.price
+                                )}
+
+                            </strong>
+
+                        `
+
+                        : ""
+                }
 
 
-                <p
-                    class="product-description"
-                >
+                ${
+                    product.description
 
-                    ${escapeHTML(
-                        product.description
-                    )}
+                        ? `
 
-                </p>
+                            <p>
+
+                                ${escapeHTML(
+                                    product.description
+                                )}
+
+                            </p>
+
+                        `
+
+                        : ""
+                }
 
 
                 <div
                     class="product-signals"
                 >
 
-                    <span
-                        class="product-signal"
-                    >
-                        👁
-                        ${product.metrics.views}
+                    <span>
+                        👁 ${metrics.views}
                     </span>
 
-
-                    <span
-                        class="product-signal"
-                    >
-                        ♡
-                        ${product.metrics.interactions}
+                    <span>
+                        ♡ ${metrics.interactions}
                     </span>
 
-
-                    <span
-                        class="product-signal"
-                    >
-                        🔥
-                        ${product.metrics.interested}
+                    <span>
+                        🔥 ${metrics.interested}
                     </span>
 
-
-                    <span
-                        class="product-signal"
-                    >
-                        💰
-                        ${product.metrics.committed}
+                    <span>
+                        💰 ${metrics.committed}
                     </span>
-
-                </div>
-
-
-                <div
-                    class="product-potential"
-                >
-
-                    <small>
-                        Potencial
-                    </small>
-
-
-                    <strong
-                        class="product-potential-badge ${potential.className}"
-                    >
-
-                        ${potential.label}
-
-                    </strong>
 
                 </div>
 
@@ -5505,26 +6732,9 @@ function renderProductCard(
                 >
 
                     <button
-                        class="product-publish-button"
+                        class="secondary-button"
                         type="button"
-                        data-publish-product="${product.id}"
-                    >
-
-                        ${
-                            product.published
-
-                                ? "PUBLICAR DE NUEVO"
-
-                                : "PUBLICAR EN MAHPE"
-                        }
-
-                    </button>
-
-
-                    <button
-                        class="product-edit-button"
-                        type="button"
-                        data-edit-product="${product.id}"
+                        onclick="editProduct('${product.id}')"
                     >
 
                         EDITAR
@@ -5533,19 +6743,31 @@ function renderProductCard(
 
 
                     <button
-                        class="product-delete-button"
+                        class="primary-button"
                         type="button"
-                        data-delete-product="${product.id}"
-                        aria-label="Eliminar ${escapeHTML(
-                            product.name
-                        )}"
+                        onclick="publishProduct('${product.id}')"
                     >
 
-                        ×
+                        ${
+                            product.published
+                                ? "PUBLICAR DE NUEVO"
+                                : "PUBLICAR"
+                        }
 
                     </button>
 
                 </div>
+
+
+                <button
+                    class="delete-product-button"
+                    type="button"
+                    onclick="deleteProduct('${product.id}')"
+                >
+
+                    Eliminar producto
+
+                </button>
 
             </div>
 
@@ -5557,12 +6779,19 @@ function renderProductCard(
 
 
 /* =========================================================
-   51. VISTA PRODUCTOS
+   82. GALERÍA DE PRODUCTOS
 ========================================================= */
 
 function renderCompanyProducts(
     company
 ) {
+
+    if (!company) {
+
+        return "";
+
+    }
+
 
     const products =
         getCompanyProducts(
@@ -5570,67 +6799,55 @@ function renderCompanyProducts(
         );
 
 
-    const totalViews =
-        products.reduce(
+    if (!products.length) {
 
-            (
-                total,
-                product
-            ) =>
+        return `
 
-                total +
-                Number(
-                    product.metrics.views ||
-                    0
-                ),
+            <section
+                class="products-empty"
+            >
 
-            0
-
-        );
+                <div
+                    class="products-empty-icon"
+                >
+                    ＋
+                </div>
 
 
-    const totalInterested =
-        products.reduce(
-
-            (
-                total,
-                product
-            ) =>
-
-                total +
-                Number(
-                    product.metrics.interested ||
-                    0
-                ),
-
-            0
-
-        );
+                <h3>
+                    Tu vitrina está vacía
+                </h3>
 
 
-    const totalCommitted =
-        products.reduce(
+                <p>
+                    Añade el primer producto de
+                    ${escapeHTML(
+                        company.name
+                    )}.
+                </p>
 
-            (
-                total,
-                product
-            ) =>
 
-                total +
-                Number(
-                    product.metrics.committed ||
-                    0
-                ),
+                <button
+                    class="primary-button"
+                    type="button"
+                    onclick="openNewProductEditor()"
+                >
 
-            0
+                    AGREGAR PRODUCTO
 
-        );
+                </button>
+
+            </section>
+
+        `;
+
+    }
 
 
     return `
 
         <section
-            class="company-products-container"
+            class="company-products-panel"
         >
 
             <div
@@ -5646,28 +6863,20 @@ function renderCompanyProducts(
                     </span>
 
 
-                    <h2>
+                    <h3>
                         Productos
-                    </h2>
-
-
-                    <p class="muted">
-
-                        Prueba tus productos y observa
-                        cómo responde el mercado.
-
-                    </p>
+                    </h3>
 
                 </div>
 
 
                 <button
-                    id="addProductButton"
                     class="add-product-button"
                     type="button"
+                    onclick="openNewProductEditor()"
                 >
 
-                    + AGREGAR PRODUCTO
+                    + Producto
 
                 </button>
 
@@ -5678,455 +6887,73 @@ function renderCompanyProducts(
                 class="product-summary"
             >
 
-                <article
-                    class="product-summary-card"
-                >
-
+                <div>
                     <strong>
-
                         ${products.length}
-
                     </strong>
 
                     <span>
                         Productos
                     </span>
+                </div>
 
-                </article>
 
-
-                <article
-                    class="product-summary-card"
-                >
-
+                <div>
                     <strong>
 
-                        ${totalViews}
+                        ${
+                            products.filter(
+                                product =>
+                                    product.published
+                            ).length
+                        }
 
                     </strong>
 
                     <span>
-                        Vistas
+                        Publicados
                     </span>
+                </div>
 
-                </article>
 
-
-                <article
-                    class="product-summary-card"
-                >
-
+                <div>
                     <strong>
 
-                        ${totalInterested}
+                        ${
+                            products.reduce(
+                                (
+                                    total,
+                                    product
+                                ) =>
+                                    total +
+                                    getProductMetrics(
+                                        product
+                                    ).interested,
+                                0
+                            )
+                        }
 
                     </strong>
 
                     <span>
                         Interesados
                     </span>
-
-                </article>
-
-
-                <article
-                    class="product-summary-card"
-                >
-
-                    <strong>
-
-                        ${totalCommitted}
-
-                    </strong>
-
-                    <span>
-                        Comprometidos
-                    </span>
-
-                </article>
-
-            </div>
-
-
-            ${
-                products.length
-
-                    ? `
-
-                        <div
-                            class="products-grid"
-                        >
-
-                            ${products
-                                .map(
-                                    renderProductCard
-                                )
-                                .join("")}
-
-
-                            <button
-                                class="add-product-card"
-                                type="button"
-                                id="addProductCard"
-                            >
-
-                                <span>
-                                    +
-                                </span>
-
-                                <strong>
-                                    Agregar producto
-                                </strong>
-
-                            </button>
-
-                        </div>
-
-                    `
-
-                    : `
-
-                        <div
-                            class="products-empty"
-                        >
-
-                            <span>
-                                ◇
-                            </span>
-
-
-                            <h3>
-                                Tu vitrina está vacía
-                            </h3>
-
-
-                            <p>
-
-                                Agrega tu primer producto,
-                                coloca sus imágenes y publícalo
-                                para comenzar a medir interés.
-
-                            </p>
-
-
-                            <button
-                                id="emptyAddProductButton"
-                                class="primary-button"
-                                type="button"
-                            >
-
-                                AGREGAR MI PRIMER PRODUCTO
-
-                            </button>
-
-                        </div>
-
-                    `
-            }
-
-        </section>
-
-    `;
-
-}
-
-
-/* =========================================================
-   52. ESTADÍSTICAS DE PRODUCTOS
-========================================================= */
-
-function renderProductStatistics(
-    company
-) {
-
-    const products =
-        getCompanyProducts(
-            company.id
-        )
-        .slice()
-        .sort(
-
-            (
-                a,
-                b
-            ) =>
-
-                getProductScore(
-                    b
-                ) -
-
-                getProductScore(
-                    a
-                )
-
-        );
-
-
-    if (!products.length) {
-
-        return `
-
-            <section
-                class="product-statistics"
-            >
-
-                <div
-                    class="products-empty"
-                >
-
-                    <span>
-                        ◇
-                    </span>
-
-
-                    <h3>
-                        Todavía no hay datos
-                    </h3>
-
-
-                    <p>
-
-                        Crea productos y publícalos
-                        para comenzar a comparar
-                        la respuesta del mercado.
-
-                    </p>
-
-
-                    <button
-                        id="statisticsAddProductButton"
-                        class="primary-button"
-                        type="button"
-                    >
-
-                        CREAR PRODUCTO
-
-                    </button>
-
-                </div>
-
-            </section>
-
-        `;
-
-    }
-
-
-    const maximumScore =
-        Math.max(
-
-            1,
-
-            ...products.map(
-                product =>
-                    getProductScore(
-                        product
-                    )
-            )
-
-        );
-
-
-    return `
-
-        <section
-            class="product-statistics"
-        >
-
-            <div
-                class="products-header"
-            >
-
-                <div>
-
-                    <span
-                        class="eyebrow"
-                    >
-                        RESPUESTA DEL MERCADO
-                    </span>
-
-
-                    <h2>
-                        Rendimiento de productos
-                    </h2>
-
-
-                    <p class="muted">
-
-                        Compara qué productos están
-                        generando mejores señales.
-
-                    </p>
-
                 </div>
 
             </div>
 
 
             <div
-                class="product-performance-list"
+                class="products-grid"
             >
 
-                ${products
-                    .map(
-                        product => {
-
-                            const cover =
-                                getProductCover(
-                                    product
-                                );
-
-
-                            const score =
-                                getProductScore(
-                                    product
-                                );
-
-
-                            const width =
-                                Math.max(
-
-                                    4,
-
-                                    Math.round(
-
-                                        score /
-                                        maximumScore *
-                                        100
-
-                                    )
-
-                                );
-
-
-                            const potential =
-                                getProductPotential(
-                                    product
-                                );
-
-
-                            return `
-
-                                <article
-                                    class="product-performance-item"
-                                >
-
-                                    <div
-                                        class="product-performance-image"
-                                    >
-
-                                        ${
-                                            cover
-
-                                                ? `
-
-                                                    <img
-                                                        src="${cover}"
-                                                        alt="${escapeHTML(
-                                                            product.name
-                                                        )}"
-                                                    >
-
-                                                `
-
-                                                : `
-
-                                                    <span>
-                                                        ${escapeHTML(
-                                                            product.name
-                                                                .charAt(0)
-                                                                .toUpperCase()
-                                                        )}
-                                                    </span>
-
-                                                `
-                                        }
-
-                                    </div>
-
-
-                                    <div
-                                        class="product-performance-copy"
-                                    >
-
-                                        <div
-                                            class="product-performance-heading"
-                                        >
-
-                                            <div>
-
-                                                <strong>
-
-                                                    ${escapeHTML(
-                                                        product.name
-                                                    )}
-
-                                                </strong>
-
-
-                                                <small>
-
-                                                    👁 ${product.metrics.views}
-
-                                                    ·
-
-                                                    ♡ ${product.metrics.interactions}
-
-                                                    ·
-
-                                                    🔥 ${product.metrics.interested}
-
-                                                    ·
-
-                                                    💰 ${product.metrics.committed}
-
-                                                </small>
-
-                                            </div>
-
-
-                                            <span
-                                                class="product-potential-badge ${potential.className}"
-                                            >
-
-                                                ${potential.label}
-
-                                            </span>
-
-                                        </div>
-
-
-                                        <div
-                                            class="product-performance-track"
-                                        >
-
-                                            <div
-                                                class="product-performance-fill"
-                                                style="width:${width}%"
-                                            ></div>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    <strong
-                                        class="product-performance-score"
-                                    >
-
-                                        ${Math.round(
-                                            score
-                                        )}
-
-                                    </strong>
-
-                                </article>
-
-                            `;
-
-                        }
-                    )
-                    .join("")}
+                ${
+                    products
+                        .map(
+                            renderProductCard
+                        )
+                        .join("")
+                }
 
             </div>
 
@@ -6138,573 +6965,7 @@ function renderProductStatistics(
 
 
 /* =========================================================
-   53. EVENTOS DE PRODUCTOS
-========================================================= */
-
-function bindProductEvents() {
-
-    const addButton =
-        document.getElementById(
-            "addProductButton"
-        );
-
-
-    const addCard =
-        document.getElementById(
-            "addProductCard"
-        );
-
-
-    const emptyButton =
-        document.getElementById(
-            "emptyAddProductButton"
-        );
-
-
-    const statisticsButton =
-        document.getElementById(
-            "statisticsAddProductButton"
-        );
-
-
-    [
-        addButton,
-        addCard,
-        emptyButton,
-        statisticsButton
-    ]
-    .filter(Boolean)
-    .forEach(
-        button => {
-
-            button.onclick =
-                () =>
-
-                    openProductEditor();
-
-        }
-    );
-
-
-    document
-        .querySelectorAll(
-            "[data-edit-product]"
-        )
-        .forEach(
-            button => {
-
-                button.onclick =
-                    () =>
-
-                        editProduct(
-                            button.dataset.editProduct
-                        );
-
-            }
-        );
-
-
-    document
-        .querySelectorAll(
-            "[data-publish-product]"
-        )
-        .forEach(
-            button => {
-
-                button.onclick =
-                    () =>
-
-                        publishProduct(
-                            button.dataset.publishProduct
-                        );
-
-            }
-        );
-
-
-    document
-        .querySelectorAll(
-            "[data-delete-product]"
-        )
-        .forEach(
-            button => {
-
-                button.onclick =
-                    () =>
-
-                        deleteProduct(
-                            button.dataset.deleteProduct
-                        );
-
-            }
-        );
-
-}
-
-
-/* =========================================================
-   54. EVENTOS DEL EDITOR
-========================================================= */
-
-if (productImagesInput) {
-
-    productImagesInput.addEventListener(
-
-        "change",
-
-        handleProductImages
-
-    );
-
-}
-
-
-if (cancelProductButton) {
-
-    cancelProductButton.addEventListener(
-
-        "click",
-
-        function() {
-
-            closeProductEditor();
-
-        }
-
-    );
-
-}
-
-
-if (saveProductButton) {
-
-    saveProductButton.addEventListener(
-
-        "click",
-
-        saveProduct
-
-    );
-
-}
-
-
-/* =========================================================
-   55. PUBLICACIÓN GENERAL DE EMPRESA
-
-   Se conserva además del sistema de productos.
-========================================================= */
-
-function publishCompanyPost() {
-
-    const company =
-        getCurrentCompany();
-
-
-    if (!company) {
-
-        return;
-
-    }
-
-
-    const postTextInput =
-        document.getElementById(
-            "companyPostInput"
-        );
-
-
-    let text =
-        postTextInput
-
-            ? postTextInput.value.trim()
-
-            : "";
-
-
-    if (!text) {
-
-        text =
-            company.description;
-
-    }
-
-
-    const post = {
-
-        id:
-            generateId(
-                "post"
-            ),
-
-        companyId:
-            company.id,
-
-        companyName:
-            company.name,
-
-        category:
-            company.category,
-
-        title:
-            company.product ||
-            company.name,
-
-        text,
-
-        productId:
-            null,
-
-        image:
-            null,
-
-        views: 0,
-
-        interactions: 0,
-
-        interested: 0,
-
-        committed: 0,
-
-        createdAt:
-            new Date()
-                .toISOString()
-
-    };
-
-
-    mahpeState.posts.push(
-        post
-    );
-
-
-    migrateCompanyBusinessData(
-        company
-    );
-
-
-    company.activity =
-        clamp(
-            company.activity +
-            3
-        );
-
-
-    company.value +=
-        10;
-
-
-    addMahpeEvent(
-
-        "post",
-
-        "Publicaste una actualización de " +
-        company.name +
-        ".",
-
-        company.id
-
-    );
-
-
-    recalculateCompanyStage(
-        company
-    );
-
-
-    saveMahpeState();
-
-
-    if (postTextInput) {
-
-        postTextInput.value =
-            "";
-
-    }
-
-
-    currentFeedMode =
-        "explore";
-
-
-    renderCompanyDashboard();
-
-
-    renderActivityInbox();
-
-
-    updateFeedControls();
-
-
-    openView(
-        "feedView"
-    );
-
-
-    renderFeed();
-
-}
-
-
-/* =========================================================
-   56. FUNCIONES GLOBALES DE PRODUCTOS
-========================================================= */
-
-window.openProductEditor =
-    openProductEditor;
-
-
-window.editProduct =
-    editProduct;
-
-
-window.deleteProduct =
-    deleteProduct;
-
-
-window.publishProduct =
-    publishProduct;
-
-
-window.publishCompanyPost =
-    publishCompanyPost;
-
-
-/* =========================================================
-   FIN PARTE 2/4
-
-   NO CIERRES EL ARCHIVO.
-
-   PEGA PARTE 3/4 INMEDIATAMENTE DEBAJO.
-
-   PARTE 3/4:
-   - Mi Empresa
-   - Resumen / Productos / Estadísticas
-   - dashboard completo
-   - Business Engine
-   - decisiones empresariales
-   - crecimiento
-   - etapas
-   - perfil MAHPE
-   - conexión visual del logo
-========================================================= */
-/* =========================================================
-   MAHPE v1.2
-
-   PARTE 3/4
-
-   - Dashboard Mi Empresa
-   - Resumen / Productos / Estadísticas
-   - Identidad visual integrada
-   - Métricas
-   - Crecimiento
-   - Business Engine
-   - Decisiones empresariales
-   - Etapas
-   - Perfil MAHPE
-========================================================= */
-
-
-/* =========================================================
-   57. CAMBIAR PESTAÑA DE EMPRESA
-========================================================= */
-
-function setCompanyTab(tab) {
-
-    const allowedTabs = [
-        "summary",
-        "products",
-        "statistics"
-    ];
-
-
-    if (!allowedTabs.includes(tab)) {
-
-        tab = "summary";
-
-    }
-
-
-    currentCompanyTab = tab;
-
-
-    closeProductEditor(false);
-
-
-    renderCompanyDashboard();
-
-}
-
-
-/* =========================================================
-   58. TABS DE EMPRESA
-========================================================= */
-
-function renderCompanyTabs() {
-
-    return `
-
-        <nav
-            class="company-tabs"
-            aria-label="Secciones de empresa"
-        >
-
-            <button
-                type="button"
-                class="company-tab ${
-                    currentCompanyTab === "summary"
-                        ? "active"
-                        : ""
-                }"
-                data-company-tab="summary"
-            >
-
-                Resumen
-
-            </button>
-
-
-            <button
-                type="button"
-                class="company-tab ${
-                    currentCompanyTab === "products"
-                        ? "active"
-                        : ""
-                }"
-                data-company-tab="products"
-            >
-
-                Productos
-
-            </button>
-
-
-            <button
-                type="button"
-                class="company-tab ${
-                    currentCompanyTab === "statistics"
-                        ? "active"
-                        : ""
-                }"
-                data-company-tab="statistics"
-            >
-
-                Estadísticas
-
-            </button>
-
-        </nav>
-
-    `;
-
-}
-
-
-/* =========================================================
-   59. CONECTAR TABS DE EMPRESA
-========================================================= */
-
-function bindCompanyTabs() {
-
-    document
-        .querySelectorAll(
-            "[data-company-tab]"
-        )
-        .forEach(
-            button => {
-
-                button.onclick =
-                    () => {
-
-                        setCompanyTab(
-                            button.dataset.companyTab
-                        );
-
-                    };
-
-            }
-        );
-
-}
-
-
-/* =========================================================
-   60. TOTAL DE MÉTRICAS DE PRODUCTOS
-========================================================= */
-
-function getCompanyProductMetrics(
-    companyId
-) {
-
-    const products =
-        getCompanyProducts(
-            companyId
-        );
-
-
-    return products.reduce(
-
-        (
-            totals,
-            product
-        ) => {
-
-            migrateProductData(
-                product
-            );
-
-
-            totals.views +=
-                Number(
-                    product.metrics.views ||
-                    0
-                );
-
-
-            totals.interactions +=
-                Number(
-                    product.metrics.interactions ||
-                    0
-                );
-
-
-            totals.interested +=
-                Number(
-                    product.metrics.interested ||
-                    0
-                );
-
-
-            totals.committed +=
-                Number(
-                    product.metrics.committed ||
-                    0
-                );
-
-
-            return totals;
-
-        },
-
-        {
-
-            views: 0,
-
-            interactions: 0,
-
-            interested: 0,
-
-            committed: 0
-
-        }
-
-    );
-
-}
-
-
-/* =========================================================
-   61. MEJOR PRODUCTO
+   83. MEJOR PRODUCTO
 ========================================================= */
 
 function getBestCompanyProduct(
@@ -6747,106 +7008,18 @@ function getBestCompanyProduct(
 
 
 /* =========================================================
-   62. PUNTUACIÓN GENERAL DE EMPRESA
+   84. ESTADÍSTICAS DE PRODUCTOS
 ========================================================= */
 
-function calculateCompanyGrowthScore(
+function renderProductStatistics(
     company
 ) {
 
     if (!company) {
 
-        return 0;
+        return "";
 
     }
-
-
-    migrateCompanyBusinessData(
-        company
-    );
-
-
-    const productMetrics =
-        getCompanyProductMetrics(
-            company.id
-        );
-
-
-    const score =
-
-        company.activity *
-            0.15 +
-
-        company.marketResponse *
-            0.20 +
-
-        company.locationStrength *
-            0.10 +
-
-        company.designLevel *
-            0.10 +
-
-        company.productValidation *
-            0.20 +
-
-        company.marketKnowledge *
-            0.10 +
-
-        company.campaignPower *
-            0.05 +
-
-        Math.min(
-            20,
-            Number(
-                company.followers ||
-                0
-            ) *
-            0.20
-        ) +
-
-        Math.min(
-            15,
-            productMetrics.interested *
-            0.5
-        ) +
-
-        Math.min(
-            20,
-            productMetrics.committed *
-            2
-        ) -
-
-        company.risk *
-            0.10;
-
-
-    return clamp(
-        score,
-        0,
-        100
-    );
-
-}
-
-
-/* =========================================================
-   63. ETAPA DE EMPRESA
-========================================================= */
-
-function recalculateCompanyStage(
-    company
-) {
-
-    if (!company) {
-
-        return;
-
-    }
-
-
-    migrateCompanyBusinessData(
-        company
-    );
 
 
     const products =
@@ -6855,359 +7028,267 @@ function recalculateCompanyStage(
         );
 
 
-    const publishedProducts =
-        products.filter(
-            product =>
-                product.published
+    if (!products.length) {
+
+        return `
+
+            <section
+                class="company-statistics-panel"
+            >
+
+                <div
+                    class="products-empty"
+                >
+
+                    <h3>
+                        Todavía no hay datos
+                    </h3>
+
+
+                    <p>
+                        Crea y publica productos para comenzar a medir respuesta.
+                    </p>
+
+                </div>
+
+            </section>
+
+        `;
+
+    }
+
+
+    const totals =
+        products.reduce(
+
+            (
+                result,
+                product
+            ) => {
+
+                const metrics =
+                    getProductMetrics(
+                        product
+                    );
+
+
+                result.views +=
+                    metrics.views;
+
+
+                result.interactions +=
+                    metrics.interactions;
+
+
+                result.interested +=
+                    metrics.interested;
+
+
+                result.committed +=
+                    metrics.committed;
+
+
+                return result;
+
+            },
+
+            {
+
+                views: 0,
+
+                interactions: 0,
+
+                interested: 0,
+
+                committed: 0
+
+            }
+
         );
 
 
-    const score =
-        calculateCompanyGrowthScore(
-            company
-        );
-
-
-    let stage =
-        "Idea";
-
-
-    if (
-        products.length >= 1 ||
-        company.activity >= 28
-    ) {
-
-        stage =
-            "En desarrollo";
-
-    }
-
-
-    if (
-        publishedProducts.length >= 1 &&
-        (
-            company.interactions >= 3 ||
-            company.interested >= 2 ||
-            score >= 35
-        )
-    ) {
-
-        stage =
-            "Lanzada";
-
-    }
-
-
-    if (
-        company.interested >= 8 ||
-        company.committed >= 3 ||
-        company.followers >= 15 ||
-        score >= 55
-    ) {
-
-        stage =
-            "En crecimiento";
-
-    }
-
-
-    if (
-        company.committed >= 12 &&
-        company.followers >= 40 &&
-        score >= 75
-    ) {
-
-        stage =
-            "Consolidada";
-
-    }
-
-
-    company.stage =
-        stage;
-
-}
-
-
-/* =========================================================
-   64. TEXTO DE CRECIMIENTO
-========================================================= */
-
-function getGrowthLabel(
-    score
-) {
-
-    if (
-        score >= 75
-    ) {
-
-        return "Crecimiento fuerte";
-
-    }
-
-
-    if (
-        score >= 55
-    ) {
-
-        return "Ganando tracción";
-
-    }
-
-
-    if (
-        score >= 35
-    ) {
-
-        return "Validación inicial";
-
-    }
-
-
-    if (
-        score >= 20
-    ) {
-
-        return "En construcción";
-
-    }
-
-
-    return "Etapa inicial";
-
-}
-
-
-/* =========================================================
-   65. RESUMEN DE EMPRESA
-========================================================= */
-
-function renderCompanySummary(
-    company
-) {
-
-    migrateCompanyBusinessData(
-        company
-    );
-
-
-    const products =
-        getCompanyProducts(
-            company.id
-        );
-
-
-    const productMetrics =
-        getCompanyProductMetrics(
-            company.id
-        );
-
-
-    const bestProduct =
+    const best =
         getBestCompanyProduct(
             company.id
         );
 
 
-    const growthScore =
-        calculateCompanyGrowthScore(
-            company
-        );
-
-
-    const growthLabel =
-        getGrowthLabel(
-            growthScore
-        );
-
-
     return `
 
-        <div
-            class="company-summary-panel"
+        <section
+            class="company-statistics-panel"
         >
 
-            ${renderBrandIdentity(
-                company
-            )}
-
-
-            <section
-                class="company-stats"
+            <div
+                class="company-statistics-grid"
             >
 
-                <article
-                    class="stat-card"
+                <div
+                    class="company-stat-card"
                 >
 
-                    <strong>
-
-                        ${Number(
-                            company.followers ||
-                            0
-                        )}
-
-                    </strong>
-
                     <span>
-                        Seguidores
+                        👁
                     </span>
 
-                </article>
-
-
-                <article
-                    class="stat-card"
-                >
-
                     <strong>
-
-                        ${
-                            Number(
-                                company.interactions ||
-                                0
-                            ) +
-                            productMetrics.interactions
-                        }
-
+                        ${totals.views}
                     </strong>
 
+                    <small>
+                        Vistas
+                    </small>
+
+                </div>
+
+
+                <div
+                    class="company-stat-card"
+                >
+
                     <span>
+                        ♡
+                    </span>
+
+                    <strong>
+                        ${totals.interactions}
+                    </strong>
+
+                    <small>
                         Interacciones
-                    </span>
+                    </small>
 
-                </article>
+                </div>
 
 
-                <article
-                    class="stat-card"
+                <div
+                    class="company-stat-card"
                 >
 
+                    <span>
+                        🔥
+                    </span>
+
                     <strong>
-
-                        ${
-                            Number(
-                                company.interested ||
-                                0
-                            ) +
-                            productMetrics.interested
-                        }
-
+                        ${totals.interested}
                     </strong>
 
-                    <span>
+                    <small>
                         Interesados
-                    </span>
+                    </small>
 
-                </article>
+                </div>
 
 
-                <article
-                    class="stat-card"
+                <div
+                    class="company-stat-card"
                 >
-
-                    <strong>
-
-                        ${
-                            Number(
-                                company.committed ||
-                                0
-                            ) +
-                            productMetrics.committed
-                        }
-
-                    </strong>
 
                     <span>
-                        Comprometidos
+                        💰
                     </span>
 
-                </article>
-
-            </section>
-
-
-            <section
-                class="company-growth-card"
-            >
-
-                <div
-                    class="company-growth-heading"
-                >
-
-                    <div>
-
-                        <span
-                            class="eyebrow"
-                        >
-                            CRECIMIENTO
-                        </span>
-
-
-                        <h3>
-
-                            ${escapeHTML(
-                                growthLabel
-                            )}
-
-                        </h3>
-
-                    </div>
-
-
                     <strong>
-
-                        ${growthScore}%
-
+                        ${totals.committed}
                     </strong>
 
-                </div>
-
-
-                <div
-                    class="company-growth-track"
-                >
-
-                    <div
-                        class="company-growth-fill"
-                        style="width:${growthScore}%"
-                    ></div>
+                    <small>
+                        Comprometidos
+                    </small>
 
                 </div>
 
-
-                <p class="muted">
-
-                    El crecimiento combina actividad,
-                    respuesta del mercado, productos,
-                    ubicación, conocimiento y riesgo.
-
-                </p>
-
-            </section>
+            </div>
 
 
             ${
-                bestProduct
+                best
 
-                    ? renderBestProductSummary(
-                        bestProduct
-                    )
+                    ? `
 
-                    : renderNoProductsSummary()
+                        <article
+                            class="best-product-card"
+                        >
+
+                            <span
+                                class="eyebrow"
+                            >
+                                PRODUCTO CON MAYOR RESPUESTA
+                            </span>
+
+
+                            <h3>
+
+                                ${escapeHTML(
+                                    best.name
+                                )}
+
+                            </h3>
+
+
+                            <p>
+
+                                Potencial:
+
+                                <strong>
+
+                                    ${
+                                        getProductPotential(
+                                            best
+                                        ).label
+                                    }
+
+                                </strong>
+
+                            </p>
+
+
+                            <div
+                                class="product-signals"
+                            >
+
+                                <span>
+                                    👁 ${
+                                        getProductMetrics(
+                                            best
+                                        ).views
+                                    }
+                                </span>
+
+                                <span>
+                                    ♡ ${
+                                        getProductMetrics(
+                                            best
+                                        ).interactions
+                                    }
+                                </span>
+
+                                <span>
+                                    🔥 ${
+                                        getProductMetrics(
+                                            best
+                                        ).interested
+                                    }
+                                </span>
+
+                                <span>
+                                    💰 ${
+                                        getProductMetrics(
+                                            best
+                                        ).committed
+                                    }
+                                </span>
+
+                            </div>
+
+                        </article>
+
+                    `
+
+                    : ""
             }
 
-
-            ${renderCompanyPublisher(
-                company
-            )}
-
-
-            ${renderBusinessEngine(
-                company
-            )}
-
-        </div>
+        </section>
 
     `;
 
@@ -7215,10 +7296,12 @@ function renderCompanySummary(
 
 
 /* =========================================================
-   66. MEJOR PRODUCTO — RESUMEN
+   85. VISTA RESUMIDA DE PRODUCTO
+
+   Se utilizará también desde Perfil.
 ========================================================= */
 
-function renderBestProductSummary(
+function renderCompactProduct(
     product
 ) {
 
@@ -7228,55 +7311,14 @@ function renderBestProductSummary(
         );
 
 
-    const potential =
-        getProductPotential(
-            product
-        );
-
-
     return `
 
-        <section
-            class="best-product-card"
+        <article
+            class="compact-product"
         >
 
             <div
-                class="best-product-heading"
-            >
-
-                <div>
-
-                    <span
-                        class="eyebrow"
-                    >
-                        PRODUCTO DESTACADO
-                    </span>
-
-
-                    <h3>
-
-                        ${escapeHTML(
-                            product.name
-                        )}
-
-                    </h3>
-
-                </div>
-
-
-                <span
-                    class="product-potential-badge ${potential.className}"
-                >
-
-                    ${potential.label}
-
-                </span>
-
-            </div>
-
-
-            <div
-                class="best-product-content"
+                class="compact-product-image"
             >
 
                 ${
@@ -7289,15 +7331,14 @@ function renderBestProductSummary(
                                 alt="${escapeHTML(
                                     product.name
                                 )}"
+                                loading="lazy"
                             >
 
                         `
 
                         : `
 
-                            <div
-                                class="product-image-placeholder"
-                            >
+                            <span>
 
                                 ${escapeHTML(
                                     product.name
@@ -7305,580 +7346,34 @@ function renderBestProductSummary(
                                         .toUpperCase()
                                 )}
 
-                            </div>
+                            </span>
 
                         `
                 }
 
-
-                <div>
-
-                    <strong
-                        class="product-price"
-                    >
-
-                        S/ ${formatPrice(
-                            product.price
-                        )}
-
-                    </strong>
-
-
-                    <p>
-
-                        ${escapeHTML(
-                            product.description
-                        )}
-
-                    </p>
-
-
-                    <small>
-
-                        👁 ${product.metrics.views}
-
-                        ·
-
-                        ♡ ${product.metrics.interactions}
-
-                        ·
-
-                        🔥 ${product.metrics.interested}
-
-                        ·
-
-                        💰 ${product.metrics.committed}
-
-                    </small>
-
-                </div>
-
             </div>
 
 
-            <button
-                type="button"
-                class="secondary-button"
-                data-open-products="true"
-            >
-
-                VER PRODUCTOS
-
-            </button>
-
-        </section>
-
-    `;
-
-}
-
-
-/* =========================================================
-   67. SIN PRODUCTOS — RESUMEN
-========================================================= */
-
-function renderNoProductsSummary() {
-
-    return `
-
-        <section
-            class="best-product-card"
-        >
-
-            <span
-                class="eyebrow"
-            >
-                PRODUCTOS
-            </span>
-
-
-            <h3>
-                Construye tu vitrina
-            </h3>
-
-
-            <p class="muted">
-
-                Agrega productos con imágenes para
-                probar cuáles generan mayor interés.
-
-            </p>
-
-
-            <button
-                type="button"
-                class="primary-button"
-                data-create-product-summary="true"
-            >
-
-                + CREAR PRODUCTO
-
-            </button>
-
-        </section>
-
-    `;
-
-}
-
-
-/* =========================================================
-   68. PUBLICADOR DE EMPRESA
-========================================================= */
-
-function renderCompanyPublisher(
-    company
-) {
-
-    return `
-
-        <section
-            class="publisher-card"
-        >
-
-            <span
-                class="eyebrow"
-            >
-                PUBLICAR
-            </span>
-
-
-            <h3>
-                Comparte una actualización
-            </h3>
-
-
-            <p class="muted">
-
-                Publica avances, ideas o novedades
-                de ${escapeHTML(
-                    company.name
-                )}.
-
-            </p>
-
-
-            <textarea
-                id="companyPostInput"
-                placeholder="¿Qué está pasando en tu empresa?"
-            ></textarea>
-
-
-            <button
-                id="publishCompanyPostButton"
-                class="primary-button"
-                type="button"
-            >
-
-                PUBLICAR EN MAHPE
-
-            </button>
-
-        </section>
-
-    `;
-
-}
-
-
-/* =========================================================
-   69. BUSINESS ENGINE — DATOS
-========================================================= */
-
-const BUSINESS_DECISIONS = {
-
-    improve_design: {
-
-        title:
-            "Mejorar diseño",
-
-        description:
-            "Invierte en mejorar la presentación e identidad del producto.",
-
-        cost: 40,
-
-        effects: {
-
-            designLevel: 8,
-
-            productValidation: 2,
-
-            activity: 1,
-
-            value: 25
-
-        }
-
-    },
-
-
-    market_research: {
-
-        title:
-            "Investigar mercado",
-
-        description:
-            "Obtén más información antes de tomar decisiones.",
-
-        cost: 35,
-
-        effects: {
-
-            marketKnowledge: 10,
-
-            marketResponse: 3,
-
-            risk: -3,
-
-            value: 20
-
-        }
-
-    },
-
-
-    launch_campaign: {
-
-        title:
-            "Lanzar campaña",
-
-        description:
-            "Aumenta temporalmente la exposición de la empresa.",
-
-        cost: 70,
-
-        effects: {
-
-            campaignPower: 12,
-
-            activity: 8,
-
-            marketResponse: 4,
-
-            risk: 2,
-
-            value: 35
-
-        }
-
-    },
-
-
-    validate_product: {
-
-        title:
-            "Validar producto",
-
-        description:
-            "Prueba la propuesta antes de invertir más recursos.",
-
-        cost: 45,
-
-        effects: {
-
-            productValidation: 10,
-
-            marketKnowledge: 4,
-
-            marketResponse: 4,
-
-            risk: -2,
-
-            value: 30
-
-        }
-
-    },
-
-
-    test_location: {
-
-        title:
-            "Probar ubicación",
-
-        description:
-            "Utiliza COYOTE para fortalecer tu lectura territorial.",
-
-        cost: 30,
-
-        effects: {
-
-            locationStrength: 8,
-
-            marketKnowledge: 3,
-
-            activity: 2,
-
-            value: 20
-
-        }
-
-    }
-
-};
-
-
-/* =========================================================
-   70. RENDER BUSINESS ENGINE
-========================================================= */
-
-function renderBusinessEngine(
-    company
-) {
-
-    migrateCompanyBusinessData(
-        company
-    );
-
-
-    const decisions =
-        Object.entries(
-            BUSINESS_DECISIONS
-        );
-
-
-    return `
-
-        <section
-            class="business-engine"
-        >
-
-            <div
-                class="business-engine-heading"
-            >
-
-                <div>
-
-                    <span
-                        class="eyebrow"
-                    >
-                        BUSINESS ENGINE
-                    </span>
-
-
-                    <h2>
-                        Toma decisiones
-                    </h2>
-
-
-                    <p class="muted">
-
-                        Cada decisión modifica el estado
-                        de tu empresa.
-
-                    </p>
-
-                </div>
-
-
-                <strong
-                    class="business-capital"
-                >
-
-                    Capital:
-                    S/ ${formatPrice(
-                        company.capital
-                    )}
-
-                </strong>
-
-            </div>
-
-
-            <div
-                class="business-metrics"
-            >
-
-                ${renderBusinessMetric(
-                    "Actividad",
-                    company.activity
-                )}
-
-
-                ${renderBusinessMetric(
-                    "Respuesta",
-                    company.marketResponse
-                )}
-
-
-                ${renderBusinessMetric(
-                    "Ubicación",
-                    company.locationStrength
-                )}
-
-
-                ${renderBusinessMetric(
-                    "Diseño",
-                    company.designLevel
-                )}
-
-
-                ${renderBusinessMetric(
-                    "Validación",
-                    company.productValidation
-                )}
-
-
-                ${renderBusinessMetric(
-                    "Mercado",
-                    company.marketKnowledge
-                )}
-
-
-                ${renderBusinessMetric(
-                    "Campaña",
-                    company.campaignPower
-                )}
-
-
-                ${renderBusinessMetric(
-                    "Riesgo",
-                    company.risk,
-                    true
-                )}
-
-            </div>
-
-
-            <div
-                class="business-decisions"
-            >
-
-                ${decisions
-                    .map(
-                        (
-                            [
-                                decisionId,
-                                decision
-                            ]
-                        ) => `
-
-                            <article
-                                class="decision-card"
-                            >
-
-                                <div>
-
-                                    <strong>
-
-                                        ${escapeHTML(
-                                            decision.title
-                                        )}
-
-                                    </strong>
-
-
-                                    <p>
-
-                                        ${escapeHTML(
-                                            decision.description
-                                        )}
-
-                                    </p>
-
-                                </div>
-
-
-                                <div
-                                    class="decision-footer"
-                                >
-
-                                    <span>
-
-                                        ${decision.cost}
-                                        Mahpes
-
-                                    </span>
-
-
-                                    <button
-                                        type="button"
-                                        class="decision-button"
-                                        data-business-decision="${decisionId}"
-                                    >
-
-                                        ELEGIR
-
-                                    </button>
-
-                                </div>
-
-                            </article>
-
-                        `
-                    )
-                    .join("")}
-
-            </div>
-
-
-            ${renderDecisionHistory(
-                company
-            )}
-
-        </section>
-
-    `;
-
-}
-
-
-/* =========================================================
-   71. MÉTRICA BUSINESS ENGINE
-========================================================= */
-
-function renderBusinessMetric(
-    label,
-    value,
-    inverse = false
-) {
-
-    const safeValue =
-        clamp(
-            value
-        );
-
-
-    return `
-
-        <article
-            class="business-metric"
-        >
-
-            <div
-                class="business-metric-heading"
-            >
-
-                <span>
-
-                    ${escapeHTML(
-                        label
-                    )}
-
-                </span>
-
+            <div>
 
                 <strong>
 
-                    ${safeValue}
+                    ${escapeHTML(
+                        product.name
+                    )}
 
                 </strong>
 
-            </div>
 
+                <small>
 
-            <div
-                class="business-progress"
-            >
+                    ${
+                        product.published
+                            ? "Publicado"
+                            : "En desarrollo"
+                    }
 
-                <div
-                    class="business-progress-fill ${
-                        inverse
-                            ? "risk"
-                            : ""
-                    }"
-                    style="width:${safeValue}%"
-                ></div>
+                </small>
 
             </div>
 
@@ -7890,753 +7385,99 @@ function renderBusinessMetric(
 
 
 /* =========================================================
-   72. HISTORIAL DE DECISIONES
+   86. PRODUCTOS PUBLICADOS
 ========================================================= */
 
-function renderDecisionHistory(
-    company
-) {
+function getPublishedProducts() {
 
-    const decisions =
-        Array.isArray(
-            company.decisions
-        )
+    return mahpeState.products.filter(
 
-            ? company.decisions
-                .slice()
-                .reverse()
-                .slice(
-                    0,
-                    5
-                )
+        product =>
+            product.published
 
-            : [];
-
-
-    if (!decisions.length) {
-
-        return `
-
-            <div
-                class="decision-history empty"
-            >
-
-                <strong>
-                    Historial
-                </strong>
-
-
-                <p class="muted">
-
-                    Tus decisiones aparecerán aquí.
-
-                </p>
-
-            </div>
-
-        `;
-
-    }
-
-
-    return `
-
-        <div
-            class="decision-history"
-        >
-
-            <strong>
-                Últimas decisiones
-            </strong>
-
-
-            <div
-                class="decision-history-list"
-            >
-
-                ${decisions
-                    .map(
-                        decision => `
-
-                            <article
-                                class="decision-history-item"
-                            >
-
-                                <span>
-
-                                    ${escapeHTML(
-                                        decision.title
-                                    )}
-
-                                </span>
-
-
-                                <small>
-
-                                    -${Number(
-                                        decision.cost ||
-                                        0
-                                    )}
-                                    Mahpes
-
-                                </small>
-
-                            </article>
-
-                        `
-                    )
-                    .join("")}
-
-            </div>
-
-        </div>
-
-    `;
+    );
 
 }
 
 
 /* =========================================================
-   73. EJECUTAR DECISIÓN
+   87. EMPRESA CON MAYOR RESPUESTA
 ========================================================= */
 
-function executeBusinessDecision(
-    decisionId
-) {
-
-    const company =
-        getCurrentCompany();
-
-
-    const decision =
-        BUSINESS_DECISIONS[
-            decisionId
-        ];
-
+function getMostActiveCompany() {
 
     if (
-        !company ||
-        !decision
+        !mahpeState.companies.length
     ) {
 
-        return;
+        return null;
 
     }
 
 
-    migrateCompanyBusinessData(
-        company
-    );
+    return mahpeState.companies
+        .slice()
+        .sort(
 
+            (
+                a,
+                b
+            ) => {
 
-    if (
-        mahpeState.mahpes <
-        decision.cost
-    ) {
+                const scoreA =
 
-        window.alert(
-            "No tienes suficientes Mahpes para esta decisión."
-        );
-
-
-        return;
-
-    }
-
-
-    mahpeState.mahpes -=
-        decision.cost;
-
-
-    const effects =
-        decision.effects ||
-        {};
-
-
-    Object.entries(
-        effects
-    )
-    .forEach(
-        (
-            [
-                key,
-                amount
-            ]
-        ) => {
-
-            if (
-                key ===
-                "value"
-            ) {
-
-                company.value =
                     Number(
-                        company.value ||
+                        a.interactions ||
                         0
                     ) +
+
                     Number(
-                        amount ||
+                        a.interested ||
                         0
-                    );
-
-
-                return;
-
-            }
-
-
-            if (
-                typeof company[key] ===
-                "number"
-            ) {
-
-                company[key] =
-                    clamp(
-
-                        company[key] +
-                        Number(
-                            amount ||
-                            0
-                        )
-
-                    );
-
-            }
-
-        }
-    );
-
-
-    const historyItem = {
-
-        id:
-            generateId(
-                "decision"
-            ),
-
-        decisionId,
-
-        title:
-            decision.title,
-
-        cost:
-            decision.cost,
-
-        createdAt:
-            new Date()
-                .toISOString()
-
-    };
-
-
-    company.decisions.push(
-        historyItem
-    );
-
-
-    mahpeState.decisionHistory.unshift({
-
-        ...historyItem,
-
-        companyId:
-            company.id,
-
-        companyName:
-            company.name
-
-    });
-
-
-    mahpeState.decisionHistory =
-        mahpeState.decisionHistory.slice(
-            0,
-            50
-        );
-
-
-    addMahpeEvent(
-
-        "decision",
-
-        company.name +
-        " tomó la decisión: " +
-        decision.title +
-        ".",
-
-        company.id
-
-    );
-
-
-    recalculateCompanyStage(
-        company
-    );
-
-
-    saveMahpeState();
-
-
-    renderCompanyDashboard();
-
-
-    renderActivityInbox();
-
-
-    updateProfile();
-
-}
-
-
-/* =========================================================
-   74. CONECTAR BUSINESS ENGINE
-========================================================= */
-
-function bindBusinessDecisionEvents() {
-
-    document
-        .querySelectorAll(
-            "[data-business-decision]"
-        )
-        .forEach(
-            button => {
-
-                button.onclick =
-                    () => {
-
-                        executeBusinessDecision(
-                            button.dataset.businessDecision
-                        );
-
-                    };
-
-            }
-        );
-
-}
-
-
-/* =========================================================
-   75. HERO DE EMPRESA
-========================================================= */
-
-function renderCompanyHero(
-    company
-) {
-
-    const products =
-        getCompanyProducts(
-            company.id
-        );
-
-
-    return `
-
-        <section
-            class="company-hero"
-        >
-
-            ${renderCompanyAvatar(
-                company,
-                "company-big-avatar"
-            )}
-
-
-            <div
-                class="company-hero-copy"
-            >
-
-                <span
-                    class="eyebrow"
-                >
-
-                    MI EMPRESA
-
-                </span>
-
-
-                <h1>
-
-                    ${escapeHTML(
-                        company.name
-                    )}
-
-                </h1>
-
-
-                <p>
-
-                    ${escapeHTML(
-                        company.description
-                    )}
-
-                </p>
-
-
-                <div
-                    class="company-meta"
-                >
-
-                    <span>
-
-                        ${escapeHTML(
-                            company.category
-                        )}
-
-                    </span>
-
-
-                    <span>
-
-                        ${escapeHTML(
-                            company.stage
-                        )}
-
-                    </span>
-
-
-                    <span>
-
-                        ${products.length}
-                        ${
-                            products.length === 1
-                                ? "producto"
-                                : "productos"
-                        }
-
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div
-                class="company-value"
-            >
-
-                <small>
-                    Valor simulado
-                </small>
-
-
-                <strong>
-
-                    S/ ${formatPrice(
-                        company.value
-                    )}
-
-                </strong>
-
-            </div>
-
-        </section>
-
-    `;
-
-}
-
-
-/* =========================================================
-   76. DASHBOARD VACÍO
-========================================================= */
-
-function renderEmptyCompanyDashboard(
-    dashboard
-) {
-
-    dashboard.innerHTML = `
-
-        <section
-            class="empty-state"
-        >
-
-            <span
-                class="eyebrow"
-            >
-                MAHPE
-            </span>
-
-
-            <h2>
-                Crea tu primera empresa
-            </h2>
-
-
-            <p>
-
-                Cuando crees una empresa podrás
-                construir su identidad, agregar
-                productos, publicar y medir cómo
-                responde el mercado.
-
-            </p>
-
-
-            <button
-                id="goCreateCompanyButton"
-                class="primary-button"
-                type="button"
-            >
-
-                CREAR EMPRESA
-
-            </button>
-
-        </section>
-
-    `;
-
-
-    const button =
-        document.getElementById(
-            "goCreateCompanyButton"
-        );
-
-
-    if (button) {
-
-        button.onclick =
-            () =>
-
-                openView(
-                    "createView"
+                    ) *
+                    4 +
+
+                    Number(
+                        a.committed ||
+                        0
+                    ) *
+                    10;
+
+
+                const scoreB =
+
+                    Number(
+                        b.interactions ||
+                        0
+                    ) +
+
+                    Number(
+                        b.interested ||
+                        0
+                    ) *
+                    4 +
+
+                    Number(
+                        b.committed ||
+                        0
+                    ) *
+                    10;
+
+
+                return (
+                    scoreB -
+                    scoreA
                 );
 
-    }
-
-}
-
-
-/* =========================================================
-   77. RENDER PRINCIPAL — MI EMPRESA
-========================================================= */
-
-function renderCompanyDashboard() {
-
-    const dashboard =
-        document.getElementById(
-            "companyDashboard"
-        );
-
-
-    const productsWorkspace =
-        document.getElementById(
-            "companyProductsWorkspace"
-        );
-
-
-    if (!dashboard) {
-
-        return;
-
-    }
-
-
-    const company =
-        getCurrentCompany();
-
-
-    if (!company) {
-
-        if (productsWorkspace) {
-
-            productsWorkspace.classList.add(
-                "hidden"
-            );
-
-
-            productsWorkspace.innerHTML =
-                "";
-
-        }
-
-
-        renderEmptyCompanyDashboard(
-            dashboard
-        );
-
-
-        return;
-
-    }
-
-
-    migrateCompanyBusinessData(
-        company
-    );
-
-
-    recalculateCompanyStage(
-        company
-    );
-
-
-    dashboard.innerHTML = `
-
-        ${renderCompanyHero(
-            company
-        )}
-
-
-        ${renderCompanyTabs()}
-
-
-        <div
-            id="companyTabContent"
-            class="company-tab-content"
-        ></div>
-
-    `;
-
-
-    const tabContent =
-        document.getElementById(
-            "companyTabContent"
-        );
-
-
-    if (productsWorkspace) {
-
-        productsWorkspace.classList.add(
-            "hidden"
-        );
-
-
-        productsWorkspace.innerHTML =
-            "";
-
-    }
-
-
-    if (tabContent) {
-
-        if (
-            currentCompanyTab ===
-            "summary"
-        ) {
-
-            tabContent.innerHTML =
-                renderCompanySummary(
-                    company
-                );
-
-        }
-
-
-        else if (
-            currentCompanyTab ===
-            "products"
-        ) {
-
-            tabContent.innerHTML =
-                renderCompanyProducts(
-                    company
-                );
-
-        }
-
-
-        else if (
-            currentCompanyTab ===
-            "statistics"
-        ) {
-
-            tabContent.innerHTML =
-                renderProductStatistics(
-                    company
-                );
-
-        }
-
-    }
-
-
-    bindCompanyTabs();
-
-
-    bindCompanyDashboardEvents();
-
-
-    bindBrandIdentityEvents();
-
-
-    bindProductEvents();
-
-
-    bindBusinessDecisionEvents();
-
-}
-
-
-/* =========================================================
-   78. EVENTOS DEL DASHBOARD
-========================================================= */
-
-function bindCompanyDashboardEvents() {
-
-    const publishButton =
-        document.getElementById(
-            "publishCompanyPostButton"
-        );
-
-
-    if (publishButton) {
-
-        publishButton.onclick =
-            publishCompanyPost;
-
-    }
-
-
-    document
-        .querySelectorAll(
-            "[data-open-products]"
-        )
-        .forEach(
-            button => {
-
-                button.onclick =
-                    () => {
-
-                        setCompanyTab(
-                            "products"
-                        );
-
-                    };
-
             }
-        );
 
-
-    document
-        .querySelectorAll(
-            "[data-create-product-summary]"
-        )
-        .forEach(
-            button => {
-
-                button.onclick =
-                    () => {
-
-                        currentCompanyTab =
-                            "products";
-
-
-                        renderCompanyDashboard();
-
-
-                        openProductEditor();
-
-                    };
-
-            }
-        );
+        )[0];
 
 }
 
 
 /* =========================================================
-   79. CAMBIAR EMPRESA ACTUAL
+   88. CAMBIAR EMPRESA ACTUAL
 ========================================================= */
 
 function selectCompany(
@@ -8665,13 +7506,17 @@ function selectCompany(
 
 
     currentCompanyTab =
-        "summary";
+        "products";
 
 
-    renderCompanyDashboard();
+    if (
+        typeof renderCompanyDashboard ===
+        "function"
+    ) {
 
+        renderCompanyDashboard();
 
-    updateProfile();
+    }
 
 
     openView(
@@ -8682,641 +7527,2077 @@ function selectCompany(
 
 
 /* =========================================================
-   80. MÉTRICAS GLOBALES DEL PERFIL
+   89. ELIMINAR EMPRESA
+
+   Elimina empresa + productos.
+   Conserva publicaciones como historial,
+   pero rompe las relaciones eliminadas.
 ========================================================= */
 
-function getProfileMetrics() {
+function deleteCompany(
+    companyId
+) {
 
-    const companyTotals =
-        mahpeState.companies.reduce(
+    const company =
+        mahpeState.companies.find(
 
-            (
-                totals,
-                company
-            ) => {
-
-                totals.interactions +=
-                    Number(
-                        company.interactions ||
-                        0
-                    );
-
-
-                totals.interested +=
-                    Number(
-                        company.interested ||
-                        0
-                    );
-
-
-                totals.committed +=
-                    Number(
-                        company.committed ||
-                        0
-                    );
-
-
-                return totals;
-
-            },
-
-            {
-
-                interactions: 0,
-
-                interested: 0,
-
-                committed: 0
-
-            }
+            item =>
+                item.id ===
+                companyId
 
         );
 
 
-    const productTotals =
-        mahpeState.products.reduce(
+    if (!company) {
 
-            (
-                totals,
-                product
-            ) => {
+        return;
 
-                migrateProductData(
-                    product
+    }
+
+
+    const accepted =
+        window.confirm(
+
+            "¿Eliminar " +
+            company.name +
+            "? Esta acción también eliminará sus productos."
+
+        );
+
+
+    if (!accepted) {
+
+        return;
+
+    }
+
+
+    const productIds =
+        mahpeState.products
+
+            .filter(
+                product =>
+                    product.companyId ===
+                    companyId
+            )
+
+            .map(
+                product =>
+                    product.id
+            );
+
+
+    mahpeState.products =
+        mahpeState.products.filter(
+
+            product =>
+                product.companyId !==
+                companyId
+
+        );
+
+
+    mahpeState.posts =
+        mahpeState.posts.filter(
+
+            post =>
+                post.companyId !==
+                companyId
+
+        );
+
+
+    productIds.forEach(
+        productId => {
+
+            Object.keys(
+                mahpeState.interactions
+            ).forEach(
+                key => {
+
+                    /*
+                       Las interacciones se limpian
+                       cuando pertenecían a posts
+                       eliminados posteriormente.
+                    */
+
+                    if (
+                        key.includes(
+                            productId
+                        )
+                    ) {
+
+                        delete mahpeState.interactions[
+                            key
+                        ];
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    delete mahpeState.following[
+        companyId
+    ];
+
+
+    mahpeState.companies =
+        mahpeState.companies.filter(
+
+            item =>
+                item.id !==
+                companyId
+
+        );
+
+
+    if (
+        currentCompanyId ===
+        companyId
+    ) {
+
+        currentCompanyId =
+            mahpeState.companies.length
+
+                ? mahpeState.companies[0].id
+
+                : null;
+
+    }
+
+
+    addMahpeEvent(
+
+        "company",
+
+        "Eliminaste " +
+        company.name +
+        "."
+
+    );
+
+
+    saveMahpeState();
+
+
+    renderFeed();
+
+
+    if (
+        typeof renderCompanyDashboard ===
+        "function"
+    ) {
+
+        renderCompanyDashboard();
+
+    }
+
+
+    if (
+        typeof updateProfile ===
+        "function"
+    ) {
+
+        updateProfile();
+
+    }
+
+}
+
+
+/* =========================================================
+   90. EVENTOS DEL EDITOR DE PRODUCTOS
+========================================================= */
+
+function bindProductEditorEvents() {
+
+    const elements =
+        getProductEditorElements();
+
+
+    if (elements.save) {
+
+        elements.save.onclick =
+            saveProductFromEditor;
+
+    }
+
+
+    if (elements.cancel) {
+
+        elements.cancel.onclick =
+            () => {
+
+                closeProductEditor(
+                    true
+                );
+
+            };
+
+    }
+
+
+    if (elements.images) {
+
+        elements.images.onchange =
+            async function() {
+
+                await handleProductImages(
+                    this.files
                 );
 
 
-                totals.interactions +=
-                    Number(
-                        product.metrics.interactions ||
-                        0
-                    );
+                this.value = "";
 
+            };
 
-                totals.interested +=
-                    Number(
-                        product.metrics.interested ||
-                        0
-                    );
-
-
-                totals.committed +=
-                    Number(
-                        product.metrics.committed ||
-                        0
-                    );
-
-
-                return totals;
-
-            },
-
-            {
-
-                interactions: 0,
-
-                interested: 0,
-
-                committed: 0
-
-            }
-
-        );
-
-
-    return {
-
-        interactions:
-            companyTotals.interactions +
-            productTotals.interactions,
-
-        interested:
-            companyTotals.interested +
-            productTotals.interested,
-
-        committed:
-            companyTotals.committed +
-            productTotals.committed
-
-    };
+    }
 
 }
 
 
 /* =========================================================
-   81. ACTUALIZAR PERFIL
+   91. EVENTO DE CREAR EMPRESA
 ========================================================= */
 
-function updateProfile() {
+function bindCompanyCreation() {
 
-    const mahpesElement =
-        document.getElementById(
-            "profileMahpes"
-        );
+    if (createCompanyButton) {
 
-
-    const companiesElement =
-        document.getElementById(
-            "profileCompanies"
-        );
-
-
-    const interestElement =
-        document.getElementById(
-            "profileInterest"
-        );
-
-
-    const commitmentElement =
-        document.getElementById(
-            "profileCommitment"
-        );
-
-
-    const metrics =
-        getProfileMetrics();
-
-
-    if (mahpesElement) {
-
-        mahpesElement.textContent =
-            Number(
-                mahpeState.mahpes ||
-                0
-            );
+        createCompanyButton.onclick =
+            createCompany;
 
     }
-
-
-    if (companiesElement) {
-
-        companiesElement.textContent =
-            mahpeState.companies.length;
-
-    }
-
-
-    if (interestElement) {
-
-        interestElement.textContent =
-            metrics.interested;
-
-    }
-
-
-    if (commitmentElement) {
-
-        commitmentElement.textContent =
-            metrics.committed;
-
-    }
-
-
-    renderProfileCompanies();
 
 }
 
 
 /* =========================================================
-   82. LISTA DE EMPRESAS EN PERFIL
+   92. EXPONER FUNCIONES DEL BLOQUE 2
 ========================================================= */
 
-function renderProfileCompanies() {
+window.createCompany =
+    createCompany;
 
-    /*
-       Si el HTML actual no tiene este contenedor,
-       simplemente no hacemos nada.
 
-       Esto mantiene compatibilidad con el index.
-    */
+window.openCompanyLogoPicker =
+    openCompanyLogoPicker;
 
-    const container =
-        document.getElementById(
-            "profileCompanyList"
-        );
 
+window.removeCompanyLogo =
+    removeCompanyLogo;
 
-    if (!container) {
 
-        return;
+window.openNewProductEditor =
+    openNewProductEditor;
 
-    }
 
+window.editProduct =
+    editProduct;
 
-    if (
-        !mahpeState.companies.length
-    ) {
 
-        container.innerHTML = `
+window.closeProductEditor =
+    closeProductEditor;
 
-            <div
-                class="empty-state compact"
-            >
 
-                Todavía no tienes empresas.
+window.setProductCover =
+    setProductCover;
 
-            </div>
 
-        `;
+window.removeProductEditorImage =
+    removeProductEditorImage;
 
 
-        return;
+window.saveProductFromEditor =
+    saveProductFromEditor;
 
-    }
 
+window.deleteProduct =
+    deleteProduct;
 
-    container.innerHTML =
-        mahpeState.companies
-            .map(
-                company => `
 
-                    <button
-                        type="button"
-                        class="profile-company-card"
-                        data-profile-company="${company.id}"
-                    >
+window.publishProduct =
+    publishProduct;
 
-                        ${renderCompanyAvatar(
-                            company,
-                            "company-avatar"
-                        )}
 
-
-                        <span>
-
-                            <strong>
-
-                                ${escapeHTML(
-                                    company.name
-                                )}
-
-                            </strong>
-
-
-                            <small>
-
-                                ${escapeHTML(
-                                    company.stage
-                                )}
-
-                            </small>
-
-                        </span>
-
-                    </button>
-
-                `
-            )
-            .join("");
-
-
-    container
-        .querySelectorAll(
-            "[data-profile-company]"
-        )
-        .forEach(
-            button => {
-
-                button.onclick =
-                    () => {
-
-                        selectCompany(
-                            button.dataset.profileCompany
-                        );
-
-                    };
-
-            }
-        );
-
-}
-
-
-/* =========================================================
-   83. ACTUALIZAR UI GLOBAL
-========================================================= */
-
-function updateGlobalUI() {
-
-    const wallet =
-        document.getElementById(
-            "walletBalance"
-        );
-
-
-    if (wallet) {
-
-        wallet.textContent =
-            Number(
-                mahpeState.mahpes ||
-                0
-            );
-
-    }
-
-
-    const followingCount =
-        document.getElementById(
-            "followingCount"
-        );
-
-
-    if (followingCount) {
-
-        followingCount.textContent =
-            getFollowingCount();
-
-    }
-
-
-    updateProfile();
-
-
-    renderActivityInbox();
-
-}
-
-
-/* =========================================================
-   84. MARCAR ACTIVIDAD COMO LEÍDA
-========================================================= */
-
-function markActivityAsRead() {
-
-    if (
-        !Array.isArray(
-            mahpeState.events
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    let changed =
-        false;
-
-
-    mahpeState.events.forEach(
-        event => {
-
-            if (!event.read) {
-
-                event.read =
-                    true;
-
-
-                changed =
-                    true;
-
-            }
-
-        }
-    );
-
-
-    if (changed) {
-
-        saveMahpeState();
-
-    }
-
-
-    renderActivityInbox();
-
-}
-
-
-/* =========================================================
-   85. BANDEJA DE ACTIVIDAD
-========================================================= */
-
-function bindActivityInbox() {
-
-    const inbox =
-        document.getElementById(
-            "activityInbox"
-        );
-
-
-    if (!inbox) {
-
-        return;
-
-    }
-
-
-    /*
-       Al interactuar con la bandeja,
-       las novedades pasan a leídas.
-    */
-
-    inbox.addEventListener(
-
-        "click",
-
-        function() {
-
-            markActivityAsRead();
-
-        }
-
-    );
-
-}
-
-
-/* =========================================================
-   86. ESTADO DE EMPRESA PARA COYOTE
-========================================================= */
-
-function getCompanyCoyoteData() {
-
-    const company =
-        getCurrentCompany();
-
-
-    if (!company) {
-
-        return null;
-
-    }
-
-
-    migrateCompanyBusinessData(
-        company
-    );
-
-
-    const products =
-        getCompanyProducts(
-            company.id
-        );
-
-
-    const bestProduct =
-        getBestCompanyProduct(
-            company.id
-        );
-
-
-    return {
-
-        id:
-            company.id,
-
-        name:
-            company.name,
-
-        category:
-            company.category,
-
-        stage:
-            company.stage,
-
-        logo:
-            company.brandImage ||
-            null,
-
-        product:
-            bestProduct
-                ? bestProduct.name
-                : company.product ||
-                  "",
-
-        products:
-            products.map(
-                product => ({
-
-                    id:
-                        product.id,
-
-                    name:
-                        product.name,
-
-                    category:
-                        product.category,
-
-                    price:
-                        product.price,
-
-                    cover:
-                        getProductCover(
-                            product
-                        )
-
-                })
-            )
-
-    };
-
-}
-
-
-/* =========================================================
-   87. PREPARAR PRODUCTO PARA COYOTE
-========================================================= */
-
-function getDefaultCoyoteProduct() {
-
-    const company =
-        getCurrentCompany();
-
-
-    if (!company) {
-
-        return "";
-
-    }
-
-
-    const bestProduct =
-        getBestCompanyProduct(
-            company.id
-        );
-
-
-    if (bestProduct) {
-
-        return bestProduct.name;
-
-    }
-
-
-    return (
-        company.product ||
-        ""
-    );
-
-}
-
-
-/* =========================================================
-   88. EXPONER FUNCIONES NECESARIAS
-========================================================= */
-
-window.setCompanyTab =
-    setCompanyTab;
+window.publishCompanyPost =
+    publishCompanyPost;
 
 
 window.selectCompany =
     selectCompany;
 
 
+window.deleteCompany =
+    deleteCompany;
+
+
+/* =========================================================
+   FIN BLOQUE 2/4
+
+   NO INICIALIZAR TODAVÍA.
+
+   EL BLOQUE 3/4 CONTINÚA CON:
+
+   ★ NUEVO PANEL "MI EMPRESA"
+   ★ Header / portada / logo
+   ★ Productos | Estadísticas | Decisiones
+   ★ Business Engine
+   ★ Etapas de crecimiento
+   ★ Decisiones y consecuencias
+
+   Y, SOBRE TODO:
+
+   ★ NUEVO "MI PERFIL"
+   ★ Foto editable
+   ★ Nombre
+   ★ @usuario
+   ★ Bio
+   ★ Ubicación opcional
+   ★ Mahpes
+   ★ Empresas
+   ★ Productos
+   ★ Recomendaciones / referencias
+   ★ Actividad
+   ★ Configuración
+   ★ Ayuda
+   ★ Cerrar sesión
+
+   SIN DINERO REAL.
+========================================================= */
+/* =========================================================
+   MAHPE v2.0 — BLOQUE 3/4
+   EMPRESA + BUSINESS ENGINE + PERFIL
+========================================================= */
+
+/* =========================================================
+   93. ELEMENTOS PRINCIPALES
+========================================================= */
+
+const companyDashboard =
+    document.getElementById("companyDashboard");
+
+const profileView =
+    document.getElementById("profileView");
+
+
+/* =========================================================
+   94. ETAPAS EMPRESARIALES
+========================================================= */
+
+const COMPANY_STAGES = [
+    "Idea",
+    "En desarrollo",
+    "Lanzada",
+    "En crecimiento",
+    "Consolidada"
+];
+
+function getCompanyGrowthScore(company) {
+
+    if (!company) return 0;
+
+    return clamp(
+        Number(company.activity || 0) * 0.20 +
+        Number(company.marketResponse || 0) * 0.25 +
+        Number(company.productValidation || 0) * 0.25 +
+        Number(company.designLevel || 0) * 0.10 +
+        Number(company.marketKnowledge || 0) * 0.10 +
+        Number(company.locationStrength || 0) * 0.10
+    );
+}
+
+function recalculateCompanyStage(company) {
+
+    if (!company || company.demo) return;
+
+    const score = getCompanyGrowthScore(company);
+
+    const products = getCompanyProducts(company.id);
+
+    const published = products.some(
+        product => product.published
+    );
+
+    let nextStage = "Idea";
+
+    if (score >= 25 || products.length > 0) {
+        nextStage = "En desarrollo";
+    }
+
+    if (published && score >= 35) {
+        nextStage = "Lanzada";
+    }
+
+    if (
+        published &&
+        score >= 60 &&
+        Number(company.interested || 0) >= 5
+    ) {
+        nextStage = "En crecimiento";
+    }
+
+    if (
+        published &&
+        score >= 85 &&
+        Number(company.committed || 0) >= 20
+    ) {
+        nextStage = "Consolidada";
+    }
+
+    if (company.stage !== nextStage) {
+
+        company.stage = nextStage;
+
+        addMahpeEvent(
+            "company",
+            `${company.name} alcanzó la etapa ${nextStage}.`,
+            company.id
+        );
+    }
+}
+
+
+/* =========================================================
+   95. MOTOR DE DECISIONES
+========================================================= */
+
+const BUSINESS_DECISIONS = [
+    {
+        id: "design",
+        icon: "🎨",
+        title: "Mejorar identidad",
+        description: "Trabaja en la presentación de tu marca.",
+        cost: 25,
+        effects: {
+            designLevel: 10,
+            activity: 3
+        },
+        risk: 0
+    },
+    {
+        id: "research",
+        icon: "🔎",
+        title: "Investigar mercado",
+        description: "Conoce mejor a tus posibles compradores.",
+        cost: 35,
+        effects: {
+            marketKnowledge: 12,
+            marketResponse: 5
+        },
+        risk: 0
+    },
+    {
+        id: "campaign",
+        icon: "📣",
+        title: "Lanzar campaña",
+        description: "Prueba una estrategia de promoción.",
+        cost: 45,
+        effects: {
+            campaignPower: 12,
+            activity: 8,
+            marketResponse: 4
+        },
+        risk: 5
+    },
+    {
+        id: "validation",
+        icon: "🧪",
+        title: "Validar producto",
+        description: "Evalúa la respuesta potencial del mercado.",
+        cost: 30,
+        effects: {
+            productValidation: 12,
+            marketKnowledge: 4
+        },
+        risk: 0
+    },
+    {
+        id: "territory",
+        icon: "📍",
+        title: "Estudiar ubicación",
+        description: "Analiza oportunidades territoriales con COYOTE.",
+        cost: 40,
+        effects: {
+            locationStrength: 12,
+            marketKnowledge: 5
+        },
+        risk: -3
+    }
+];
+
+
+/* =========================================================
+   96. EJECUTAR DECISIÓN
+========================================================= */
+
+function executeBusinessDecision(decisionId) {
+
+    const company = getCurrentCompany();
+
+    const decision = BUSINESS_DECISIONS.find(
+        item => item.id === decisionId
+    );
+
+    if (!company || !decision) return;
+
+    const cost = Number(decision.cost || 0);
+
+    if (mahpeState.mahpes < cost) {
+
+        alert("No tienes suficientes Mahpes para esta decisión.");
+        return;
+    }
+
+    mahpeState.mahpes -= cost;
+
+    Object.entries(decision.effects).forEach(
+        ([metric, change]) => {
+
+            company[metric] = clamp(
+                Number(company[metric] || 0) + change
+            );
+        }
+    );
+
+    company.risk = clamp(
+        Number(company.risk || 0) +
+        Number(decision.risk || 0)
+    );
+
+    company.decisions.push({
+        id: generateId("decision"),
+        decisionId,
+        title: decision.title,
+        cost,
+        effects: { ...decision.effects },
+        createdAt: new Date().toISOString()
+    });
+
+    mahpeState.decisionHistory.unshift({
+        id: generateId("history"),
+        companyId: company.id,
+        decisionId,
+        title: decision.title,
+        cost,
+        createdAt: new Date().toISOString()
+    });
+
+    company.value =
+        Number(company.value || 0) +
+        cost * 0.5;
+
+    recalculateCompanyStage(company);
+
+    addMahpeEvent(
+        "decision",
+        `${company.name}: ${decision.title}.`,
+        company.id
+    );
+
+    saveMahpeState();
+
+    renderCompanyDashboard();
+    renderActivityInbox();
+    updateProfile();
+}
+
+
+/* =========================================================
+   97. MÉTRICAS EMPRESARIALES
+========================================================= */
+
+function renderBusinessMetric(label, value, icon = "●") {
+
+    const safeValue = clamp(value);
+
+    return `
+        <div class="mahpe-business-metric">
+            <div class="mahpe-business-metric-top">
+                <span>${icon} ${escapeHTML(label)}</span>
+                <strong>${safeValue}%</strong>
+            </div>
+
+            <div class="mahpe-business-metric-track">
+                <div
+                    class="mahpe-business-metric-fill"
+                    style="width:${safeValue}%"
+                ></div>
+            </div>
+        </div>
+    `;
+}
+
+function renderBusinessMetrics(company) {
+
+    return `
+        <section class="mahpe-business-metrics">
+            <div class="mahpe-section-heading">
+                <h3>Estado empresarial</h3>
+                <small>Indicadores del simulador</small>
+            </div>
+
+            ${renderBusinessMetric(
+                "Actividad",
+                company.activity,
+                "⚡"
+            )}
+
+            ${renderBusinessMetric(
+                "Respuesta del mercado",
+                company.marketResponse,
+                "🔥"
+            )}
+
+            ${renderBusinessMetric(
+                "Validación",
+                company.productValidation,
+                "🧪"
+            )}
+
+            ${renderBusinessMetric(
+                "Diseño",
+                company.designLevel,
+                "🎨"
+            )}
+
+            ${renderBusinessMetric(
+                "Conocimiento del mercado",
+                company.marketKnowledge,
+                "🔎"
+            )}
+
+            ${renderBusinessMetric(
+                "Ubicación",
+                company.locationStrength,
+                "📍"
+            )}
+
+            ${renderBusinessMetric(
+                "Riesgo",
+                company.risk,
+                "⚠️"
+            )}
+        </section>
+    `;
+}
+
+
+/* =========================================================
+   98. HISTORIAL DE DECISIONES
+========================================================= */
+
+function renderBusinessDecisionHistory(company) {
+
+    const history = Array.isArray(company.decisions)
+        ? company.decisions.slice().reverse().slice(0, 8)
+        : [];
+
+    if (!history.length) {
+
+        return `
+            <div class="mahpe-empty-note">
+                Todavía no has tomado decisiones empresariales.
+            </div>
+        `;
+    }
+
+    return `
+        <div class="mahpe-decision-history">
+            ${history.map(item => `
+                <article class="mahpe-history-item">
+                    <div>
+                        <strong>${escapeHTML(item.title)}</strong>
+                        <small>${formatRelativeDate(item.createdAt)}</small>
+                    </div>
+
+                    <span>−${Number(item.cost || 0)} Mahpes</span>
+                </article>
+            `).join("")}
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   99. PANEL DE DECISIONES
+========================================================= */
+
+function renderCompanyDecisions(company) {
+
+    return `
+        <section class="mahpe-decisions-panel">
+
+            <div class="mahpe-section-heading">
+                <div>
+                    <span class="eyebrow">SIMULADOR</span>
+                    <h3>Decisiones</h3>
+                </div>
+
+                <span class="mahpe-small-balance">
+                    ◈ ${mahpeState.mahpes.toLocaleString("es-PE")}
+                </span>
+            </div>
+
+            <p class="muted">
+                Cada decisión utiliza Mahpes y modifica
+                los indicadores simulados de tu empresa.
+            </p>
+
+            <div class="mahpe-decisions-grid">
+                ${BUSINESS_DECISIONS.map(decision => `
+                    <article class="mahpe-decision-card">
+
+                        <span class="mahpe-decision-icon">
+                            ${decision.icon}
+                        </span>
+
+                        <h4>${escapeHTML(decision.title)}</h4>
+
+                        <p>${escapeHTML(decision.description)}</p>
+
+                        <div class="mahpe-decision-footer">
+                            <span>
+                                ◈ ${decision.cost} Mahpes
+                            </span>
+
+                            <button
+                                type="button"
+                                class="secondary-button"
+                                data-business-decision="${decision.id}"
+                                ${mahpeState.mahpes < decision.cost
+                                    ? "disabled"
+                                    : ""}
+                            >
+                                DECIDIR
+                            </button>
+                        </div>
+
+                    </article>
+                `).join("")}
+            </div>
+
+            <h3>Historial</h3>
+
+            ${renderBusinessDecisionHistory(company)}
+
+        </section>
+    `;
+}
+
+
+/* =========================================================
+   100. PORTADA DE EMPRESA
+========================================================= */
+
+function renderCompanyHero(company) {
+
+    const products = getCompanyProducts(company.id);
+
+    return `
+        <section class="mahpe-company-hero">
+
+            <div class="mahpe-company-cover">
+                <span class="mahpe-cover-wordmark">
+                    ${escapeHTML(company.name)}
+                </span>
+            </div>
+
+            <div class="mahpe-company-identity">
+
+                ${renderCompanyAvatar(
+                    company,
+                    "mahpe-company-logo"
+                )}
+
+                <div class="mahpe-company-identity-text">
+
+                    <span class="eyebrow">
+                        MI EMPRESA
+                    </span>
+
+                    <h2>${escapeHTML(company.name)}</h2>
+
+                    <p>
+                        ${escapeHTML(company.category || "Empresa")}
+                        ·
+                        ${escapeHTML(company.stage || "Idea")}
+                    </p>
+
+                </div>
+
+            </div>
+
+            <p class="mahpe-company-description">
+                ${escapeHTML(
+                    company.description ||
+                    "Construye tu empresa dentro de MAHPE."
+                )}
+            </p>
+
+            <div class="mahpe-company-stats">
+
+                <div>
+                    <strong>${products.length}</strong>
+                    <span>Productos</span>
+                </div>
+
+                <div>
+                    <strong>${Number(company.followers || 0)}</strong>
+                    <span>Seguidores</span>
+                </div>
+
+                <div>
+                    <strong>
+                        S/ ${formatPrice(company.value)}
+                    </strong>
+                    <span>Valor simulado</span>
+                </div>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+/* =========================================================
+   101. PESTAÑAS DE EMPRESA
+========================================================= */
+
+function setCompanyTab(tab) {
+
+    const valid = [
+        "products",
+        "statistics",
+        "decisions"
+    ];
+
+    if (!valid.includes(tab)) return;
+
+    currentCompanyTab = tab;
+
+    renderCompanyDashboard();
+}
+
+function renderCompanyTabs() {
+
+    const tabs = [
+        ["products", "Productos"],
+        ["statistics", "Estadísticas"],
+        ["decisions", "Decisiones"]
+    ];
+
+    return `
+        <nav
+            class="company-tabs"
+            aria-label="Secciones de empresa"
+        >
+            ${tabs.map(([id, label]) => `
+                <button
+                    type="button"
+                    class="company-tab ${
+                        currentCompanyTab === id
+                            ? "active"
+                            : ""
+                    }"
+                    data-company-tab="${id}"
+                >
+                    ${label}
+                </button>
+            `).join("")}
+        </nav>
+    `;
+}
+
+
+/* =========================================================
+   102. PANEL ESTADÍSTICAS
+========================================================= */
+
+function renderCompanyStatistics(company) {
+
+    const growth = getCompanyGrowthScore(company);
+
+    return `
+        <section class="mahpe-statistics-dashboard">
+
+            <div class="mahpe-growth-card">
+
+                <span class="eyebrow">
+                    CRECIMIENTO
+                </span>
+
+                <div class="mahpe-growth-value">
+                    <strong>${growth}%</strong>
+                    <span>${escapeHTML(company.stage)}</span>
+                </div>
+
+                <div class="mahpe-business-metric-track">
+                    <div
+                        class="mahpe-business-metric-fill"
+                        style="width:${growth}%"
+                    ></div>
+                </div>
+
+            </div>
+
+            ${renderProductStatistics(company)}
+
+            ${renderBusinessMetrics(company)}
+
+        </section>
+    `;
+}
+
+
+/* =========================================================
+   103. CAMBIAR EMPRESA DESDE SELECTOR
+========================================================= */
+
+function renderCompanySelector() {
+
+    if (mahpeState.companies.length <= 1) {
+        return "";
+    }
+
+    return `
+        <div class="mahpe-company-switcher">
+
+            <label for="mahpeCompanySelect">
+                Empresa activa
+            </label>
+
+            <select id="mahpeCompanySelect">
+                ${mahpeState.companies.map(company => `
+                    <option
+                        value="${escapeHTML(company.id)}"
+                        ${company.id === currentCompanyId
+                            ? "selected"
+                            : ""}
+                    >
+                        ${escapeHTML(company.name)}
+                    </option>
+                `).join("")}
+            </select>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   104. RENDER PRINCIPAL DE MI EMPRESA
+========================================================= */
+
+function renderCompanyDashboard() {
+
+    if (!companyDashboard) return;
+
+    const company = getCurrentCompany();
+
+    if (!company) {
+
+        companyDashboard.innerHTML = `
+            <section class="mahpe-company-empty">
+
+                <span class="eyebrow">
+                    MI EMPRESA
+                </span>
+
+                <h2>Todo empieza con una idea</h2>
+
+                <p>
+                    Crea tu primera empresa, diseña sus productos
+                    y descubre cómo responde el mercado.
+                </p>
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="mahpeGoCreateCompany"
+                >
+                    CREAR MI EMPRESA
+                </button>
+
+            </section>
+        `;
+
+        const createButton =
+            document.getElementById("mahpeGoCreateCompany");
+
+        if (createButton) {
+            createButton.onclick = () => openView("createView");
+        }
+
+        return;
+    }
+
+    let content = "";
+
+    if (currentCompanyTab === "products") {
+
+        content = renderCompanyProducts(company);
+
+    } else if (currentCompanyTab === "statistics") {
+
+        content = renderCompanyStatistics(company);
+
+    } else {
+
+        content = renderCompanyDecisions(company);
+    }
+
+    companyDashboard.innerHTML = `
+        <div class="mahpe-company-dashboard">
+
+            ${renderCompanySelector()}
+
+            ${renderCompanyHero(company)}
+
+            ${renderCompanyTabs()}
+
+            <div class="mahpe-company-tab-content">
+                ${content}
+            </div>
+
+            ${renderBrandIdentity(company)}
+
+        </div>
+    `;
+
+    bindCompanyDashboardEvents();
+}
+
+
+/* =========================================================
+   105. EVENTOS DEL PANEL EMPRESA
+========================================================= */
+
+function bindCompanyDashboardEvents() {
+
+    document
+        .querySelectorAll("[data-company-tab]")
+        .forEach(button => {
+
+            button.onclick = () => {
+                setCompanyTab(button.dataset.companyTab);
+            };
+        });
+
+    document
+        .querySelectorAll("[data-business-decision]")
+        .forEach(button => {
+
+            button.onclick = () => {
+                executeBusinessDecision(
+                    button.dataset.businessDecision
+                );
+            };
+        });
+
+    const selector =
+        document.getElementById("mahpeCompanySelect");
+
+    if (selector) {
+
+        selector.onchange = () => {
+            selectCompany(selector.value);
+        };
+    }
+
+    bindCompanyLogoInput();
+}
+
+
+/* =========================================================
+   106. PERFIL — ESTADO DE EDICIÓN
+========================================================= */
+
+let profileEditing = false;
+
+let profileSection = "overview";
+
+
+/* =========================================================
+   107. PERFIL — FOTO
+========================================================= */
+
+function renderProfileAvatar() {
+
+    const profile = mahpeState.profile;
+
+    if (profile.photo) {
+
+        return `
+            <div class="mahpe-profile-avatar has-photo">
+
+                <img
+                    src="${profile.photo}"
+                    alt="Foto de perfil"
+                >
+
+                <button
+                    type="button"
+                    class="mahpe-profile-camera"
+                    id="mahpeChangePhoto"
+                    aria-label="Cambiar foto de perfil"
+                >
+                    📷
+                </button>
+
+            </div>
+        `;
+    }
+
+    const initial = (
+        profile.name || "M"
+    ).charAt(0).toUpperCase();
+
+    return `
+        <div class="mahpe-profile-avatar">
+
+            <span>${escapeHTML(initial)}</span>
+
+            <button
+                type="button"
+                class="mahpe-profile-camera"
+                id="mahpeChangePhoto"
+                aria-label="Agregar foto de perfil"
+            >
+                📷
+            </button>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   108. PERFIL — MÉTRICAS
+========================================================= */
+
+function getProfileStatistics() {
+
+    return {
+        mahpes: Number(mahpeState.mahpes || 0),
+        companies: mahpeState.companies.length,
+        products: mahpeState.products.length,
+        recommendations:
+            mahpeState.profile.recommendations.length
+    };
+}
+
+
+/* =========================================================
+   109. PERFIL — MENÚ
+========================================================= */
+
+const PROFILE_MENU = [
+    {
+        id: "companies",
+        icon: "🏢",
+        label: "Mis empresas"
+    },
+    {
+        id: "products",
+        icon: "📦",
+        label: "Mis productos"
+    },
+    {
+        id: "recommendations",
+        icon: "★",
+        label: "Recomendaciones"
+    },
+    {
+        id: "activity",
+        icon: "◷",
+        label: "Mi actividad"
+    },
+    {
+        id: "mahpes",
+        icon: "◈",
+        label: "Mis Mahpes"
+    },
+    {
+        id: "settings",
+        icon: "⚙",
+        label: "Configuración"
+    },
+    {
+        id: "help",
+        icon: "?",
+        label: "Ayuda"
+    }
+];
+
+
+/* =========================================================
+   110. PERFIL — RESUMEN
+========================================================= */
+
+function renderProfileOverview() {
+
+    const stats = getProfileStatistics();
+
+    return `
+        <div class="mahpe-profile-menu">
+
+            ${PROFILE_MENU.map(item => {
+
+                let count = "";
+
+                if (item.id === "companies") {
+                    count = stats.companies;
+                }
+
+                if (item.id === "products") {
+                    count = stats.products;
+                }
+
+                if (item.id === "recommendations") {
+                    count = stats.recommendations;
+                }
+
+                if (item.id === "mahpes") {
+                    count = stats.mahpes.toLocaleString("es-PE");
+                }
+
+                return `
+                    <button
+                        type="button"
+                        class="mahpe-profile-menu-item"
+                        data-profile-section="${item.id}"
+                    >
+                        <span class="mahpe-profile-menu-icon">
+                            ${item.icon}
+                        </span>
+
+                        <span class="mahpe-profile-menu-label">
+                            ${item.label}
+                        </span>
+
+                        <span class="mahpe-profile-menu-value">
+                            ${count}
+                        </span>
+
+                        <span class="mahpe-profile-menu-arrow">
+                            ›
+                        </span>
+                    </button>
+                `;
+            }).join("")}
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   111. PERFIL — EMPRESAS
+========================================================= */
+
+function renderProfileCompanies() {
+
+    if (!mahpeState.companies.length) {
+
+        return `
+            <div class="mahpe-profile-empty">
+                Todavía no tienes empresas.
+            </div>
+        `;
+    }
+
+    return `
+        <div class="mahpe-profile-company-list">
+
+            ${mahpeState.companies.map(company => `
+                <button
+                    type="button"
+                    class="mahpe-profile-company-item"
+                    data-select-company="${escapeHTML(company.id)}"
+                >
+                    ${renderCompanyAvatar(
+                        company,
+                        "mahpe-profile-company-logo"
+                    )}
+
+                    <div>
+                        <strong>${escapeHTML(company.name)}</strong>
+                        <small>${escapeHTML(company.stage)}</small>
+                    </div>
+
+                    <span>›</span>
+                </button>
+            `).join("")}
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   112. PERFIL — PRODUCTOS
+========================================================= */
+
+function renderProfileProducts() {
+
+    if (!mahpeState.products.length) {
+
+        return `
+            <div class="mahpe-profile-empty">
+                Todavía no has creado productos.
+            </div>
+        `;
+    }
+
+    return `
+        <div class="mahpe-profile-products-list">
+
+            ${mahpeState.products.map(
+                renderCompactProduct
+            ).join("")}
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   113. PERFIL — REFERENCIAS
+========================================================= */
+
+function renderProfileRecommendations() {
+
+    const recommendations =
+        mahpeState.profile.recommendations;
+
+    if (!recommendations.length) {
+
+        return `
+            <div class="mahpe-profile-empty">
+
+                <h4>Todavía no tienes referencias</h4>
+
+                <p>
+                    Cuando otros usuarios puedan recomendar
+                    tu trabajo, aparecerán aquí.
+                </p>
+
+                <small>
+                    Las referencias reales requieren
+                    cuentas de usuarios verificables.
+                </small>
+
+            </div>
+        `;
+    }
+
+    return `
+        <div class="mahpe-recommendations-list">
+
+            ${recommendations.map(item => `
+                <article class="mahpe-recommendation-card">
+
+                    <div>
+                        <strong>
+                            ${escapeHTML(item.author || "Usuario")}
+                        </strong>
+
+                        <span>
+                            ${"★".repeat(
+                                Math.max(
+                                    0,
+                                    Math.min(5, Number(item.rating || 0))
+                                )
+                            )}
+                        </span>
+                    </div>
+
+                    <p>${escapeHTML(item.text || "")}</p>
+
+                    <small>
+                        ${formatRelativeDate(item.createdAt)}
+                    </small>
+
+                </article>
+            `).join("")}
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   114. PERFIL — ACTIVIDAD
+========================================================= */
+
+function renderProfileActivity() {
+
+    const events = mahpeState.events.slice(0, 20);
+
+    if (!events.length) {
+
+        return `
+            <div class="mahpe-profile-empty">
+                Todavía no tienes actividad.
+            </div>
+        `;
+    }
+
+    return `
+        <div class="mahpe-profile-activity-list">
+
+            ${events.map(event => `
+                <article class="mahpe-profile-activity-item">
+
+                    <span>
+                        ${getActivityIcon(event.type)}
+                    </span>
+
+                    <div>
+                        <strong>${escapeHTML(event.message)}</strong>
+
+                        <small>
+                            ${formatRelativeDate(event.createdAt)}
+                        </small>
+                    </div>
+
+                </article>
+            `).join("")}
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   115. PERFIL — MAHPES
+========================================================= */
+
+function renderProfileMahpes() {
+
+    return `
+        <section class="mahpe-profile-mahpes">
+
+            <span class="eyebrow">
+                MONEDA DEL SIMULADOR
+            </span>
+
+            <div class="mahpe-profile-mahpes-value">
+                ◈ ${mahpeState.mahpes.toLocaleString("es-PE")}
+            </div>
+
+            <p>
+                Los Mahpes sirven para tomar decisiones
+                y desarrollar empresas dentro del juego.
+            </p>
+
+            <small>
+                No son dinero real, no se pueden retirar
+                y no representan una inversión.
+            </small>
+
+        </section>
+    `;
+}
+
+
+/* =========================================================
+   116. PERFIL — CONFIGURACIÓN
+========================================================= */
+
+function renderProfileSettings() {
+
+    return `
+        <div class="mahpe-profile-settings">
+
+            <button
+                type="button"
+                class="mahpe-profile-setting-button"
+                id="mahpeEditProfileFromSettings"
+            >
+                ✎ Editar mi perfil
+            </button>
+
+            <div class="mahpe-profile-setting-note">
+                Los datos de esta versión se guardan
+                localmente en este navegador.
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   117. PERFIL — AYUDA
+========================================================= */
+
+function renderProfileHelp() {
+
+    return `
+        <div class="mahpe-profile-help">
+
+            <h4>¿Qué es MAHPE?</h4>
+
+            <p>
+                Es un simulador empresarial donde puedes
+                crear marcas, presentar productos, medir
+                señales de interés y tomar decisiones.
+            </p>
+
+            <h4>¿Qué es COYOTE?</h4>
+
+            <p>
+                Es el módulo territorial de MAHPE.
+                Permite explorar comercios y activar
+                voluntariamente un Punto Verde.
+            </p>
+
+            <h4>¿Se utiliza dinero real?</h4>
+
+            <p>
+                No. Esta versión funciona con Mahpes
+                y valores simulados.
+            </p>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   118. PERFIL — CONTENIDO DE SECCIÓN
+========================================================= */
+
+function renderProfileSection() {
+
+    const sections = {
+        overview: renderProfileOverview,
+        companies: renderProfileCompanies,
+        products: renderProfileProducts,
+        recommendations: renderProfileRecommendations,
+        activity: renderProfileActivity,
+        mahpes: renderProfileMahpes,
+        settings: renderProfileSettings,
+        help: renderProfileHelp
+    };
+
+    const renderer =
+        sections[profileSection] ||
+        renderProfileOverview;
+
+    return renderer();
+}
+
+
+/* =========================================================
+   119. PERFIL — EDITOR
+========================================================= */
+
+function renderProfileEditor() {
+
+    const profile = mahpeState.profile;
+
+    return `
+        <section class="mahpe-profile-editor">
+
+            <h3>Editar perfil</h3>
+
+            <label for="mahpeProfileNameInput">
+                Nombre
+            </label>
+
+            <input
+                id="mahpeProfileNameInput"
+                type="text"
+                maxlength="60"
+                value="${escapeHTML(profile.name)}"
+            >
+
+            <label for="mahpeProfileUsernameInput">
+                Nombre de usuario
+            </label>
+
+            <input
+                id="mahpeProfileUsernameInput"
+                type="text"
+                maxlength="30"
+                value="${escapeHTML(profile.username)}"
+            >
+
+            <label for="mahpeProfileBioInput">
+                Biografía
+            </label>
+
+            <textarea
+                id="mahpeProfileBioInput"
+                maxlength="240"
+                rows="3"
+            >${escapeHTML(profile.bio)}</textarea>
+
+            <label for="mahpeProfileLocationInput">
+                Ubicación (opcional)
+            </label>
+
+            <input
+                id="mahpeProfileLocationInput"
+                type="text"
+                maxlength="80"
+                value="${escapeHTML(profile.location)}"
+                placeholder="Ej. Lima, Perú"
+            >
+
+            <div class="mahpe-profile-editor-actions">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    id="mahpeCancelProfileEdit"
+                >
+                    CANCELAR
+                </button>
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="mahpeSaveProfile"
+                >
+                    GUARDAR
+                </button>
+
+            </div>
+
+        </section>
+    `;
+}
+
+
+/* =========================================================
+   120. GUARDAR PERFIL
+========================================================= */
+
+function saveProfileChanges() {
+
+    const name = document
+        .getElementById("mahpeProfileNameInput")
+        ?.value.trim();
+
+    const username = document
+        .getElementById("mahpeProfileUsernameInput")
+        ?.value.trim();
+
+    const bio = document
+        .getElementById("mahpeProfileBioInput")
+        ?.value.trim();
+
+    const location = document
+        .getElementById("mahpeProfileLocationInput")
+        ?.value.trim();
+
+    if (!name) {
+        alert("Escribe tu nombre.");
+        return;
+    }
+
+    if (!username) {
+        alert("Escribe tu nombre de usuario.");
+        return;
+    }
+
+    const cleanUsername = username
+        .replace(/^@+/, "")
+        .replace(/\s+/g, "_")
+        .toLowerCase();
+
+    if (!/^[a-z0-9_.]{3,30}$/.test(cleanUsername)) {
+        alert(
+            "El usuario debe tener entre 3 y 30 caracteres: letras, números, punto o guion bajo."
+        );
+        return;
+    }
+
+    mahpeState.profile.name = name;
+    mahpeState.profile.username = cleanUsername;
+    mahpeState.profile.bio = bio || "";
+    mahpeState.profile.location = location || "";
+
+    addMahpeEvent(
+        "profile",
+        "Actualizaste tu perfil."
+    );
+
+    profileEditing = false;
+
+    saveMahpeState();
+    updateProfile();
+    renderActivityInbox();
+}
+
+
+/* =========================================================
+   121. CAMBIAR FOTO
+========================================================= */
+
+async function handleProfilePhoto(file) {
+
+    if (!file) return;
+
+    try {
+
+        const compressed = await compressImageFile(
+            file,
+            {
+                maxDimension: 500,
+                quality: 0.78
+            }
+        );
+
+        mahpeState.profile.photo = compressed;
+
+        addMahpeEvent(
+            "profile",
+            "Actualizaste tu foto de perfil."
+        );
+
+        saveMahpeState();
+        updateProfile();
+        renderActivityInbox();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            error.message ||
+            "No se pudo procesar la foto."
+        );
+    }
+}
+
+
+/* =========================================================
+   122. PERFIL — RENDER PRINCIPAL
+========================================================= */
+
+function updateProfile() {
+
+    if (!profileView) return;
+
+    const profile = mahpeState.profile;
+
+    const stats = getProfileStatistics();
+
+    profileView.innerHTML = `
+        <div class="mahpe-profile-page">
+
+            <header class="mahpe-profile-topbar">
+
+                <h2>Mi perfil</h2>
+
+                <button
+                    type="button"
+                    class="mahpe-profile-gear"
+                    id="mahpeProfileSettingsButton"
+                    aria-label="Configuración"
+                >
+                    ⚙
+                </button>
+
+            </header>
+
+            <div class="mahpe-profile-identity">
+
+                ${renderProfileAvatar()}
+
+                <h3>${escapeHTML(profile.name)}</h3>
+
+                <span class="mahpe-profile-handle">
+                    @${escapeHTML(profile.username)}
+                </span>
+
+                ${
+                    profile.bio
+                        ? `
+                            <p class="mahpe-profile-bio">
+                                ${escapeHTML(profile.bio)}
+                            </p>
+                        `
+                        : ""
+                }
+
+                ${
+                    profile.location
+                        ? `
+                            <span class="mahpe-profile-location">
+                                📍 ${escapeHTML(profile.location)}
+                            </span>
+                        `
+                        : ""
+                }
+
+                <button
+                    type="button"
+                    class="mahpe-profile-edit-button"
+                    id="mahpeEditProfileButton"
+                >
+                    Editar perfil
+                </button>
+
+            </div>
+
+            <div class="mahpe-profile-stats">
+
+                <div>
+                    <strong>
+                        ${stats.mahpes.toLocaleString("es-PE")}
+                    </strong>
+                    <span>Mahpes</span>
+                </div>
+
+                <div>
+                    <strong>${stats.companies}</strong>
+                    <span>Empresas</span>
+                </div>
+
+                <div>
+                    <strong>${stats.products}</strong>
+                    <span>Productos</span>
+                </div>
+
+            </div>
+
+            ${
+                profileEditing
+                    ? renderProfileEditor()
+                    : `
+                        <section class="mahpe-profile-content">
+
+                            ${
+                                profileSection !== "overview"
+                                    ? `
+                                        <button
+                                            type="button"
+                                            class="mahpe-profile-back"
+                                            id="mahpeProfileBack"
+                                        >
+                                            ← Mi perfil
+                                        </button>
+
+                                        <h3 class="mahpe-profile-section-title">
+                                            ${escapeHTML(
+                                                PROFILE_MENU.find(
+                                                    item =>
+                                                        item.id === profileSection
+                                                )?.label || ""
+                                            )}
+                                        </h3>
+                                    `
+                                    : ""
+                            }
+
+                            ${renderProfileSection()}
+
+                        </section>
+                    `
+            }
+
+            <input
+                id="mahpeProfilePhotoInput"
+                type="file"
+                accept="image/*"
+                hidden
+            >
+
+        </div>
+    `;
+
+    bindProfileEvents();
+}
+
+
+/* =========================================================
+   123. PERFIL — NAVEGACIÓN
+========================================================= */
+
+function openProfileSection(section) {
+
+    profileEditing = false;
+
+    profileSection = section;
+
+    updateProfile();
+}
+
+function openProfileEditor() {
+
+    profileEditing = true;
+
+    updateProfile();
+}
+
+
+/* =========================================================
+   124. EVENTOS DEL PERFIL
+========================================================= */
+
+function bindProfileEvents() {
+
+    const photoButton =
+        document.getElementById("mahpeChangePhoto");
+
+    const photoInput =
+        document.getElementById("mahpeProfilePhotoInput");
+
+    if (photoButton && photoInput) {
+
+        photoButton.onclick = () => photoInput.click();
+
+        photoInput.onchange = async () => {
+
+            const file = photoInput.files?.[0];
+
+            if (file) {
+                await handleProfilePhoto(file);
+            }
+        };
+    }
+
+    const editButton =
+        document.getElementById("mahpeEditProfileButton");
+
+    if (editButton) {
+        editButton.onclick = openProfileEditor;
+    }
+
+    const settingsButton =
+        document.getElementById("mahpeProfileSettingsButton");
+
+    if (settingsButton) {
+        settingsButton.onclick = () => {
+            openProfileSection("settings");
+        };
+    }
+
+    document
+        .querySelectorAll("[data-profile-section]")
+        .forEach(button => {
+
+            button.onclick = () => {
+                openProfileSection(
+                    button.dataset.profileSection
+                );
+            };
+        });
+
+    document
+        .querySelectorAll("[data-select-company]")
+        .forEach(button => {
+
+            button.onclick = () => {
+                selectCompany(
+                    button.dataset.selectCompany
+                );
+            };
+        });
+
+    const backButton =
+        document.getElementById("mahpeProfileBack");
+
+    if (backButton) {
+
+        backButton.onclick = () => {
+            openProfileSection("overview");
+        };
+    }
+
+    const saveButton =
+        document.getElementById("mahpeSaveProfile");
+
+    if (saveButton) {
+        saveButton.onclick = saveProfileChanges;
+    }
+
+    const cancelButton =
+        document.getElementById("mahpeCancelProfileEdit");
+
+    if (cancelButton) {
+
+        cancelButton.onclick = () => {
+            profileEditing = false;
+            updateProfile();
+        };
+    }
+
+    const settingsEdit =
+        document.getElementById(
+            "mahpeEditProfileFromSettings"
+        );
+
+    if (settingsEdit) {
+        settingsEdit.onclick = openProfileEditor;
+    }
+}
+
+
+/* =========================================================
+   125. EXPONER FUNCIONES DEL BLOQUE 3
+========================================================= */
+
+window.setCompanyTab =
+    setCompanyTab;
+
 window.executeBusinessDecision =
     executeBusinessDecision;
 
+window.renderCompanyDashboard =
+    renderCompanyDashboard;
 
-window.markActivityAsRead =
-    markActivityAsRead;
+window.updateProfile =
+    updateProfile;
+
+window.openProfileSection =
+    openProfileSection;
+
+window.openProfileEditor =
+    openProfileEditor;
 
 
 /* =========================================================
-   FIN PARTE 3/4
+   FIN BLOQUE 3/4
 
-   PEGA PARTE 4/4 INMEDIATAMENTE DEBAJO.
+   NO INICIALIZAR AQUÍ.
 
-   PARTE 4/4 COMPLETA EL ARCHIVO CON:
-
-   - COYOTE / Leaflet
-   - Punto Verde ON / OFF persistente
-   - reactivación sin volver a llenar datos
-   - búsqueda por producto
-   - radios 1 / 3 / 10 / 20 km
-   - IR A ESTE PUNTO
-   - seguimiento
-   - sincronización COYOTE ↔ empresa
-   - arranque definitivo de MAHPE
-   - validación del DOM
+   BLOQUE 4/4:
+   - COYOTE
+   - Punto Verde ON/OFF
+   - Ubicación azul vs comercio verde
+   - Búsqueda y radios
+   - Seguimiento de puntos
+   - Persistencia
+   - Inicialización única
 ========================================================= */
 /* =========================================================
-   MAHPE v1.2
-
-   PARTE 4/4 — FINAL
-
-   - COYOTE / Leaflet
-   - Punto Verde persistente
-   - Activar / desactivar
-   - Reactivar comercio guardado
-   - Búsqueda por producto
-   - Radio 1 / 3 / 10 / 20 km
-   - Distancias
-   - IR A ESTE PUNTO
-   - Seguimiento
-   - Sincronización COYOTE ↔ MAHPE
-   - Validación
-   - Arranque definitivo
+   MAHPE v2.0 — BLOQUE 4/4
+   COYOTE + PUNTO VERDE + INICIALIZACIÓN
 ========================================================= */
 
 
 /* =========================================================
-   89. ESTADO COYOTE
-
-   IMPORTANTE:
-   ESTA ES LA ÚNICA DECLARACIÓN DE map
-   EN TODO EL SCRIPT NUEVO.
+   126. ESTADO COYOTE
 ========================================================= */
+
+const COYOTE_SELLER_KEY = "coyote_seller_point";
+
+const COYOTE_DEFAULT_CENTER = [
+    -12.0464,
+    -77.0428
+];
 
 let map = null;
 
@@ -9340,812 +9621,723 @@ let selectedRadius = 10;
 
 let commercialPoints = [];
 
+let coyoteSearchResults = [];
+
+let coyoteMapInitialized = false;
+
 
 /* =========================================================
-   90. ELEMENTOS COYOTE
+   127. ELEMENTOS COYOTE
 ========================================================= */
 
 const activateButton =
-    document.getElementById(
-        "activateButton"
-    );
-
+    document.getElementById("activateButton");
 
 const sellerForm =
-    document.getElementById(
-        "sellerForm"
-    );
-
+    document.getElementById("sellerForm");
 
 const productInput =
-    document.getElementById(
-        "productInput"
-    );
-
+    document.getElementById("productInput");
 
 const confirmSellerButton =
-    document.getElementById(
-        "confirmSellerButton"
-    );
-
+    document.getElementById("confirmSellerButton");
 
 const searchInput =
-    document.getElementById(
-        "searchInput"
-    );
-
+    document.getElementById("searchInput");
 
 const searchButton =
-    document.getElementById(
-        "searchButton"
-    );
-
+    document.getElementById("searchButton");
 
 const referenceText =
-    document.getElementById(
-        "referenceText"
-    );
-
+    document.getElementById("referenceText");
 
 const offerText =
-    document.getElementById(
-        "offerText"
-    );
-
+    document.getElementById("offerText");
 
 const demandBar =
-    document.getElementById(
-        "demandBar"
-    );
-
+    document.getElementById("demandBar");
 
 const demandText =
-    document.getElementById(
-        "demandText"
+    document.getElementById("demandText");
+
+const coyoteStatus =
+    document.getElementById("status");
+
+
+/* =========================================================
+   128. UTILIDADES COYOTE
+========================================================= */
+
+function updateStatus(message) {
+
+    if (coyoteStatus) {
+        coyoteStatus.textContent = message;
+    }
+}
+
+function isValidCoordinate(value) {
+
+    return Number.isFinite(Number(value));
+}
+
+function isValidCoyotePoint(point) {
+
+    return Boolean(
+        point &&
+        isValidCoordinate(point.lat) &&
+        isValidCoordinate(point.lng) &&
+        Math.abs(Number(point.lat)) <= 90 &&
+        Math.abs(Number(point.lng)) <= 180
     );
+}
 
+function escapeCoyoteText(value) {
 
-/* =========================================================
-   91. MAPA
-========================================================= */
-
-function initializeMap() {
-
-    const mapElement =
-        document.getElementById(
-            "map"
-        );
-
-
-    if (
-        !mapElement ||
-        typeof L ===
-            "undefined"
-    ) {
-
-        console.warn(
-            "COYOTE: Leaflet o #map no disponible."
-        );
-
-        return;
-
-    }
-
-
-    if (map) {
-
-        return;
-
-    }
-
-
-    /*
-       Centro inicial aproximado de Lima.
-
-       La ubicación real del usuario solamente
-       se solicita cuando el navegador lo permite
-       y el usuario da consentimiento.
-    */
-
-    map =
-        L.map(
-            "map",
-            {
-                zoomControl: true
-            }
-        )
-        .setView(
-            [
-                -12.0464,
-                -77.0428
-            ],
-            12
-        );
-
-
-    L.tileLayer(
-
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-
-        {
-
-            maxZoom: 19,
-
-            attribution:
-                "&copy; OpenStreetMap"
-
-        }
-
-    ).addTo(
-        map
-    );
-
-
-    loadSavedSeller();
-
-
-    locateUserSilently();
-
-
-    updateReference();
-
+    return escapeHTML(String(value ?? ""));
 }
 
 
 /* =========================================================
-   92. UBICACIÓN INICIAL DEL USUARIO
-========================================================= */
-
-function locateUserSilently() {
-
-    if (
-        !navigator.geolocation
-    ) {
-
-        return;
-
-    }
-
-
-    navigator.geolocation.getCurrentPosition(
-
-        function(position) {
-
-            userLocation = {
-
-                lat:
-                    position.coords.latitude,
-
-                lng:
-                    position.coords.longitude
-
-            };
-
-
-            updateUserMarker(
-                userLocation.lat,
-                userLocation.lng
-            );
-
-
-            updateReference();
-
-        },
-
-
-        function() {
-
-            /*
-               No mostramos error aquí.
-
-               El usuario puede seguir explorando
-               el mapa sin compartir ubicación.
-            */
-
-        },
-
-
-        {
-
-            enableHighAccuracy: false,
-
-            maximumAge: 60000,
-
-            timeout: 6000
-
-        }
-
-    );
-
-}
-
-
-/* =========================================================
-   93. MARCADOR DEL USUARIO
-========================================================= */
-
-function updateUserMarker(
-    lat,
-    lng
-) {
-
-    if (!map) {
-
-        return;
-
-    }
-
-
-    if (!userMarker) {
-
-        userMarker =
-            L.circleMarker(
-
-                [
-                    lat,
-                    lng
-                ],
-
-                {
-
-                    radius: 7,
-
-                    weight: 2,
-
-                    color:
-                        "#ffffff",
-
-                    fillColor:
-                        "#00e86d",
-
-                    fillOpacity: 1
-
-                }
-
-            )
-            .addTo(
-                map
-            )
-            .bindPopup(
-                "Tu ubicación"
-            );
-
-    }
-
-    else {
-
-        userMarker.setLatLng(
-            [
-                lat,
-                lng
-            ]
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   94. RADIO DE BÚSQUEDA
-========================================================= */
-
-function drawSearchRadius() {
-
-    if (
-        !map ||
-        !userLocation
-    ) {
-
-        return;
-
-    }
-
-
-    if (searchCircle) {
-
-        try {
-
-            map.removeLayer(
-                searchCircle
-            );
-
-        }
-
-        catch (error) {
-
-            console.warn(
-                error
-            );
-
-        }
-
-    }
-
-
-    searchCircle =
-        L.circle(
-
-            [
-                userLocation.lat,
-                userLocation.lng
-            ],
-
-            {
-
-                radius:
-                    selectedRadius *
-                    1000,
-
-                weight: 1,
-
-                fillOpacity: 0.04
-
-            }
-
-        ).addTo(
-            map
-        );
-
-}
-
-
-/* =========================================================
-   95. ACTUALIZAR REFERENCIA
-========================================================= */
-
-function updateReference() {
-
-    if (referenceText) {
-
-        referenceText.textContent =
-            selectedRadius +
-            " km";
-
-    }
-
-
-    drawSearchRadius();
-
-}
-
-
-/* =========================================================
-   96. BOTONES DE RADIO
-========================================================= */
-
-function initializeRadiusButtons() {
-
-    const buttons =
-        document.querySelectorAll(
-            "[data-radius]"
-        );
-
-
-    buttons.forEach(
-        button => {
-
-            const radius =
-                Number(
-                    button.dataset.radius
-                );
-
-
-            button.classList.toggle(
-
-                "active",
-
-                radius ===
-                    selectedRadius
-
-            );
-
-
-            button.onclick =
-                function() {
-
-                    const value =
-                        Number(
-                            this.dataset.radius
-                        );
-
-
-                    if (
-                        !Number.isFinite(
-                            value
-                        )
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    selectedRadius =
-                        value;
-
-
-                    buttons.forEach(
-                        item => {
-
-                            item.classList.toggle(
-
-                                "active",
-
-                                item ===
-                                    this
-
-                            );
-
-                        }
-                    );
-
-
-                    updateReference();
-
-
-                    searchCommercialPoints();
-
-                };
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   97. LEER PUNTO GUARDADO
+   129. LEER PUNTO GUARDADO
 ========================================================= */
 
 function getSavedSellerPoint() {
 
     try {
 
-        const raw =
-            localStorage.getItem(
-                "coyote_seller_point"
-            );
+        const raw = localStorage.getItem(
+            COYOTE_SELLER_KEY
+        );
 
+        if (!raw) return null;
 
-        if (!raw) {
+        const point = JSON.parse(raw);
 
+        if (!isValidCoyotePoint(point)) {
             return null;
-
         }
-
-
-        const point =
-            JSON.parse(
-                raw
-            );
-
-
-        if (
-            !point ||
-            !Number.isFinite(
-                Number(
-                    point.lat
-                )
-            ) ||
-            !Number.isFinite(
-                Number(
-                    point.lng
-                )
-            )
-        ) {
-
-            return null;
-
-        }
-
 
         return point;
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
-            "COYOTE: no se pudo leer el Punto Verde.",
+            "COYOTE: error al leer el Punto Verde.",
             error
         );
 
-
         return null;
-
     }
-
 }
 
 
 /* =========================================================
-   98. GUARDAR PUNTO
+   130. GUARDAR PUNTO
 ========================================================= */
 
-function saveSellerPoint(
-    point
-) {
+function saveSellerPoint(point) {
+
+    if (!isValidCoyotePoint(point)) {
+        return false;
+    }
 
     try {
 
         localStorage.setItem(
-
-            "coyote_seller_point",
-
-            JSON.stringify(
-                point
-            )
-
+            COYOTE_SELLER_KEY,
+            JSON.stringify(point)
         );
 
-    }
+        return true;
 
-    catch (error) {
+    } catch (error) {
 
         console.error(
-            "COYOTE: no se pudo guardar el Punto Verde.",
+            "COYOTE: error al guardar el Punto Verde.",
             error
         );
 
+        return false;
     }
-
 }
 
 
 /* =========================================================
-   99. UI DEL BOTÓN ACTIVAR / DESACTIVAR
+   131. INICIALIZAR MAPA
 ========================================================= */
 
-function updateSellerToggleUI(
-    active
-) {
+function initializeMap() {
 
-    if (!activateButton) {
+    const mapElement =
+        document.getElementById("map");
 
+    if (!mapElement) {
+        console.warn("COYOTE: falta #map.");
         return;
-
     }
 
+    if (typeof L === "undefined") {
 
-    activateButton.textContent =
-        active
+        console.warn(
+            "COYOTE: Leaflet no está disponible."
+        );
 
-            ? "DESACTIVAR PUNTO"
+        updateStatus(
+            "No se pudo cargar el mapa."
+        );
 
-            : "ACTIVAR PUNTO";
+        return;
+    }
 
+    if (map) {
+
+        map.invalidateSize();
+        return;
+    }
+
+    map = L.map("map", {
+        zoomControl: true
+    }).setView(
+        COYOTE_DEFAULT_CENTER,
+        12
+    );
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap"
+        }
+    ).addTo(map);
+
+    coyoteMapInitialized = true;
+
+    loadSavedSeller();
+
+    updateReference();
+
+    /*
+       La ubicación se solicita únicamente
+       cuando sea necesaria para activar
+       o utilizar una función geográfica.
+    */
+
+    updateStatus(
+        getSavedSellerPoint()?.active
+            ? "Tu Punto Verde está activo."
+            : "Explora COYOTE o activa tu Punto Verde."
+    );
+}
+
+
+/* =========================================================
+   132. MARCADOR DE UBICACIÓN PERSONAL
+
+   AZUL: ubicación del usuario.
+   VERDE: comercio activo.
+
+   Ya no se confunden.
+========================================================= */
+
+function updateUserMarker(lat, lng) {
+
+    if (!map || typeof L === "undefined") {
+        return;
+    }
+
+    if (
+        !isValidCoordinate(lat) ||
+        !isValidCoordinate(lng)
+    ) {
+        return;
+    }
+
+    const coordinates = [
+        Number(lat),
+        Number(lng)
+    ];
+
+    if (!userMarker) {
+
+        userMarker = L.circleMarker(
+            coordinates,
+            {
+                radius: 7,
+                color: "#ffffff",
+                weight: 3,
+                fillColor: "#348bff",
+                fillOpacity: 1
+            }
+        ).addTo(map);
+
+        userMarker.bindPopup(
+            "📍 Tu ubicación"
+        );
+
+    } else {
+
+        userMarker.setLatLng(coordinates);
+    }
+}
+
+
+/* =========================================================
+   133. SOLICITAR UBICACIÓN
+========================================================= */
+
+function requestCoyoteLocation(options = {}) {
+
+    return new Promise((resolve, reject) => {
+
+        if (!navigator.geolocation) {
+
+            reject(
+                new Error(
+                    "Este navegador no admite geolocalización."
+                )
+            );
+
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            position => {
+
+                userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                updateUserMarker(
+                    userLocation.lat,
+                    userLocation.lng
+                );
+
+                updateReference();
+
+                resolve(userLocation);
+            },
+            error => {
+
+                let message =
+                    "No se pudo obtener tu ubicación.";
+
+                if (error.code === 1) {
+
+                    message =
+                        "Debes permitir el acceso a la ubicación.";
+                }
+
+                reject(new Error(message));
+            },
+            {
+                enableHighAccuracy:
+                    options.highAccuracy ?? false,
+                timeout: 12000,
+                maximumAge: 60000
+            }
+        );
+    });
+}
+
+
+/* =========================================================
+   134. RADIO DE BÚSQUEDA
+========================================================= */
+
+function drawSearchRadius() {
+
+    if (!map) return;
+
+    if (searchCircle) {
+
+        map.removeLayer(searchCircle);
+        searchCircle = null;
+    }
+
+    if (!userLocation) return;
+
+    searchCircle = L.circle(
+        [
+            userLocation.lat,
+            userLocation.lng
+        ],
+        {
+            radius: selectedRadius * 1000,
+            color: "#348bff",
+            weight: 1,
+            fillColor: "#348bff",
+            fillOpacity: 0.035
+        }
+    ).addTo(map);
+}
+
+function updateReference() {
+
+    if (referenceText) {
+
+        referenceText.textContent =
+            `${selectedRadius} km`;
+    }
+
+    drawSearchRadius();
+}
+
+function initializeRadiusButtons() {
+
+    document
+        .querySelectorAll("[data-radius]")
+        .forEach(button => {
+
+            const radius =
+                Number(button.dataset.radius);
+
+            button.classList.toggle(
+                "active",
+                radius === selectedRadius
+            );
+
+            button.onclick = () => {
+
+                if (
+                    !Number.isFinite(radius) ||
+                    radius <= 0
+                ) {
+                    return;
+                }
+
+                selectedRadius = radius;
+
+                document
+                    .querySelectorAll("[data-radius]")
+                    .forEach(item => {
+
+                        item.classList.toggle(
+                            "active",
+                            item === button
+                        );
+                    });
+
+                updateReference();
+                searchCommercialPoints();
+            };
+        });
+}
+
+
+/* =========================================================
+   135. BOTÓN PUNTO VERDE
+========================================================= */
+
+function updateSellerToggleUI(active) {
+
+    if (!activateButton) return;
+
+    activateButton.textContent = active
+        ? "DESACTIVAR PUNTO"
+        : "ACTIVAR PUNTO";
 
     activateButton.classList.toggle(
         "is-active",
-        active
+        Boolean(active)
     );
-
 
     activateButton.setAttribute(
         "aria-pressed",
-        active
-            ? "true"
-            : "false"
+        active ? "true" : "false"
     );
-
 }
 
+function showSellerForm(show) {
 
-/* =========================================================
-   100. MOSTRAR / OCULTAR FORMULARIO
-========================================================= */
-
-function showSellerForm(
-    show
-) {
-
-    if (!sellerForm) {
-
-        return;
-
-    }
-
+    if (!sellerForm) return;
 
     sellerForm.classList.toggle(
         "hidden",
         !show
     );
-
 }
 
 
 /* =========================================================
-   101. PRIMERA ACTIVACIÓN
+   136. PRODUCTO PREDETERMINADO
 ========================================================= */
 
-function requestFirstSellerActivation() {
+function getDefaultCoyoteProduct() {
 
-    if (
-        !navigator.geolocation
-    ) {
+    const company = getCurrentCompany();
 
-        updateStatus(
-            "⚠️ Tu navegador no permite obtener ubicación."
-        );
+    if (!company) return "";
 
-        return;
+    const products = getCompanyProducts(
+        company.id
+    );
 
+    if (products.length) {
+        return products[0].name;
     }
 
+    return company.product || "";
+}
+
+
+/* =========================================================
+   137. POPUP DEL PUNTO VERDE
+========================================================= */
+
+function buildSellerPopup(point) {
+
+    const companyName = escapeCoyoteText(
+        point.companyName || "Comerciante"
+    );
+
+    const product = escapeCoyoteText(
+        point.product || "Producto"
+    );
+
+    return `
+        <div class="coyote-seller-popup">
+
+            <strong>🟢 ${companyName}</strong>
+
+            <p>${product}</p>
+
+            <small>
+                Punto comercial activo
+            </small>
+
+            <button
+                type="button"
+                onclick="deactivateSeller()"
+                style="
+                    display:block;
+                    margin-top:10px;
+                    padding:8px 12px;
+                    border:0;
+                    border-radius:8px;
+                    cursor:pointer;
+                "
+            >
+                Desactivar punto
+            </button>
+
+        </div>
+    `;
+}
+
+
+/* =========================================================
+   138. QUITAR MARCADOR COMERCIAL
+
+   Esta función elimina exclusivamente
+   el marcador del vendedor.
+
+   El marcador azul del usuario permanece.
+========================================================= */
+
+function removeSellerMarker() {
+
+    if (!map) {
+
+        sellerMarker = null;
+        return;
+    }
+
+    if (sellerMarker) {
+
+        try {
+
+            map.removeLayer(sellerMarker);
+
+        } catch (error) {
+
+            console.warn(
+                "COYOTE: error quitando marcador.",
+                error
+            );
+        }
+    }
+
+    /*
+       Limpieza defensiva de marcadores
+       comerciales anteriores que pudieran
+       quedar en el mapa.
+    */
+
+    map.eachLayer(layer => {
+
+        if (
+            layer &&
+            layer.options &&
+            layer.options.mahpeSellerMarker === true
+        ) {
+
+            map.removeLayer(layer);
+        }
+    });
+
+    sellerMarker = null;
+}
+
+
+/* =========================================================
+   139. CREAR MARCADOR COMERCIAL
+========================================================= */
+
+function createSellerPoint(point) {
+
+    if (!map) return;
+
+    removeSellerMarker();
+
+    if (
+        !point ||
+        !point.active ||
+        !isValidCoyotePoint(point)
+    ) {
+
+        commercialPoints = [];
+        updateOfferMetrics([]);
+        return;
+    }
+
+    commercialPoints = [point];
+
+    const markerIcon = L.divIcon({
+        className: "coyote-green-marker",
+        html: `
+            <div class="coyote-green-dot"></div>
+        `,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+    });
+
+    sellerMarker = L.marker(
+        [
+            Number(point.lat),
+            Number(point.lng)
+        ],
+        {
+            icon: markerIcon,
+            mahpeSellerMarker: true
+        }
+    ).addTo(map);
+
+    sellerMarker.bindPopup(
+        buildSellerPopup(point)
+    );
+
+    map.setView(
+        [
+            Number(point.lat),
+            Number(point.lng)
+        ],
+        Math.max(map.getZoom(), 15)
+    );
+
+    updateOfferMetrics(commercialPoints);
+}
+
+
+/* =========================================================
+   140. DESACTIVAR PUNTO VERDE
+========================================================= */
+
+function deactivateSeller() {
+
+    stopFollowingSeller(false);
+
+    const saved = getSavedSellerPoint();
+
+    if (saved) {
+
+        saved.active = false;
+
+        saved.updatedAt =
+            new Date().toISOString();
+
+        saveSellerPoint(saved);
+    }
+
+    /*
+       Primero eliminamos el marcador.
+       Después limpiamos el estado visual.
+    */
+
+    removeSellerMarker();
+
+    commercialPoints = [];
+
+    coyoteSearchResults = [];
+
+    showSellerForm(false);
+
+    updateSellerToggleUI(false);
+
+    updateOfferMetrics([]);
 
     updateStatus(
-        "📍 Obteniendo tu ubicación..."
+        "Punto Verde desactivado. Tu comercio sigue guardado."
     );
 
+    /*
+       La ubicación personal permanece
+       azul si el usuario la compartió.
+    */
 
-    navigator.geolocation.getCurrentPosition(
-
-        function(position) {
-
-            userLocation = {
-
-                lat:
-                    position.coords.latitude,
-
-                lng:
-                    position.coords.longitude
-
-            };
-
-
-            updateUserMarker(
-                userLocation.lat,
-                userLocation.lng
-            );
-
-
-            const defaultProduct =
-                getDefaultCoyoteProduct();
-
-
-            if (
-                productInput &&
-                !productInput.value.trim() &&
-                defaultProduct
-            ) {
-
-                productInput.value =
-                    defaultProduct;
-
-            }
-
-
-            showSellerForm(
-                true
-            );
-
-
-            updateStatus(
-                "📍 Ubicación lista. Indica qué estás ofreciendo y confirma tu Punto Verde."
-            );
-
-
-            if (productInput) {
-
-                productInput.focus();
-
-            }
-
-        },
-
-
-        function(error) {
-
-            if (
-                error &&
-                error.code === 1
-            ) {
-
-                updateStatus(
-                    "⚠️ Necesitas permitir ubicación para activar tu Punto Verde."
-                );
-
-            }
-
-            else {
-
-                updateStatus(
-                    "⚠️ No pudimos obtener tu ubicación."
-                );
-
-            }
-
-        },
-
-
-        {
-
-            enableHighAccuracy: true,
-
-            maximumAge: 5000,
-
-            timeout: 12000
-
-        }
-
-    );
-
+    if (map) {
+        map.closePopup();
+    }
 }
 
 
 /* =========================================================
-   102. BOTÓN PRINCIPAL DEL PUNTO VERDE
+   141. PRIMERA ACTIVACIÓN
 ========================================================= */
 
-function handleSellerToggle() {
+async function requestFirstSellerActivation() {
 
-    const saved =
-        getSavedSellerPoint();
+    updateStatus(
+        "📍 Solicitando ubicación para tu Punto Verde..."
+    );
 
+    try {
 
-    /*
-       ESTADO 1:
-       Punto actualmente activo.
-    */
+        await requestCoyoteLocation({
+            highAccuracy: true
+        });
 
-    if (
-        saved &&
-        saved.active
-    ) {
+        const defaultProduct =
+            getDefaultCoyoteProduct();
 
-        deactivateSeller();
+        if (
+            productInput &&
+            !productInput.value.trim()
+        ) {
 
-        return;
+            productInput.value =
+                defaultProduct;
+        }
 
-    }
+        showSellerForm(true);
 
-
-    /*
-       ESTADO 2:
-       Punto existe, pero está apagado.
-
-       Se reactiva directamente usando
-       las coordenadas y producto guardados.
-    */
-
-    if (
-        saved &&
-        !saved.active &&
-        saved.product &&
-        Number.isFinite(
-            Number(
-                saved.lat
-            )
-        ) &&
-        Number.isFinite(
-            Number(
-                saved.lng
-            )
-        )
-    ) {
-
-        reactivateSavedSeller(
-            saved
+        updateStatus(
+            "Ubicación lista. Indica qué vendes y confirma."
         );
 
-        return;
+        productInput?.focus();
 
+    } catch (error) {
+
+        updateStatus(
+            "⚠️ " + error.message
+        );
     }
-
-
-    /*
-       ESTADO 3:
-       Nunca creó un Punto Verde.
-    */
-
-    requestFirstSellerActivation();
-
 }
 
 
 /* =========================================================
-   103. CONFIRMAR PRIMER PUNTO
+   142. CONFIRMAR ACTIVACIÓN
 ========================================================= */
 
 function confirmSellerPoint() {
@@ -10153,1389 +10345,183 @@ function confirmSellerPoint() {
     if (!userLocation) {
 
         updateStatus(
-            "⚠️ Primero necesitamos tu ubicación."
+            "Primero debes compartir tu ubicación."
         );
 
         return;
-
     }
 
-
-    let product =
-        productInput
-            ? productInput.value.trim()
-            : "";
-
-
-    if (!product) {
-
-        product =
-            getDefaultCoyoteProduct();
-
-    }
-
+    const product =
+        productInput?.value.trim() ||
+        getDefaultCoyoteProduct();
 
     if (!product) {
 
         updateStatus(
-            "⚠️ Escribe qué producto estás ofreciendo."
+            "Indica qué producto ofreces."
         );
 
         return;
-
     }
 
-
-    const company =
-        getCurrentCompany();
-
+    const company = getCurrentCompany();
 
     const point = {
-
-        id:
-            "local-seller",
-
-        companyId:
-            company
-                ? company.id
-                : null,
-
+        id: "local-seller",
+        companyId: company?.id || null,
         companyName:
-            company
-                ? company.name
-                : "Comerciante",
-
+            company?.name || "Comerciante",
         category:
-            company
-                ? company.category
-                : "",
-
+            company?.category || "",
         product,
-
-        lat:
-            userLocation.lat,
-
-        lng:
-            userLocation.lng,
-
+        lat: userLocation.lat,
+        lng: userLocation.lng,
         active: true,
-
-        updatedAt:
-            new Date()
-                .toISOString()
-
+        updatedAt: new Date().toISOString()
     };
 
+    if (!saveSellerPoint(point)) {
 
-    saveSellerPoint(
-        point
-    );
+        updateStatus(
+            "No se pudo guardar el Punto Verde."
+        );
 
+        return;
+    }
 
-    createSellerPoint(
-        point
-    );
+    createSellerPoint(point);
 
+    showSellerForm(false);
 
-    showSellerForm(
-        false
-    );
-
-
-    updateSellerToggleUI(
-        true
-    );
-
+    updateSellerToggleUI(true);
 
     updateStatus(
-
-        "🟢 Punto Verde activo. Estás visible para búsquedas cercanas."
-
+        "🟢 Punto Verde activado."
     );
 
+    addMahpeEvent(
+        "coyote",
+        "Activaste tu Punto Verde.",
+        company?.id || null
+    );
 
-    syncCompanyWithCoyotePoint();
-
+    saveMahpeState();
 }
 
 
 /* =========================================================
-   104. REACTIVAR PUNTO GUARDADO
+   143. REACTIVAR PUNTO GUARDADO
 ========================================================= */
 
-function reactivateSavedSeller(
-    saved
-) {
+function reactivateSavedSeller(saved) {
 
-    if (!saved) {
+    if (!isValidCoyotePoint(saved)) {
 
+        requestFirstSellerActivation();
         return;
-
     }
 
-
-    saved.active =
-        true;
-
+    saved.active = true;
 
     saved.updatedAt =
-        new Date()
-            .toISOString();
+        new Date().toISOString();
 
+    if (!saveSellerPoint(saved)) {
 
-    /*
-       Si ahora existe una empresa activa,
-       actualizamos la relación con ella.
-    */
-
-    const company =
-        getCurrentCompany();
-
-
-    if (company) {
-
-        saved.companyId =
-            company.id;
-
-
-        saved.companyName =
-            company.name;
-
-
-        saved.category =
-            company.category;
-
-
-        if (
-            !saved.product
-        ) {
-
-            saved.product =
-                getDefaultCoyoteProduct();
-
-        }
-
-    }
-
-
-    saveSellerPoint(
-        saved
-    );
-
-
-    createSellerPoint(
-        saved
-    );
-
-
-    showSellerForm(
-        false
-    );
-
-
-    updateSellerToggleUI(
-        true
-    );
-
-
-    updateStatus(
-        "🟢 Punto Verde reactivado. Tu comercio vuelve a estar visible."
-    );
-
-
-    syncCompanyWithCoyotePoint();
-
-}
-
-
-/* =========================================================
-   105. CREAR MARCADOR DE VENDEDOR
-========================================================= */
-
-function createSellerPoint(
-    point
-) {
-
-    if (
-        !map ||
-        !point ||
-        !point.active
-    ) {
+        updateStatus(
+            "No se pudo reactivar el punto."
+        );
 
         return;
-
     }
 
+    createSellerPoint(saved);
 
-    removeSellerMarker();
+    showSellerForm(false);
 
-
-    commercialPoints = [
-        point
-    ];
-
-
-    const markerIcon =
-        L.divIcon({
-
-            className:
-                "coyote-green-marker",
-
-            html:
-                '<div class="coyote-green-dot"></div>',
-
-            iconSize:
-                [24, 24],
-
-            iconAnchor:
-                [12, 12]
-
-        });
-
-
-    sellerMarker =
-        L.marker(
-
-            [
-                Number(
-                    point.lat
-                ),
-
-                Number(
-                    point.lng
-                )
-            ],
-
-            {
-                icon:
-                    markerIcon
-            }
-
-        ).addTo(
-            map
-        );
-
-
-    sellerMarker.bindPopup(
-        buildSellerPopup(
-            point
-        )
-    );
-
-
-    map.setView(
-
-        [
-            Number(
-                point.lat
-            ),
-
-            Number(
-                point.lng
-            )
-        ],
-
-        Math.max(
-            map.getZoom(),
-            15
-        )
-
-    );
-
-
-    updateOfferMetrics(
-        commercialPoints
-    );
-
-}
-
-
-/* =========================================================
-   106. POPUP DEL PUNTO VERDE
-========================================================= */
-
-function buildSellerPopup(
-    point
-) {
-
-    const companyName =
-        point.companyName ||
-        "Comerciante";
-
-
-    const category =
-        point.category ||
-        "Comercio";
-
-
-    const product =
-        point.product ||
-        "Producto";
-
-
-    return `
-
-        <div
-            class="coyote-popup"
-        >
-
-            <strong>
-
-                ${escapeHTML(
-                    companyName
-                )}
-
-            </strong>
-
-
-            <small>
-
-                ${escapeHTML(
-                    category
-                )}
-
-            </small>
-
-
-            <p>
-
-                ${escapeHTML(
-                    product
-                )}
-
-            </p>
-
-
-            <button
-                type="button"
-                onclick="followSellerPoint('${point.id}')"
-            >
-
-                IR A ESTE PUNTO
-
-            </button>
-
-
-            ${
-                point.id ===
-                "local-seller"
-
-                    ? `
-
-                        <button
-                            type="button"
-                            onclick="deactivateSeller()"
-                        >
-
-                            DESACTIVAR
-
-                        </button>
-
-                    `
-
-                    : ""
-            }
-
-        </div>
-
-    `;
-
-}
-
-
-/* =========================================================
-   107. QUITAR MARCADOR
-========================================================= */
-
-function removeSellerMarker() {
-
-    if (
-        sellerMarker &&
-        map
-    ) {
-
-        try {
-
-            if (
-                map.hasLayer(
-                    sellerMarker
-                )
-            ) {
-
-                map.removeLayer(
-                    sellerMarker
-                );
-
-            }
-
-        }
-
-        catch (error) {
-
-            console.warn(
-                error
-            );
-
-        }
-
-    }
-
-
-    sellerMarker = null;
-
-}
-
-
-/* =========================================================
-   108. DESACTIVAR PUNTO VERDE
-========================================================= */
-
-function deactivateSeller() {
-
-    stopFollowingSeller(
-        false
-    );
-
-
-    const saved =
-        getSavedSellerPoint();
-
-
-    if (saved) {
-
-        saved.active =
-            false;
-
-
-        saved.updatedAt =
-            new Date()
-                .toISOString();
-
-
-        /*
-           IMPORTANTE:
-           NO eliminamos coyote_seller_point.
-
-           Se conserva para poder reactivar
-           posteriormente con un clic.
-        */
-
-        saveSellerPoint(
-            saved
-        );
-
-    }
-
-
-    removeSellerMarker();
-
-
-    commercialPoints = [];
-
-
-    showSellerForm(
-        false
-    );
-
-
-    updateSellerToggleUI(
-        false
-    );
-
-
-    updateOfferMetrics(
-        commercialPoints
-    );
-
+    updateSellerToggleUI(true);
 
     updateStatus(
-        "Punto Verde desactivado. Tu comercio sigue guardado."
+        "🟢 Punto Verde reactivado."
     );
-
 }
 
 
 /* =========================================================
-   109. COMPATIBILIDAD — TOGGLE
+   144. INTERRUPTOR PRINCIPAL
 ========================================================= */
 
-function toggleSellerPresence() {
+function handleSellerToggle() {
 
-    handleSellerToggle();
+    const saved = getSavedSellerPoint();
 
+    if (saved?.active) {
+
+        deactivateSeller();
+        return;
+    }
+
+    if (
+        saved &&
+        !saved.active &&
+        saved.product &&
+        isValidCoyotePoint(saved)
+    ) {
+
+        reactivateSavedSeller(saved);
+        return;
+    }
+
+    requestFirstSellerActivation();
 }
 
 
 /* =========================================================
-   110. CARGAR PUNTO GUARDADO
+   145. CARGAR PUNTO GUARDADO
 ========================================================= */
 
 function loadSavedSeller() {
 
-    const point =
-        getSavedSellerPoint();
-
+    const point = getSavedSellerPoint();
 
     if (!point) {
-
-        commercialPoints =
-            [];
-
-
-        updateSellerToggleUI(
-            false
-        );
-
-
-        updateOfferMetrics(
-            commercialPoints
-        );
-
-
-        return;
-
-    }
-
-
-    if (!point.active) {
-
-        commercialPoints =
-            [];
-
 
         removeSellerMarker();
 
+        commercialPoints = [];
 
-        updateSellerToggleUI(
-            false
-        );
+        updateSellerToggleUI(false);
 
-
-        updateOfferMetrics(
-            commercialPoints
-        );
-
-
-        updateStatus(
-            "Tu Punto Verde está guardado, pero actualmente está desactivado."
-        );
-
+        updateOfferMetrics([]);
 
         return;
-
     }
-
-
-    createSellerPoint(
-        point
-    );
-
-
-    updateSellerToggleUI(
-        true
-    );
-
-
-    updateStatus(
-        "🟢 Tu Punto Verde está activo."
-    );
-
-}
-
-
-/* =========================================================
-   111. BÚSQUEDA DE COMERCIOS
-========================================================= */
-
-function searchCommercialPoints() {
-
-    const query =
-        searchInput
-            ? searchInput.value
-                .trim()
-                .toLowerCase()
-            : "";
-
-
-    const saved =
-        getSavedSellerPoint();
-
-
-    let availablePoints =
-        [];
-
-
-    /*
-       Solo puntos ACTIVOS participan
-       en las búsquedas.
-    */
-
-    if (
-        saved &&
-        saved.active
-    ) {
-
-        availablePoints.push(
-            saved
-        );
-
-    }
-
-
-    if (query) {
-
-        availablePoints =
-            availablePoints.filter(
-                point => {
-
-                    const searchable = [
-
-                        point.product,
-
-                        point.companyName,
-
-                        point.category
-
-                    ]
-                    .filter(Boolean)
-                    .join(" ")
-                    .toLowerCase();
-
-
-                    return searchable.includes(
-                        query
-                    );
-
-                }
-            );
-
-    }
-
-
-    if (userLocation) {
-
-        availablePoints =
-            availablePoints.filter(
-                point => {
-
-                    const distance =
-                        calculateDistanceKm(
-
-                            userLocation.lat,
-
-                            userLocation.lng,
-
-                            Number(
-                                point.lat
-                            ),
-
-                            Number(
-                                point.lng
-                            )
-
-                        );
-
-
-                    return (
-                        distance <=
-                        selectedRadius
-                    );
-
-                }
-            );
-
-    }
-
-
-    commercialPoints =
-        availablePoints;
-
-
-    updateOfferMetrics(
-        availablePoints
-    );
-
-
-    if (!availablePoints.length) {
-
-        updateStatus(
-            query
-                ? "🔎 No encontramos puntos activos para esa búsqueda dentro del rango seleccionado."
-                : "No hay Puntos Verdes activos dentro del rango."
-        );
-
-
-        return;
-
-    }
-
-
-    const point =
-        availablePoints[0];
-
-
-    createSellerPoint(
-        point
-    );
-
-
-    if (
-        sellerMarker
-    ) {
-
-        sellerMarker.openPopup();
-
-    }
-
-
-    updateStatus(
-
-        "🔎 Encontramos " +
-        availablePoints.length +
-        (
-            availablePoints.length === 1
-                ? " Punto Verde."
-                : " Puntos Verdes."
-        )
-
-    );
-
-}
-
-
-/* =========================================================
-   112. MÉTRICAS DE OFERTA / DEMANDA
-========================================================= */
-
-function updateOfferMetrics(
-    points
-) {
-
-    const count =
-        Array.isArray(
-            points
-        )
-            ? points.length
-            : 0;
-
-
-    if (offerText) {
-
-        offerText.textContent =
-            count === 0
-
-                ? "Sin oferta visible"
-
-                : count === 1
-
-                    ? "1 punto activo"
-
-                    : count +
-                      " puntos activos";
-
-    }
-
-
-    /*
-       Por ahora es una señal local del MVP.
-
-       Cuando exista backend multiusuario,
-       esta métrica utilizará demanda real.
-    */
-
-    const demand =
-        Math.min(
-
-            100,
-
-            count *
-            25
-
-        );
-
-
-    if (demandBar) {
-
-        demandBar.style.width =
-            demand +
-            "%";
-
-    }
-
-
-    if (demandText) {
-
-        if (
-            demand >= 75
-        ) {
-
-            demandText.textContent =
-                "ALTA";
-
-        }
-
-        else if (
-            demand >= 35
-        ) {
-
-            demandText.textContent =
-                "MEDIA";
-
-        }
-
-        else {
-
-            demandText.textContent =
-                "BAJA";
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   113. ENCONTRAR PUNTO POR ID
-========================================================= */
-
-function getCommercialPointById(
-    pointId
-) {
-
-    const local =
-        commercialPoints.find(
-            point =>
-                String(
-                    point.id
-                ) ===
-                String(
-                    pointId
-                )
-        );
-
-
-    if (local) {
-
-        return local;
-
-    }
-
-
-    const saved =
-        getSavedSellerPoint();
-
-
-    if (
-        saved &&
-        saved.active &&
-        String(
-            saved.id
-        ) ===
-        String(
-            pointId
-        )
-    ) {
-
-        return saved;
-
-    }
-
-
-    return null;
-
-}
-
-
-/* =========================================================
-   114. IR A ESTE PUNTO
-========================================================= */
-
-function followSellerPoint(
-    pointId
-) {
-
-    const point =
-        getCommercialPointById(
-            pointId
-        );
-
-
-    if (!point) {
-
-        updateStatus(
-            "⚠️ Este Punto Verde ya no está disponible."
-        );
-
-        return;
-
-    }
-
 
     if (!point.active) {
 
+        removeSellerMarker();
+
+        commercialPoints = [];
+
+        updateSellerToggleUI(false);
+
+        updateOfferMetrics([]);
+
         updateStatus(
-            "⚠️ Este Punto Verde está desactivado."
+            "Tu Punto Verde está guardado y desactivado."
         );
 
         return;
-
     }
 
+    createSellerPoint(point);
 
-    startFollowingSeller(
-        point
-    );
-
+    updateSellerToggleUI(true);
 }
 
 
 /* =========================================================
-   115. INICIAR SEGUIMIENTO
-========================================================= */
-
-function startFollowingSeller(
-    point
-) {
-
-    if (
-        !point ||
-        !navigator.geolocation
-    ) {
-
-        updateStatus(
-            "⚠️ Tu navegador no permite seguimiento por ubicación."
-        );
-
-        return;
-
-    }
-
-
-    stopFollowingSeller(
-        false
-    );
-
-
-    followedSellerPoint =
-        point;
-
-
-    updateStatus(
-        "🧭 Preparando ruta hacia el Punto Verde..."
-    );
-
-
-    followWatchId =
-        navigator.geolocation.watchPosition(
-
-            function(position) {
-
-                const buyerLat =
-                    position.coords.latitude;
-
-
-                const buyerLng =
-                    position.coords.longitude;
-
-
-                userLocation = {
-
-                    lat:
-                        buyerLat,
-
-                    lng:
-                        buyerLng
-
-                };
-
-
-                updateUserMarker(
-                    buyerLat,
-                    buyerLng
-                );
-
-
-                updateFollowMap(
-
-                    buyerLat,
-
-                    buyerLng,
-
-                    Number(
-                        point.lat
-                    ),
-
-                    Number(
-                        point.lng
-                    )
-
-                );
-
-            },
-
-
-            function(error) {
-
-                if (
-                    error &&
-                    error.code === 1
-                ) {
-
-                    updateStatus(
-                        "⚠️ Necesitas permitir ubicación para usar IR A ESTE PUNTO."
-                    );
-
-                }
-
-                else {
-
-                    updateStatus(
-                        "⚠️ No pudimos actualizar tu ubicación."
-                    );
-
-                }
-
-            },
-
-
-            {
-
-                enableHighAccuracy:
-                    true,
-
-                maximumAge:
-                    3000,
-
-                timeout:
-                    12000
-
-            }
-
-        );
-
-}
-
-
-/* =========================================================
-   116. ACTUALIZAR MAPA DE SEGUIMIENTO
-========================================================= */
-
-function updateFollowMap(
-    buyerLat,
-    buyerLng,
-    sellerLat,
-    sellerLng
-) {
-
-    if (
-        !map ||
-        typeof L ===
-            "undefined"
-    ) {
-
-        return;
-
-    }
-
-
-    if (!followUserMarker) {
-
-        followUserMarker =
-            L.circleMarker(
-
-                [
-                    buyerLat,
-                    buyerLng
-                ],
-
-                {
-
-                    radius: 7,
-
-                    weight: 2,
-
-                    color:
-                        "#ffffff",
-
-                    fillColor:
-                        "#4f8cff",
-
-                    fillOpacity: 1
-
-                }
-
-            ).addTo(
-                map
-            );
-
-
-        followUserMarker.bindPopup(
-            "Tu posición"
-        );
-
-    }
-
-    else {
-
-        followUserMarker.setLatLng(
-            [
-                buyerLat,
-                buyerLng
-            ]
-        );
-
-    }
-
-
-    if (followLine) {
-
-        try {
-
-            map.removeLayer(
-                followLine
-            );
-
-        }
-
-        catch (error) {
-
-            console.warn(
-                error
-            );
-
-        }
-
-    }
-
-
-    followLine =
-        L.polyline(
-
-            [
-
-                [
-                    buyerLat,
-                    buyerLng
-                ],
-
-                [
-                    sellerLat,
-                    sellerLng
-                ]
-
-            ],
-
-            {
-
-                color:
-                    "#00e86d",
-
-                weight: 3,
-
-                opacity: 0.85,
-
-                dashArray:
-                    "8 8"
-
-            }
-
-        ).addTo(
-            map
-        );
-
-
-    const distance =
-        calculateDistanceKm(
-
-            buyerLat,
-
-            buyerLng,
-
-            sellerLat,
-
-            sellerLng
-
-        );
-
-
-    let distanceText;
-
-
-    if (
-        distance < 1
-    ) {
-
-        distanceText =
-            Math.round(
-                distance *
-                1000
-            ) +
-            " m";
-
-    }
-
-    else {
-
-        distanceText =
-            distance
-                .toFixed(2) +
-            " km";
-
-    }
-
-
-    updateStatus(
-
-        "🧭 Distancia al Punto Verde: <strong>" +
-
-        escapeHTML(
-            distanceText
-        ) +
-
-        "</strong>."
-
-    );
-
-
-    map.fitBounds(
-
-        [
-
-            [
-                buyerLat,
-                buyerLng
-            ],
-
-            [
-                sellerLat,
-                sellerLng
-            ]
-
-        ],
-
-        {
-
-            padding:
-                [60, 60],
-
-            maxZoom: 17
-
-        }
-
-    );
-
-}
-
-
-/* =========================================================
-   117. DETENER SEGUIMIENTO
-========================================================= */
-
-function stopFollowingSeller(
-    showMessage = true
-) {
-
-    if (
-        followWatchId !== null &&
-        navigator.geolocation
-    ) {
-
-        navigator.geolocation.clearWatch(
-            followWatchId
-        );
-
-
-        followWatchId =
-            null;
-
-    }
-
-
-    if (
-        followUserMarker &&
-        map
-    ) {
-
-        try {
-
-            if (
-                map.hasLayer(
-                    followUserMarker
-                )
-            ) {
-
-                map.removeLayer(
-                    followUserMarker
-                );
-
-            }
-
-        }
-
-        catch (error) {
-
-            console.warn(
-                error
-            );
-
-        }
-
-    }
-
-
-    if (
-        followLine &&
-        map
-    ) {
-
-        try {
-
-            if (
-                map.hasLayer(
-                    followLine
-                )
-            ) {
-
-                map.removeLayer(
-                    followLine
-                );
-
-            }
-
-        }
-
-        catch (error) {
-
-            console.warn(
-                error
-            );
-
-        }
-
-    }
-
-
-    followUserMarker = null;
-
-    followLine = null;
-
-    followedSellerPoint = null;
-
-
-    if (showMessage) {
-
-        updateStatus(
-            "🧭 Seguimiento detenido."
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   118. DISTANCIA HAVERSINE
+   146. DISTANCIA HAVERSINE
 ========================================================= */
 
 function calculateDistanceKm(
@@ -11545,225 +10531,323 @@ function calculateDistanceKm(
     lng2
 ) {
 
-    const earthRadiusKm =
-        6371;
+    const toRad = degrees =>
+        degrees * Math.PI / 180;
 
+    const earthRadius = 6371;
 
-    const toRadians =
-        degrees =>
-            degrees *
-            Math.PI /
-            180;
+    const dLat = toRad(lat2 - lat1);
 
-
-    const dLat =
-        toRadians(
-            lat2 -
-            lat1
-        );
-
-
-    const dLng =
-        toRadians(
-            lng2 -
-            lng1
-        );
-
+    const dLng = toRad(lng2 - lng1);
 
     const a =
-
-        Math.sin(
-            dLat / 2
-        ) ** 2 +
-
-        Math.cos(
-            toRadians(
-                lat1
-            )
-        ) *
-
-        Math.cos(
-            toRadians(
-                lat2
-            )
-        ) *
-
-        Math.sin(
-            dLng / 2
-        ) ** 2;
-
-
-    const c =
-        2 *
-        Math.atan2(
-
-            Math.sqrt(a),
-
-            Math.sqrt(
-                1 - a
-            )
-
-        );
-
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLng / 2) ** 2;
 
     return (
-        earthRadiusKm *
-        c
+        2 *
+        earthRadius *
+        Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1 - a)
+        )
     );
-
 }
 
 
 /* =========================================================
-   119. SINCRONIZAR COYOTE CON EMPRESA
+   147. MÉTRICAS DE OFERTA
+
+   MVP LOCAL:
+   Solo se consulta el punto guardado
+   en este navegador.
+
+   Los comercios de otros usuarios
+   requerirán una base de datos.
 ========================================================= */
 
-function syncCompanyWithCoyotePoint() {
+function updateOfferMetrics(points = []) {
 
-    const company =
-        getCurrentCompany();
+    const activePoints = points.filter(
+        point => point && point.active
+    );
 
+    if (offerText) {
 
-    if (!company) {
-
-        return;
-
+        offerText.textContent =
+            `${activePoints.length} comercio${
+                activePoints.length === 1
+                    ? ""
+                    : "s"
+            }`;
     }
 
+    if (demandBar) {
 
-    const point =
-        getSavedSellerPoint();
+        const intensity = Math.min(
+            100,
+            activePoints.length * 20
+        );
 
+        demandBar.style.width =
+            `${intensity}%`;
+    }
+
+    if (demandText) {
+
+        demandText.textContent =
+            activePoints.length
+                ? "Oferta local registrada"
+                : "Sin oferta activa registrada";
+    }
+}
+
+
+/* =========================================================
+   148. BÚSQUEDA DE COMERCIOS
+========================================================= */
+
+function searchCommercialPoints() {
+
+    const query = (
+        searchInput?.value || ""
+    ).trim().toLowerCase();
+
+    const saved = getSavedSellerPoint();
+
+    const available = [];
+
+    if (saved?.active) {
+
+        let insideRadius = true;
+
+        if (userLocation) {
+
+            const distance =
+                calculateDistanceKm(
+                    userLocation.lat,
+                    userLocation.lng,
+                    Number(saved.lat),
+                    Number(saved.lng)
+                );
+
+            insideRadius =
+                distance <= selectedRadius;
+        }
+
+        const searchableText = [
+            saved.product,
+            saved.companyName,
+            saved.category
+        ].join(" ").toLowerCase();
+
+        const matchesQuery =
+            !query ||
+            searchableText.includes(query);
+
+        if (insideRadius && matchesQuery) {
+            available.push(saved);
+        }
+    }
+
+    coyoteSearchResults = available;
+
+    commercialPoints = available;
+
+    updateOfferMetrics(available);
+
+    if (!available.length) {
+
+        updateStatus(
+            "No se encontraron comercios activos con esos criterios."
+        );
+
+        return;
+    }
+
+    const point = available[0];
+
+    updateStatus(
+        `Encontramos ${available.length} comercio activo.`
+    );
+
+    if (map) {
+
+        map.setView(
+            [
+                Number(point.lat),
+                Number(point.lng)
+            ],
+            15
+        );
+
+        if (sellerMarker) {
+            sellerMarker.openPopup();
+        }
+    }
+}
+
+
+/* =========================================================
+   149. SEGUIMIENTO DEL PUNTO
+
+   El seguimiento es voluntario.
+========================================================= */
+
+function stopFollowingSeller(showMessage = true) {
 
     if (
-        !point ||
-        !point.active
+        followWatchId !== null &&
+        navigator.geolocation
     ) {
 
-        return;
-
+        navigator.geolocation.clearWatch(
+            followWatchId
+        );
     }
 
+    followWatchId = null;
 
-    migrateCompanyBusinessData(
-        company
-    );
+    followedSellerPoint = null;
 
+    if (map) {
 
-    company.locationStrength =
-        clamp(
+        if (followUserMarker) {
+            map.removeLayer(followUserMarker);
+        }
 
-            company.locationStrength +
-            3
+        if (followLine) {
+            map.removeLayer(followLine);
+        }
+    }
 
+    followUserMarker = null;
+    followLine = null;
+
+    if (showMessage) {
+
+        updateStatus(
+            "Seguimiento detenido."
+        );
+    }
+}
+
+function updateFollowLine() {
+
+    if (
+        !map ||
+        !userLocation ||
+        !followedSellerPoint
+    ) {
+        return;
+    }
+
+    const coordinates = [
+        [
+            userLocation.lat,
+            userLocation.lng
+        ],
+        [
+            Number(followedSellerPoint.lat),
+            Number(followedSellerPoint.lng)
+        ]
+    ];
+
+    if (!followLine) {
+
+        followLine = L.polyline(
+            coordinates,
+            {
+                color: "#348bff",
+                weight: 3,
+                dashArray: "7 7"
+            }
+        ).addTo(map);
+
+    } else {
+
+        followLine.setLatLngs(coordinates);
+    }
+}
+
+function followSellerPoint() {
+
+    const point = getSavedSellerPoint();
+
+    if (!point?.active) {
+
+        updateStatus(
+            "No hay un Punto Verde activo para seguir."
         );
 
+        return;
+    }
 
-    company.marketKnowledge =
-        clamp(
+    if (!navigator.geolocation) {
 
-            company.marketKnowledge +
-            2
-
+        updateStatus(
+            "Tu navegador no permite seguimiento GPS."
         );
 
+        return;
+    }
 
-    company.value +=
-        15;
+    stopFollowingSeller(false);
 
+    followedSellerPoint = point;
 
-    recalculateCompanyStage(
-        company
-    );
+    followWatchId =
+        navigator.geolocation.watchPosition(
+            position => {
 
+                userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
 
-    addMahpeEvent(
+                updateUserMarker(
+                    userLocation.lat,
+                    userLocation.lng
+                );
 
-        "company",
+                updateFollowLine();
 
-        company.name +
-        " activó presencia comercial en COYOTE.",
+                const distance =
+                    calculateDistanceKm(
+                        userLocation.lat,
+                        userLocation.lng,
+                        Number(point.lat),
+                        Number(point.lng)
+                    );
 
-        company.id
+                updateStatus(
+                    `Distancia al Punto Verde: ${
+                        distance.toFixed(2)
+                    } km`
+                );
 
-    );
+            },
+            error => {
 
+                updateStatus(
+                    "No se pudo actualizar tu ubicación."
+                );
 
-    saveMahpeState();
-
-
-    renderCompanyDashboard();
-
-
-    renderActivityInbox();
-
+                console.warn(error);
+            },
+            {
+                enableHighAccuracy: true,
+                maximumAge: 5000,
+                timeout: 15000
+            }
+        );
 }
 
 
 /* =========================================================
-   120. STATUS COYOTE
-========================================================= */
-
-function updateStatus(
-    message
-) {
-
-    const status =
-        document.getElementById(
-            "status"
-        );
-
-
-    if (!status) {
-
-        return;
-
-    }
-
-
-    status.innerHTML =
-        message;
-
-}
-
-
-/* =========================================================
-   121. REFRESCAR MAPA
-========================================================= */
-
-function refreshCoyoteMap() {
-
-    if (!map) {
-
-        return;
-
-    }
-
-
-    setTimeout(
-        function() {
-
-            map.invalidateSize();
-
-        },
-        80
-    );
-
-
-    setTimeout(
-        function() {
-
-            map.invalidateSize();
-
-        },
-        300
-    );
-
-}
-
-
-/* =========================================================
-   122. EVENTOS COYOTE
+   150. CONECTAR CONTROLES COYOTE
 ========================================================= */
 
 function bindCoyoteEvents() {
@@ -11772,510 +10856,374 @@ function bindCoyoteEvents() {
 
         activateButton.onclick =
             handleSellerToggle;
-
     }
-
 
     if (confirmSellerButton) {
 
         confirmSellerButton.onclick =
             confirmSellerPoint;
-
     }
-
 
     if (searchButton) {
 
         searchButton.onclick =
             searchCommercialPoints;
-
     }
-
 
     if (searchInput) {
 
-        searchInput.addEventListener(
+        searchInput.onkeydown = event => {
 
-            "keydown",
+            if (event.key === "Enter") {
 
-            function(event) {
-
-                if (
-                    event.key ===
-                    "Enter"
-                ) {
-
-                    event.preventDefault();
-
-
-                    searchCommercialPoints();
-
-                }
-
+                event.preventDefault();
+                searchCommercialPoints();
             }
-
-        );
-
+        };
     }
-
 
     initializeRadiusButtons();
-
 }
 
 
 /* =========================================================
-   123. REDIMENSIONAR MAPA
+   151. REPARACIÓN DE ACTIVIDAD COMPACTA
+
+   Se conserva la bandeja expandida
+   al marcar las notificaciones leídas.
 ========================================================= */
 
-window.addEventListener(
-
-    "resize",
-
-    function() {
-
-        const mapView =
-            document.getElementById(
-                "mapView"
-            );
-
-
-        if (
-            mapView &&
-            mapView.classList.contains(
-                "active"
-            )
-        ) {
-
-            refreshCoyoteMap();
-
-        }
-
-    }
-
-);
-
-
-/* =========================================================
-   124. LIMPIEZA AL SALIR
-========================================================= */
-
-window.addEventListener(
-
-    "beforeunload",
-
-    function() {
-
-        stopFollowingSeller(
-            false
-        );
-
-    }
-
-);
-
-
-/* =========================================================
-   125. FUNCIONES DE POPUP / COMPATIBILIDAD
-========================================================= */
-
-window.followSellerPoint =
-    followSellerPoint;
-
-
-window.startFollowingSeller =
-    startFollowingSeller;
-
-
-window.stopFollowingSeller =
-    stopFollowingSeller;
-
-
-window.deactivateSeller =
-    deactivateSeller;
-
-
-window.toggleSellerPresence =
-    toggleSellerPresence;
-
-
-window.handleSellerToggle =
-    handleSellerToggle;
-
-
-window.executeBusinessDecision =
-    executeBusinessDecision;
-
-
-window.openView =
-    openView;
-
-
-window.publishCompanyPost =
-    publishCompanyPost;
-
-
-/* =========================================================
-   126. VALIDAR DOM
-========================================================= */
-
-function validateMahpeDOM() {
-
-    const importantElements = [
-
-        "feedView",
-
-        "feedContainer",
-
-        "mapView",
-
-        "map",
-
-        "createView",
-
-        "companyView",
-
-        "companyDashboard",
-
-        "profileView",
-
-        "walletBalance"
-
-    ];
-
-
-    const missing =
-        importantElements.filter(
-            id =>
-                !document.getElementById(
-                    id
-                )
-        );
-
-
-    if (
-        missing.length
-    ) {
-
-        console.warn(
-
-            "MAHPE: faltan elementos HTML:",
-
-            missing
-
-        );
-
-    }
-
-
-    return missing;
-
-}
-
-
-/* =========================================================
-   127. REPARAR EMPRESA ACTUAL
-========================================================= */
-
-function resolveCurrentCompany() {
-
-    if (
-        currentCompanyId &&
-        mahpeState.companies.some(
-            company =>
-                company.id ===
-                currentCompanyId
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    currentCompanyId =
-        mahpeState.companies.length
-
-            ? mahpeState.companies[0].id
-
-            : null;
-
-}
-
-
-/* =========================================================
-   128. VALIDAR PRODUCTOS HUÉRFANOS
-========================================================= */
-
-function cleanOrphanProducts() {
-
-    if (
-        !Array.isArray(
-            mahpeState.products
-        )
-    ) {
-
-        mahpeState.products = [];
-
-        return;
-
-    }
-
-
-    mahpeState.products =
-        mahpeState.products.filter(
-            product => {
-
-                if (
-                    !product ||
-                    !product.companyId
-                ) {
-
-                    return false;
-
-                }
-
-
-                return mahpeState.companies.some(
-                    company =>
-                        company.id ===
-                        product.companyId
-                );
-
-            }
-        );
-
-}
-
-
-/* =========================================================
-   129. REPARAR POSTS ANTIGUOS
-========================================================= */
-
-function migratePosts() {
-
-    mahpeState.posts.forEach(
-        post => {
-
-            if (
-                typeof post.views !==
-                "number"
-            ) {
-
-                post.views = 0;
-
-            }
-
-
-            if (
-                typeof post.interactions !==
-                "number"
-            ) {
-
-                post.interactions = 0;
-
-            }
-
-
-            if (
-                typeof post.interested !==
-                "number"
-            ) {
-
-                post.interested = 0;
-
-            }
-
-
-            if (
-                typeof post.committed !==
-                "number"
-            ) {
-
-                post.committed = 0;
-
-            }
-
-
-            if (
-                typeof post.productId ===
-                "undefined"
-            ) {
-
-                post.productId =
-                    null;
-
-            }
-
-
-            if (
-                typeof post.image ===
-                "undefined"
-            ) {
-
-                post.image =
-                    null;
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   130. PREPARACIÓN FINAL DEL ESTADO
-========================================================= */
-
-function prepareMahpeState() {
-
-    migrateMahpeBusinessState();
-
-
-    cleanOrphanProducts();
-
-
-    migratePosts();
-
-
-    resolveCurrentCompany();
-
-
-    mahpeState.companies.forEach(
-        company => {
-
-            migrateCompanyBusinessData(
-                company
-            );
-
-
-            recalculateCompanyStage(
-                company
-            );
-
-        }
-    );
-
+function markActivityAsRead() {
+
+    mahpeState.events.forEach(event => {
+        event.read = true;
+    });
 
     saveMahpeState();
 
+    const badge =
+        document.getElementById("activityBadge");
+
+    if (badge) {
+
+        badge.textContent = "0";
+        badge.classList.add("hidden");
+    }
+
+    const inbox =
+        document.getElementById("activityInbox");
+
+    if (inbox) {
+
+        inbox.classList.remove("has-unread");
+    }
 }
 
 
 /* =========================================================
-   131. ARRANQUE MAHPE
+   152. REPARACIÓN DE MÉTRICAS DEL PERFIL
 ========================================================= */
+
+function updateGlobalUI() {
+
+    const mahpes = Number(
+        mahpeState.mahpes || 0
+    ).toLocaleString("es-PE");
+
+    [
+        "mahpesCount",
+        "profileMahpes"
+    ].forEach(id => {
+
+        const element =
+            document.getElementById(id);
+
+        if (element) {
+            element.textContent = mahpes;
+        }
+    });
+
+    const companies =
+        document.getElementById("profileCompanies");
+
+    if (companies) {
+
+        companies.textContent =
+            mahpeState.companies.length;
+    }
+
+    const following =
+        document.getElementById("followingCount");
+
+    if (following) {
+
+        following.textContent =
+            getFollowingCount();
+    }
+}
+
+
+/* =========================================================
+   153. REPARACIÓN DE NAVEGACIÓN
+
+   Compatible con los botones existentes
+   de index.html.
+========================================================= */
+
+function bindMainNavigation() {
+
+    document
+        .querySelectorAll("[data-view]")
+        .forEach(button => {
+
+            if (!button.closest("#mahpeMainNav")) {
+                return;
+            }
+
+            button.onclick = () => {
+
+                const viewId =
+                    button.dataset.view;
+
+                if (!viewId) return;
+
+                openView(viewId);
+            };
+        });
+}
+
+
+/* =========================================================
+   154. INICIALIZAR EMPRESA ACTIVA
+========================================================= */
+
+function initializeCurrentCompany() {
+
+    if (!mahpeState.companies.length) {
+
+        currentCompanyId = null;
+        return;
+    }
+
+    const exists =
+        mahpeState.companies.some(
+            company =>
+                company.id === currentCompanyId
+        );
+
+    if (!exists) {
+
+        currentCompanyId =
+            mahpeState.companies[0].id;
+    }
+}
+
+
+/* =========================================================
+   155. CONECTAR PUBLICADOR EXISTENTE
+========================================================= */
+
+function bindCompanyPublisher() {
+
+    const publishButton =
+        document.getElementById("publishPostButton");
+
+    const postInput =
+        document.getElementById("postTextInput");
+
+    if (!publishButton || !postInput) {
+        return;
+    }
+
+    publishButton.onclick = () => {
+
+        const text = postInput.value.trim();
+
+        if (!text) return;
+
+        const published =
+            publishCompanyPost(text);
+
+        if (published) {
+
+            postInput.value = "";
+
+            currentFeedMode = "explore";
+
+            openView("feedView");
+            renderFeed();
+        }
+    };
+}
+
+
+/* =========================================================
+   156. SINCRONIZACIÓN BÁSICA DE ETAPAS
+========================================================= */
+
+function synchronizeCompanyStages() {
+
+    mahpeState.companies.forEach(company => {
+
+        migrateCompanyBusinessData(company);
+
+        recalculateCompanyStage(company);
+    });
+}
+
+
+/* =========================================================
+   157. INICIALIZACIÓN GENERAL MAHPE
+========================================================= */
+
+let mahpeInitialized = false;
 
 function initializeMahpe() {
 
-    console.log(
-        "MAHPE v1.2: iniciando..."
+    if (mahpeInitialized) {
+        return;
+    }
+
+    mahpeInitialized = true;
+
+    console.info(
+        "MAHPE v2.0 — Inicializando..."
     );
 
-
-    validateMahpeDOM();
-
-
     /*
-       1. Reparar / migrar datos anteriores.
+       1. Estado
     */
 
-    prepareMahpeState();
+    migrateMahpeBusinessState();
 
+    initializeCurrentCompany();
 
     /*
-       2. Feed.
+       2. Navegación
+    */
 
-       IMPORTANTE:
-       ensureFeedShell NO crea botones.
-       Solamente usa los del index.html.
+    bindMainNavigation();
+
+    /*
+       3. Feed
     */
 
     initializeFeedTabs();
 
-
     renderFeed();
-
-
-    /*
-       3. Empresa.
-    */
-
-    renderCompanyDashboard();
-
-
-    /*
-       4. Perfil / wallet / actividad.
-    */
-
-    updateGlobalUI();
-
 
     renderActivityInbox();
 
+    /*
+       4. Empresa
+    */
 
-    bindActivityInbox();
+    bindCompanyCreation();
 
+    bindProductEditorEvents();
+
+    bindCompanyPublisher();
+
+    renderCompanyDashboard();
 
     /*
-       5. COYOTE.
+       5. Perfil
+    */
+
+    updateProfile();
+
+    /*
+       6. COYOTE
     */
 
     bindCoyoteEvents();
 
-
     initializeMap();
 
-
     /*
-       6. La aplicación abre en Inicio.
+       7. Métricas globales
     */
 
-    openView(
-        "feedView"
+    updateGlobalUI();
+
+    console.info(
+        "MAHPE v2.0 — Inicialización completada."
     );
-
-
-    console.log(
-        "MAHPE v1.2: listo."
-    );
-
 }
 
 
 /* =========================================================
-   132. EJECUCIÓN SEGURA
+   158. ARRANQUE ÚNICO
 ========================================================= */
 
-if (
-    document.readyState ===
-    "loading"
-) {
+if (document.readyState === "loading") {
 
     document.addEventListener(
-
         "DOMContentLoaded",
-
         initializeMahpe,
-
-        {
-            once: true
-        }
-
+        { once: true }
     );
 
-}
-
-else {
+} else {
 
     initializeMahpe();
-
 }
 
 
 /* =========================================================
-   FIN MAHPE v1.2
-   FIN PARTE 4/4
-   FIN SCRIPT.JS
+   159. FUNCIONES PÚBLICAS COYOTE
+========================================================= */
+
+window.handleSellerToggle =
+    handleSellerToggle;
+
+window.deactivateSeller =
+    deactivateSeller;
+
+window.confirmSellerPoint =
+    confirmSellerPoint;
+
+window.searchCommercialPoints =
+    searchCommercialPoints;
+
+window.followSellerPoint =
+    followSellerPoint;
+
+window.stopFollowingSeller =
+    stopFollowingSeller;
+
+window.initializeMahpe =
+    initializeMahpe;
+
+
+/* =========================================================
+   FIN BLOQUE 4/4
+
+   MAHPE v2.0
+   Crea. Simula. Haz crecer.
+
+   FUNCIONALIDADES INTEGRADAS:
+
+   - Inicio
+   - Feed
+   - Siguiendo
+   - Descubrir
+   - Tendencias
+   - Señales
+   - Empresas
+   - Productos
+   - Imágenes
+   - Logos
+   - Publicaciones
+   - Estadísticas
+   - Decisiones
+   - Perfil
+   - Foto editable
+   - Recomendaciones
+   - Actividad
+   - Mahpes
+   - COYOTE
+   - Punto Verde ON/OFF
+
+   SIN DINERO REAL.
 ========================================================= */
