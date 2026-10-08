@@ -4496,45 +4496,55 @@ function createCompany() {
 
 
 /* =========================================================
-   60. IDENTIDAD VISUAL
+   60. IDENTIDAD VISUAL — MAHPE
 ========================================================= */
 
-function renderBrandIdentity(
-    company
-) {
+function renderBrandIdentity(company) {
 
     if (!company) {
-
         return "";
-
     }
 
+    const aiTools = [
+        {
+            number: "01",
+            name: "Midjourney",
+            description: "Arte conceptual, moda y creatividad visual.",
+            url: "https://www.midjourney.com/"
+        },
+        {
+            number: "02",
+            name: "ChatGPT Imágenes",
+            description: "Crea, edita y perfecciona tus ideas.",
+            url: "https://chatgpt.com/"
+        },
+        {
+            number: "03",
+            name: "Google Gemini",
+            description: "Genera imágenes e inspira nuevos diseños.",
+            url: "https://gemini.google.com/"
+        },
+        {
+            number: "04",
+            name: "Ideogram",
+            description: "Logotipos, tipografía e identidad de marca.",
+            url: "https://ideogram.ai/"
+        }
+    ];
 
     return `
 
-        <section
-            class="brand-identity-card"
-        >
+        <section class="brand-identity-card">
 
-            <div
-                class="brand-identity-header"
-            >
+            <div class="brand-identity-header">
 
                 <div>
-
-                    <span
-                        class="eyebrow"
-                    >
-                        IDENTIDAD
+                    <span class="eyebrow">
+                        IDENTIDAD VISUAL
                     </span>
 
-
-                    <h3>
-                        Identidad visual
-                    </h3>
-
+                    <h3>Tu marca, tu identidad</h3>
                 </div>
-
 
                 ${renderCompanyAvatar(
                     company,
@@ -4543,63 +4553,63 @@ function renderBrandIdentity(
 
             </div>
 
+            <div class="mahpe-ai-tools">
 
-            <div
-                class="brand-ai-help"
-            >
+                <span class="eyebrow">
+                    LABORATORIO CREATIVO
+                </span>
 
-                <strong>
-                    Crea tu logo con IA:
-                </strong>
+                <h3>
+                    Las 4 mejores IA para crear imágenes
+                </h3>
 
+                <p class="mahpe-ai-description">
+                    Convierte tu imaginación en realidad.
+                    Diseña el logo de tu empresa,
+                    desarrolla conceptos visuales
+                    y transforma tus ideas en imágenes.
+                </p>
 
-                <div
-                    class="brand-ai-links"
-                >
+                <div class="mahpe-ai-grid">
 
-                    <a
-                        href="https://chatgpt.com/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        ChatGPT
-                    </a>
+                    ${aiTools.map(tool => `
 
+                        <a
+                            class="mahpe-ai-link"
+                            href="${tool.url}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
 
-                    <a
-                        href="https://www.canva.com/ai-logo-generator/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Canva
-                    </a>
+                            <span class="mahpe-ai-number">
+                                ${tool.number}
+                            </span>
 
+                            <span class="mahpe-ai-info">
 
-                    <a
-                        href="https://www.adobe.com/express/create/logo"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Adobe Express
-                    </a>
+                                <strong>
+                                    ${tool.name}
+                                </strong>
 
+                                <small>
+                                    ${tool.description}
+                                </small>
 
-                    <a
-                        href="https://looka.com/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Looka
-                    </a>
+                            </span>
+
+                            <span aria-hidden="true">
+                                ↗
+                            </span>
+
+                        </a>
+
+                    `).join("")}
 
                 </div>
 
             </div>
 
-
-            <div
-                class="brand-upload-row"
-            >
+            <div class="brand-upload-row">
 
                 <input
                     id="companyLogoInput"
@@ -4607,7 +4617,6 @@ function renderBrandIdentity(
                     accept="image/*"
                     hidden
                 >
-
 
                 <button
                     class="secondary-button"
@@ -4623,24 +4632,17 @@ function renderBrandIdentity(
 
                 </button>
 
-
                 ${
                     company.brandImage
-
                         ? `
-
                             <button
                                 class="text-button danger"
                                 type="button"
                                 onclick="removeCompanyLogo()"
                             >
-
-                                Quitar
-
+                                Quitar logo
                             </button>
-
                         `
-
                         : ""
                 }
 
@@ -4649,7 +4651,6 @@ function renderBrandIdentity(
         </section>
 
     `;
-
 }
 
 
