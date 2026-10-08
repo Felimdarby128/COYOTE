@@ -7852,3 +7852,60 @@ and (
         font-size: 17px;
     }
 }
+
+/* ==========================================
+   MAHPE — TARJETAS DE MIS EMPRESAS
+========================================== */
+
+.mahpe-profile-companies,
+.mahpe-profile-company-list,
+.mahpe-profile-companies-list {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+}
+
+.mahpe-profile-companies button,
+.mahpe-profile-company-list button,
+.mahpe-profile-companies-list button {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    width: 100%;
+    min-height: 76px;
+    padding: 16px;
+
+    border: 1px solid #26392e;
+    border-radius: 16px;
+
+    background: #111a15;
+    color: #ffffff;
+
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.mahpe-profile-companies button:hover,
+.mahpe-profile-company-list button:hover,
+.mahpe-profile-companies-list button:hover {
+    border-color: #00e86d;
+    background: #17271c;
+}
+
+.mahpe-profile-companies button strong,
+.mahpe-profile-company-list button strong,
+.mahpe-profile-companies-list button strong {
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 850;
+}
+
+.mahpe-profile-companies button small,
+.mahpe-profile-company-list button small,
+.mahpe-profile-companies-list button small {
+    color: #9aa99e;
+    font-size: 11px;
+}
+
