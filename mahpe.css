@@ -7989,3 +7989,148 @@ and (
     font-weight: 600;
 }
 
+/* ==========================================
+   MAHPE — CABECERA DE MI EMPRESA
+========================================== */
+
+.mahpe-company-dashboard {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.mahpe-company-hero {
+    display: block;
+    padding: 0 0 20px;
+    border: 1px solid #25372b;
+    border-radius: 22px;
+    background: #101813;
+    overflow: hidden;
+}
+
+.mahpe-company-cover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 105px;
+    padding: 20px;
+    background: linear-gradient(135deg, #103821, #08130d);
+}
+
+.mahpe-cover-wordmark {
+    color: #d7f8e3;
+    font-size: 23px;
+    font-weight: 900;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+}
+
+.mahpe-company-identity {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 20px 0;
+}
+
+.mahpe-company-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 65px;
+    width: 65px;
+    height: 65px;
+    border: 1px solid #197a43;
+    border-radius: 17px;
+    background: #0c4728;
+    color: #00e86d;
+    font-size: 30px;
+    font-weight: 900;
+    overflow: hidden;
+}
+
+.mahpe-company-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mahpe-company-identity-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.mahpe-company-identity-text h2 {
+    margin: 5px 0;
+    color: #fff;
+    font-size: 23px;
+    font-weight: 900;
+}
+
+.mahpe-company-identity-text p {
+    margin: 0;
+    color: #a9b8ac;
+    font-size: 12px;
+}
+
+.mahpe-company-description {
+    margin: 15px 20px 20px;
+    color: #b6c4b9;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.mahpe-company-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+    margin: 0 20px;
+}
+
+.mahpe-company-stats > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 80px;
+    padding: 12px 6px;
+    border: 1px solid #293b2f;
+    border-radius: 13px;
+    background: #0b120e;
+    text-align: center;
+}
+
+.mahpe-company-stats strong {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 900;
+    overflow-wrap: anywhere;
+}
+
+.mahpe-company-stats span {
+    color: #9bab9e;
+    font-size: 10px;
+}
+
+@media (max-width: 600px) {
+    .mahpe-company-identity {
+        padding: 16px 14px 0;
+    }
+
+    .mahpe-company-description {
+        margin: 14px;
+    }
+
+    .mahpe-company-stats {
+        margin: 0 12px;
+        gap: 6px;
+    }
+
+    .mahpe-company-stats strong {
+        font-size: 14px;
+    }
+}
+
+
