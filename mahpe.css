@@ -7709,3 +7709,146 @@ and (
     background: #090e0b;
     color: white;
 }
+
+/* ==========================================
+   MAHPE — MEJORAS DE MI EMPRESA
+========================================== */
+
+#companyDashboard {
+    width: min(100%, 560px);
+    margin: 0 auto;
+    padding-bottom: 125px;
+}
+
+#companyDashboard h2,
+#companyDashboard h3,
+#companyDashboard h4 {
+    line-height: 1.3;
+}
+
+#companyDashboard button {
+    cursor: pointer;
+}
+
+/* HERRAMIENTAS DE IA */
+
+.mahpe-ai-tools {
+    margin-top: 20px;
+    padding: 22px;
+    border: 1px solid #24372b;
+    border-radius: 20px;
+    background: linear-gradient(
+        145deg,
+        #101b14,
+        #0b100d
+    );
+}
+
+.mahpe-ai-tools h3 {
+    margin: 10px 0;
+    font-size: 19px;
+    font-weight: 900;
+    color: white;
+}
+
+.mahpe-ai-description {
+    margin: 0 0 20px;
+    color: #aab8ad;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.mahpe-ai-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.mahpe-ai-link {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 68px;
+    padding: 13px;
+    border: 1px solid #26392d;
+    border-radius: 14px;
+    background: #141d17;
+    color: white;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.mahpe-ai-link:hover {
+    border-color: #00e86d;
+    background: #192b1e;
+    transform: translateY(-2px);
+}
+
+.mahpe-ai-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 37px;
+    height: 37px;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: #10331f;
+    color: #00e86d;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.mahpe-ai-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+
+.mahpe-ai-info strong {
+    font-size: 13px;
+    font-weight: 850;
+}
+
+.mahpe-ai-info small {
+    color: #8f9e93;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.mahpe-ai-link > span:last-child {
+    color: #00e86d;
+    font-size: 20px;
+}
+
+/* ESPACIADO EMPRESARIAL */
+
+#companyDashboard section {
+    margin-bottom: 18px;
+}
+
+#companyDashboard .eyebrow {
+    display: block;
+    margin-bottom: 9px;
+}
+
+#companyDashboard p {
+    line-height: 1.6;
+}
+
+/* ADAPTACIÓN MÓVIL */
+
+@media (max-width: 600px) {
+    #companyDashboard {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .mahpe-ai-tools {
+        padding: 17px;
+    }
+
+    .mahpe-ai-tools h3 {
+        font-size: 17px;
+    }
+}
